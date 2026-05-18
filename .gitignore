@@ -34,3 +34,36 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# =========================
+# PYTHON & FASTAPI (BACKEND)
+# =========================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+/api-service/venv/
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local database (If using SQLite locally at some point)
+*.sqlite3
+
+# Uploaded Files (PDFs uploaded by teachers)
+/api-service/uploads/
+/uploads/
+
+# =========================
+# IDE & OS SETTINGS
+# =========================
+.vscode/
+.idea/
+*.swp
