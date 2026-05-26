@@ -1,0 +1,184 @@
+// ===========================================================
+// prisma/schema.prisma
+// Database: PostgreSQL 16
+// ORM: Prisma ORM
+// ===========================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================================
+// Enums
+// ===========================================================
+
+enum UserRole {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+}
+
+enum MaterialType {
+  PDF
+  VIDEO
+  LINK
+  OTHER
+}
+
+// ===========================================================
+// Models
+// ===========================================================
+
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  hashedPassword String
+  fullName       String
+  role           UserRole @default(STUDENT)
+  avatarUrl      String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  courses     Course[]     @relation("TeacherCourses")
+  enrollments Enrollment[] @relation("StudentEnrollments")
+  chatThreads ChatThread[] @relation("StudentChatThreads")
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Course {
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  thumbnailUrl String?
+  teacherId    String
+  aiEnabled    Boolean  @default(false)
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  teacher     User         @relation("TeacherCourses", fields: [teacherId], references: [id], onDelete: Cascade)
+  modules     Module[]     @relation("CourseModules")
+  enrollments Enrollment[] @relation("CourseEnrollments")
+  chatThreads ChatThread[] @relation("CourseChatThreads")
+
+  @@index([teacherId])
+  @@index([isPublished])
+  @@map("courses")
+}
+
+model Module {
+  id          String   @id @default(uuid())
+  courseId    String
+  title       String
+  description String?
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  course  Course   @relation("CourseModules", fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[] @relation("ModuleLessons")
+
+  @@index([courseId])
+  @@map("modules")
+}
+
+model Lesson {
+  id         String   @id @default(uuid())
+  moduleId   String
+  title      String
+  content    String?
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  module    Module     @relation("ModuleLessons", fields: [moduleId], references: [id], onDelete: Cascade)
+  materials Material[] @relation("LessonMaterials")
+
+  @@index([moduleId])
+  @@map("lessons")
+}
+
+model Material {
+  id            String       @id @default(uuid())
+  lessonId      String
+  title         String
+  materialType  MaterialType @default(PDF)
+  fileUrl       String
+  fileSizeBytes BigInt?
+  geminiFileUri String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  lesson Lesson @relation("LessonMaterials", fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+  @@map("materials")
+}
+
+model Enrollment {
+  id         String           @id @default(uuid())
+  studentId  String
+  courseId   String
+  status     EnrollmentStatus @default(ACTIVE)
+  enrolledAt DateTime         @default(now())
+
+  // Relations
+  student User   @relation("StudentEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course @relation("CourseEnrollments", fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+  @@index([studentId])
+  @@index([courseId])
+  @@map("enrollments")
+}
+
+model ChatThread {
+  id        String   @id @default(uuid())
+  studentId String
+  courseId  String
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  student  User          @relation("StudentChatThreads", fields: [studentId], references: [id], onDelete: Cascade)
+  course   Course        @relation("CourseChatThreads", fields: [courseId], references: [id], onDelete: Cascade)
+  messages ChatMessage[] @relation("ThreadMessages")
+
+  @@index([studentId, courseId])
+  @@map("chat_threads")
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  threadId  String
+  role      String   // "user" | "model" — matches Gemini API role names
+  content   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  thread ChatThread @relation("ThreadMessages", fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@map("chat_messages")
+}
