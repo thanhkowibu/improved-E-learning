@@ -1,0 +1,411 @@
+# Architecture Decisions — LearnAI LMS
+
+> This document records significant architectural and security decisions made
+> during development. Each entry captures the **context**, the **decision**, and
+> the **rationale** — intended to support academic analysis of the system design.
+
+---
+
+## ADR-001 · Shift from Frontend-Driven Security to Zero Trust / Defense in Depth
+
+**Date:** 2026-05-27  
+**Phase:** 2C (Module CRUD) → Security Patch  
+**Status:** Adopted
+
+### Context
+
+During Phase 2C, the initial implementation of `GET /api/courses/:courseId/modules`
+contained the following comment — and the corresponding logic:
+
+```ts
+// Auth is optional for GET — let the course-level visibility rules
+// in getCourseById govern access.
+```
+
+This delegated the access decision for the **module** endpoint to the
+**course** endpoint. The assumption was: *"If a user can reach the module
+list, they must have already passed the course visibility check."*
+
+This is a **Frontend-Driven Security** pattern — it assumes the client
+(browser or app) will always call the course endpoint before calling the
+module endpoint, and that the course endpoint's 404/403 response will
+prevent the user from ever having a module URL to call.
+
+### The Vulnerability
+
+A direct API call bypasses the assumed call order entirely:
+
+```
+GET /api/courses/unpublished-course-id/modules
+→ HTTP 200 OK  ← full module tree exposed to unauthenticated callers
+```
+
+Any person with a valid `courseId` (obtained from a database leak, a URL
+share, or enumeration) could extract the full module/lesson structure of
+a draft course without authentication.
+
+### Decision: Zero Trust Architecture at Every Endpoint
+
+Every route handler **independently enforces** its own access policy.
+No endpoint assumes that a prior request validated authorization.
+
+The fix adds a **publication gate** directly to every module GET handler:
+
+```ts
+const course = await fetchCourseGate(courseId);   // minimal 2-column SELECT
+if (!course.isPublished) {
+  const caller = await getAuthUser(request);       // may throw AuthError
+  if (!isOwner && !isAdmin) {
+    return notFound("Course not found or not yet published.");
+  }
+}
+```
+
+The same pattern is applied consistently across the entire API surface:
+
+| Endpoint | Publication Gate | Auth Gate |
+|---|---|---|
+| `GET /api/courses/:id` | ✅ Independent | ✅ Independent |
+| `GET /api/courses/:id/modules` | ✅ Independent | ✅ Independent |
+| `GET /api/courses/:id/modules/:id` | ✅ Independent | ✅ Independent |
+| `GET /api/lessons/:id` | ✅ Independent | ✅ Independent |
+
+### Prisma Query Optimisation
+
+The naïve implementation would re-fetch the full course object (all columns)
+for every request. Instead, we use a **minimal projection** — a helper called
+`fetchCourseGate` that selects exactly two columns:
+
+```ts
+// Before (hypothetical naïve version): all columns transferred per row
+const course = await prisma.course.findUnique({ where: { id: courseId } });
+
+// After: 2 columns only — isPublished and teacherId
+async function fetchCourseGate(courseId: string) {
+  return prisma.course.findUnique({
+    where: { id: courseId },
+    select: { isPublished: true, teacherId: true },
+  });
+}
+```
+
+**Why this matters:**
+- The `description` and potential future `content` fields on a course can
+  be large. Selecting only the gate fields keeps the check lightweight.
+- The Prisma `select` clause translates directly to a SQL column projection:
+  `SELECT is_published, teacher_id FROM courses WHERE id = $1`
+- This check runs on **every GET request** to a module endpoint, so
+  minimising its cost is important for throughput.
+- The `fetchCourseGate` function is intentionally **not shared** across
+  route files — each file is self-contained and independently auditable,
+  which is itself a Zero Trust principle (no implicit trust in shared state).
+
+### 404 instead of 403 for Unpublished Resources
+
+Returning `403 Forbidden` when an unauthenticated caller hits an unpublished
+course would **confirm the course exists**. This enables enumeration attacks:
+a bot could systematically probe UUIDs and use the 403/404 distinction to
+map out the database.
+
+The decision is to **always return 404** for unpublished resources accessed
+by non-owners. This is the same pattern used by platforms such as GitHub
+(private repositories return 404, not 403, to unauthenticated callers).
+
+### Key Design & Optimisation Decisions Summary
+
+| Property | Frontend-Driven Security (before) | Zero Trust (adopted) |
+|---|---|---|
+| Access decision location | Client call order assumed | Each route handler independently |
+| Failure mode | One bypass = full exposure | Each layer fails independently |
+| API testability | Only testable via browser flow | Each endpoint testable in isolation |
+| Audit surface | Implicit, distributed across call chain | Explicit, co-located with each route |
+| Prisma query cost per gate check | Full row fetch (all columns) | 2-column `SELECT` projection |
+| Response for non-owner on unpublished | `403 Forbidden` (leaks existence) | `404 Not Found` (prevents enumeration) |
+| Inter-endpoint dependency | High — modules trust course endpoint | None — each route is self-sufficient |
+
+---
+
+## ADR-002 · JWT Dual-Delivery Strategy (localStorage + HTTP-only Cookie)
+
+**Date:** 2026-05-20  
+**Phase:** 1B (Authentication)  
+**Status:** Adopted
+
+### Context
+
+JWTs can be stored in `localStorage` (accessible by JS) or HTTP-only cookies
+(inaccessible by JS, sent automatically by the browser).
+
+Each has trade-offs:
+
+| | localStorage | HTTP-only Cookie |
+|---|---|---|
+| XSS risk | **High** — JS can read it | **None** — browser protects it |
+| CSRF risk | None — not auto-sent | Mitigated by `SameSite=Lax` |
+| Works for API clients (curl, mobile) | ✅ Yes | ❌ No — not auto-sent |
+| Works for Next.js middleware (Edge) | ❌ No — no browser | ✅ Yes |
+
+### Decision: Both
+
+The login endpoint writes the JWT to **both**:
+
+1. **HTTP-only `SameSite=Lax` cookie** (`auth_token`) — consumed by Next.js
+   middleware for SSR route protection (Edge Runtime has no `localStorage`).
+2. **Response body** (`data.accessToken`) — stored in `localStorage` by the
+   `AuthContext`, consumed by the `fetch` client for all API calls via the
+   `Authorization: Bearer` header.
+
+The `getAuthUser` helper checks the `Authorization` header first, then falls
+back to the cookie — supporting both API clients and browser clients with one
+implementation.
+
+The cookie TTL and JWT expiry are set to the same value (7 days) to prevent
+a state where the cookie is still valid after the JWT has expired.
+
+---
+
+## ADR-003 · Service Layer Pattern (No Direct Prisma in Route Handlers)
+
+**Date:** 2026-05-20  
+**Phase:** 2A (User Management)  
+**Status:** Adopted
+
+### Decision
+
+All database operations are encapsulated in `lib/services/*.service.ts` files.
+Route handlers call service functions — they never import `prisma` directly
+(with the exception of the lightweight `fetchCourseGate` gate check, which is
+intentionally kept inline for auditability).
+
+### Rationale
+
+| Concern | Without Service Layer | With Service Layer |
+|---|---|---|
+| Reuse | Prisma queries duplicated across routes | One source of truth per operation |
+| Testing | Must spin up HTTP server to test DB logic | Service functions are unit-testable |
+| Password leakage | Must remember `omit` in every route | `omit: { hashedPassword: true }` enforced once in service |
+| Ownership check | Duplicated `where: { id, teacherId }` across routes | Centralised in `check-ownership.ts` |
+
+---
+
+## ADR-004 · orderIndex Auto-Calculation (Append-by-Default)
+
+**Date:** 2026-05-26  
+**Phase:** 2C/2D (Module & Lesson CRUD)  
+**Status:** Adopted
+
+### Decision
+
+When creating a module or lesson, `orderIndex` is **not accepted from the
+client**. The server calculates it as `max(existing orderIndex) + 1`:
+
+```ts
+const aggregate = await prisma.module.aggregate({
+  where: { courseId },
+  _max: { orderIndex: true },
+});
+const nextOrder = (aggregate._max.orderIndex ?? -1) + 1;
+```
+
+Explicit reordering is a separate operation (`PUT /modules` with `{ orderedIds }`),
+executed atomically via `prisma.$transaction`.
+
+### Rationale
+
+- Prevents race conditions where two simultaneous POST requests claim the
+  same `orderIndex` (at the cost of potential gaps, which are harmless).
+- The client never needs to track current ordering state during creation.
+- Bulk reorder via ordered IDs array is a clean, idempotent interface that
+  maps naturally to drag-and-drop UI interactions.
+
+---
+
+## ADR-005 · Zod v4 Migration (required_error → error, .errors → .issues)
+
+**Date:** 2026-05-20  
+**Phase:** 1B  
+**Status:** Adopted
+
+### Context
+
+The project uses Zod **v4.4.3**. Two breaking API changes from v3 affect
+all validation schemas and error handlers:
+
+| v3 API | v4 API | Location |
+|---|---|---|
+| `z.string({ required_error: "..." })` | `z.string({ error: "..." })` | All schema files |
+| `ZodError.errors` | `ZodError.issues` | All route handlers |
+
+All schemas and route handlers in this project use the v4 API exclusively.
+The `RegisterInput` / `RegisterOutput` split (using `z.input<>` vs `z.output<>`)
+was introduced to handle the `role` field's `.default("STUDENT")` making it
+optional in the input type but required in the output — a common Zod v4
+pattern for forms with default values.
+
+---
+
+## ADR-006 · Storage Adapter Pattern + Native Web API for File Uploads
+
+**Date:** 2026-05-27  
+**Phase:** 2E (Material Upload & Management)  
+**Status:** Adopted
+
+### Context
+
+File upload in Next.js App Router can be implemented via:
+
+1. **Legacy Node.js middleware** — `multer`, `formidable`, `busboy` + `next-connect`
+2. **Native Web API** — `request.formData()` (built into the Fetch API / WinterCG)
+
+Additionally, file storage can be implemented inline (direct `fs.writeFile` in a
+route handler) or via an abstraction layer.
+
+### Decision A: Native Web API (`request.formData()`)
+
+All file parsing uses the native `request.formData()` method. No third-party
+upload middleware is used.
+
+**Why:**
+
+| Concern | multer / next-connect | Native `request.formData()` |
+|---|---|---|
+| Compatibility | Designed for Express — requires wrappers in App Router | First-class in Next.js App Router |
+| Edge Runtime | Not compatible | Fully compatible |
+| Dependencies | +2 packages, CommonJS assumptions | Zero new dependencies |
+| Maintenance | Separate ecosystem from Next.js | Maintained by Next.js / WinterCG spec |
+| File object type | `multer.File` (Buffer, non-standard) | Web `File` object (WHATWG standard) |
+
+The `File` object from `formData.get("file")` exposes `.arrayBuffer()`, `.size`,
+`.name`, and `.type` — all the fields needed for validation and storage, with
+no transformation layer required.
+
+### Decision B: Storage Adapter Pattern
+
+All physical file I/O is encapsulated in `lib/services/storage.service.ts`.
+Route handlers never import `fs` directly.
+
+**Current implementation** (local filesystem):
+
+```
+uploadFile(file, lessonId) → writes to public/uploads/<lessonId>/<uuid>-<name>
+deleteFile(fileUrl)        → unlinks from public/uploads/...
+resolveFilePath(fileUrl)   → maps /uploads/... → absolute path for streaming
+```
+
+**Future swap to AWS S3 — zero route handler changes required:**
+
+```ts
+// Only storage.service.ts changes — all callers are unaffected
+export async function uploadFile(file: File, lessonId: string): Promise<UploadResult> {
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const key = `uploads/${lessonId}/${randomUUID()}-${sanitiseFilename(file.name)}`;
+  await s3.send(new PutObjectCommand({ Bucket: BUCKET, Key: key, Body: buffer }));
+  return { fileUrl: `https://${BUCKET}.s3.amazonaws.com/${key}`, ... };
+}
+```
+
+### Key Design & Optimisation Decisions
+
+| Decision | Choice Made | Rationale |
+|---|---|---|
+| Upload parsing | `request.formData()` (Web API) | App Router native, Edge-compatible, zero new dependencies |
+| Middleware | None | multer / next-connect require Express-compatible wrappers |
+| Storage namespacing | `public/uploads/<lessonId>/` | Prevents filename collisions across lessons |
+| Filename safety | UUID prefix + non-ASCII sanitisation | Prevents path traversal and OS-unsafe character vulnerabilities |
+| File size check | `file.size` before write | Fails fast — no partial disk I/O for oversized files |
+| MIME type validation | `ALLOWED_MIME_TYPES` allowlist before write | Prevents upload of executables (`.sh`, `.exe`, `.php`) |
+| DB-write failure | Orphan file deleted (compensation transaction) | Keeps storage and DB consistent on any failure path |
+| Deletion order | Physical file first, then DB record | Orphan DB record is recoverable; a missing file with a live record is not |
+| Download route | API route (`/api/materials/.../download`) | Enables auth gating, audit logging, and future presigned URL swap |
+| Path traversal guard | `absolutePath.startsWith(UPLOADS_ROOT)` | Prevents `../../etc/passwd`-style attacks on resolveFilePath and deleteFile |
+| Future storage swap scope | Only `storage.service.ts` | Route handlers, services, validation, and tests require no changes |
+
+---
+
+## ADR-007 · BigInt JSON Serialization — Global Prototype Patch
+
+**Date:** 2026-05-27  
+**Phase:** 2E (Material Upload) — Post-implementation Bug Fix  
+**Status:** Adopted
+
+### The Problem: Why BigInt Cannot Be Serialized by Default
+
+JavaScript's `JSON.stringify` (and therefore `NextResponse.json()`) throws
+a `TypeError` when it encounters a native `BigInt` value:
+
+```
+TypeError: Do not know how to serialize a BigInt
+```
+
+**Root cause — two mismatched specifications:**
+
+1. **The JSON specification (RFC 8259)** defines numbers as IEEE 754 double-precision
+   floats. The maximum safe integer representable is `2^53 − 1 ≈ 9×10¹⁵`.
+2. **BigInt** was introduced in ES2020 to represent arbitrarily large integers —
+   values that *cannot* be safely round-tripped through a JSON number.
+3. **V8 (Node.js engine) deliberately omits a default** `.toJSON()` on BigInt
+   to force developers to consciously decide on a serialization strategy, rather
+   than silently losing precision.
+
+**Why does Prisma produce BigInt?**
+
+Prisma maps PostgreSQL's `BigInt` column type directly to JavaScript's native
+`BigInt` primitive. Our `Material.fileSizeBytes` field is declared `BigInt?`
+in `schema.prisma` because file sizes can theoretically exceed `2^31` bytes
+(standard 32-bit `Int` max ≈ 2 GB) — a reasonable choice for a media platform.
+
+### The Fix: `BigInt.prototype.toJSON`
+
+`JSON.stringify` calls `.toJSON()` on a value *before* serializing it, if the
+method exists. By patching the prototype once, every BigInt in every response
+is handled automatically:
+
+```ts
+// lib/prisma.ts
+BigInt.prototype.toJSON = function (): string {
+  return this.toString();
+};
+```
+
+**Why stringify as a string, not a number?**
+
+Converting `98360n` → `98360` (number) would appear to work for small values but
+would silently truncate large values (e.g. a 10 GB file: `10_737_418_240n` exceeds
+`Number.MAX_SAFE_INTEGER` and would be corrupted in transit). Converting to a
+**string** is always safe and the client can parse it with `BigInt(value)` when
+arithmetic is needed.
+
+### Why a Global Prototype Patch vs. Per-Route Casting
+
+Three alternative approaches were considered:
+
+| Approach | Example | Assessment |
+|---|---|---|
+| **Per-route casting** | `Number(material.fileSizeBytes)` | Precision loss for large files; must be applied in every single route handler — fragile, easy to forget |
+| **Service-layer transform** | Map `BigInt` → `string` in every service return | Requires custom transform types; breaks Prisma's auto-generated types |
+| **Custom JSON replacer** | `JSON.stringify(data, (_, v) => typeof v === 'bigint' ? v.toString() : v)` | Must be threaded through every `NextResponse.json()` call — not compatible with the existing `ok/created/...` response helpers |
+| **Global `BigInt.prototype.toJSON` patch** ✅ | Applied once in `lib/prisma.ts` | Zero per-route code, works with all existing response helpers, self-documenting, TypeScript-safe via `declare global` |
+
+### Placement Decision
+
+The patch lives in `lib/prisma.ts` rather than `instrumentation.ts` or a
+custom `_app.tsx` for two reasons:
+
+1. **Guaranteed early execution** — every database-touching module imports
+   `lib/prisma.ts`, so the patch is always applied before any BigInt value
+   could reach a response serializer.
+2. **Co-location with the root cause** — BigInt values enter our system
+   exclusively via Prisma's type mapping. Having the fix immediately adjacent
+   to the Prisma client instantiation makes the relationship self-documenting
+   and easy to find during future audits.
+
+### Key Design & Optimisation Decisions
+
+| Decision | Choice | Rationale |
+|---|---|---|
+| Serialization format | `BigInt` → `string` | Prevents IEEE 754 precision loss for values > 2^53 |
+| Patch location | `lib/prisma.ts` (module-level, runs once) | Guaranteed execution before any response; co-located with root cause |
+| Patch mechanism | `BigInt.prototype.toJSON` | Hooks into `JSON.stringify`'s built-in `.toJSON()` protocol — zero changes to callers |
+| TypeScript support | `declare global { interface BigInt { toJSON(): string } }` | Eliminates TS2339 "property does not exist" error on the prototype assignment |
+| Scope | Process-global, applies to all BigInt values | One fix covers all current and future Prisma models with BigInt columns |
+| Alternative rejected | Per-route `Number()` cast | Silent precision loss for large values; repeated boilerplate in every route |

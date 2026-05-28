@@ -112,64 +112,64 @@
 
 ### 2A — User Management
 
-- [ ] **[Next.js API]** Create Zod validation schemas (`lib/validations/user.ts` — `userUpdateSchema`, etc.)
-- [ ] **[Next.js API]** Create user service module (`lib/services/user.service.ts` — `getUserById`, `getAllUsers`, `updateUser`, `deactivateUser` using PrismaClient)
-- [ ] **[Next.js API]** Implement `GET /api/users` route handler (`app/api/users/route.ts`) — ADMIN only, paginated
-- [ ] **[Next.js API]** Implement `GET /api/users/[userId]` route handler (`app/api/users/[userId]/route.ts`) — ADMIN or self
-- [ ] **[Next.js API]** Implement `PATCH /api/users/[userId]` route handler — ADMIN or self, Zod validated
-- [ ] **[Next.js API]** Implement `DELETE /api/users/[userId]` route handler — ADMIN only, soft-delete (`isActive = false`)
+- [x] **[Next.js API]** Create Zod validation schemas (`lib/validations/user.ts` — `userUpdateSchema`, etc.)
+- [x] **[Next.js API]** Create user service module (`lib/services/user.service.ts` — `getUserById`, `getAllUsers`, `updateUser`, `deactivateUser` using PrismaClient)
+- [x] **[Next.js API]** Implement `GET /api/users` route handler (`app/api/users/route.ts`) — ADMIN only, paginated
+- [x] **[Next.js API]** Implement `GET /api/users/[userId]` route handler (`app/api/users/[userId]/route.ts`) — ADMIN or self
+- [x] **[Next.js API]** Implement `PATCH /api/users/[userId]` route handler — ADMIN or self, Zod validated
+- [x] **[Next.js API]** Implement `DELETE /api/users/[userId]` route handler — ADMIN only, soft-delete (`isActive = false`)
 
 ### 2B — Course CRUD
 
-- [ ] **[Next.js API]** Create Zod validation schemas (`lib/validations/course.ts` — `courseCreateSchema`, `courseUpdateSchema`)
-- [ ] **[Next.js API]** Create course service module (`lib/services/course.service.ts` — CRUD operations with Prisma `include` for nested relations)
-- [ ] **[Next.js API]** Implement `POST /api/courses` route handler (`app/api/courses/route.ts`) — TEACHER/ADMIN, creates course with `teacherId` from auth
-- [ ] **[Next.js API]** Implement `GET /api/courses` route handler — public (published only) / TEACHER (own) / ADMIN (all), paginated, searchable
-- [ ] **[Next.js API]** Implement `GET /api/courses/[courseId]` route handler (`app/api/courses/[courseId]/route.ts`) — with nested modules/lessons tree using Prisma `include`
-- [ ] **[Next.js API]** Implement `PATCH /api/courses/[courseId]` route handler — owner/ADMIN, Zod validated
-- [ ] **[Next.js API]** Implement `DELETE /api/courses/[courseId]` route handler — owner/ADMIN, Prisma cascade delete
-- [ ] **[Next.js API]** Create ownership validation helper (`lib/auth/check-ownership.ts`) for course operations
+- [x] **[Next.js API]** Create Zod validation schemas (`lib/validations/course.ts` — `courseCreateSchema`, `courseUpdateSchema`)
+- [x] **[Next.js API]** Create course service module (`lib/services/course.service.ts` — CRUD operations with Prisma `include` for nested relations)
+- [x] **[Next.js API]** Implement `POST /api/courses` route handler (`app/api/courses/route.ts`) — TEACHER/ADMIN, creates course with `teacherId` from auth
+- [x] **[Next.js API]** Implement `GET /api/courses` route handler — public (published only) / TEACHER (own) / ADMIN (all), paginated, searchable
+- [x] **[Next.js API]** Implement `GET /api/courses/[courseId]` route handler (`app/api/courses/[courseId]/route.ts`) — with nested modules/lessons tree using Prisma `include`
+- [x] **[Next.js API]** Implement `PATCH /api/courses/[courseId]` route handler — owner/ADMIN, Zod validated
+- [x] **[Next.js API]** Implement `DELETE /api/courses/[courseId]` route handler — owner/ADMIN, Prisma cascade delete
+- [x] **[Next.js API]** Create ownership validation helper (`lib/auth/check-ownership.ts`) for course operations
 
 ### 2C — Module CRUD
 
-- [ ] **[Next.js API]** Create Zod validation schemas (`lib/validations/module.ts`)
-- [ ] **[Next.js API]** Create module service module (`lib/services/module.service.ts`)
-- [ ] **[Next.js API]** Implement `POST /api/courses/[courseId]/modules` route handler (`app/api/courses/[courseId]/modules/route.ts`)
-- [ ] **[Next.js API]** Implement `GET /api/courses/[courseId]/modules` route handler
-- [ ] **[Next.js API]** Implement `PATCH /api/courses/[courseId]/modules/[moduleId]` route handler (`app/api/courses/[courseId]/modules/[moduleId]/route.ts`)
-- [ ] **[Next.js API]** Implement `DELETE /api/courses/[courseId]/modules/[moduleId]` route handler
-- [ ] **[Next.js API]** Handle `orderIndex` reordering logic in module service
+- [x] **[Next.js API]** Create Zod validation schemas (`lib/validations/module.ts`)
+- [x] **[Next.js API]** Create module service module (`lib/services/module.service.ts`)
+- [x] **[Next.js API]** Implement `POST /api/courses/[courseId]/modules` route handler (`app/api/courses/[courseId]/modules/route.ts`)
+- [x] **[Next.js API]** Implement `GET /api/courses/[courseId]/modules` route handler
+- [x] **[Next.js API]** Implement `PATCH /api/courses/[courseId]/modules/[moduleId]` route handler (`app/api/courses/[courseId]/modules/[moduleId]/route.ts`)
+- [x] **[Next.js API]** Implement `DELETE /api/courses/[courseId]/modules/[moduleId]` route handler
+- [x] **[Next.js API]** Handle `orderIndex` reordering logic in module service
 
 ### 2D — Lesson CRUD
 
-- [ ] **[Next.js API]** Create Zod validation schemas (`lib/validations/lesson.ts`)
-- [ ] **[Next.js API]** Create lesson service module (`lib/services/lesson.service.ts`)
-- [ ] **[Next.js API]** Implement `POST /api/modules/[moduleId]/lessons` route handler (`app/api/modules/[moduleId]/lessons/route.ts`)
-- [ ] **[Next.js API]** Implement `GET /api/modules/[moduleId]/lessons` route handler
-- [ ] **[Next.js API]** Implement `GET /api/lessons/[lessonId]` route handler (`app/api/lessons/[lessonId]/route.ts`) — with materials via Prisma `include`
-- [ ] **[Next.js API]** Implement `PATCH /api/lessons/[lessonId]` route handler
-- [ ] **[Next.js API]** Implement `DELETE /api/lessons/[lessonId]` route handler
+- [x] **[Next.js API]** Create Zod validation schemas (`lib/validations/lesson.ts`)
+- [x] **[Next.js API]** Create lesson service module (`lib/services/lesson.service.ts`)
+- [x] **[Next.js API]** Implement `POST /api/modules/[moduleId]/lessons` route handler (`app/api/modules/[moduleId]/lessons/route.ts`)
+- [x] **[Next.js API]** Implement `GET /api/modules/[moduleId]/lessons` route handler
+- [x] **[Next.js API]** Implement `GET /api/lessons/[lessonId]` route handler (`app/api/lessons/[lessonId]/route.ts`) — with materials via Prisma `include`
+- [x] **[Next.js API]** Implement `PATCH /api/lessons/[lessonId]` route handler
+- [x] **[Next.js API]** Implement `DELETE /api/lessons/[lessonId]` route handler
 
 ### 2E — Material Upload & Management
 
-- [ ] **[Next.js API]** Configure file storage (local `./public/uploads/` directory for dev, S3-compatible for production)
-- [ ] **[Next.js API]** Create Zod validation schemas (`lib/validations/material.ts`)
-- [ ] **[Next.js API]** Create material service module (`lib/services/material.service.ts`)
-- [ ] **[Next.js API]** Implement `POST /api/lessons/[lessonId]/materials/upload` route handler (`app/api/lessons/[lessonId]/materials/upload/route.ts`) — parse `FormData` with `request.formData()`, validate file type & size, write to disk with `fs.writeFile`, create Prisma record
-- [ ] **[Next.js API]** Implement `GET /api/lessons/[lessonId]/materials` route handler
-- [ ] **[Next.js API]** Implement `GET /api/materials/[materialId]/download` route handler (`app/api/materials/[materialId]/download/route.ts`) — stream file with `ReadableStream` or `NextResponse` with appropriate content headers
-- [ ] **[Next.js API]** Implement `DELETE /api/materials/[materialId]` route handler — remove file from disk (`fs.unlink`) + delete Prisma record
-- [ ] **[Next.js API]** Add file size and type validation middleware (max 50MB, allowed extensions: `.pdf`, `.mp4`, `.docx`, etc.)
+- [x] **[Next.js API]** Configure file storage (local `./public/uploads/` directory for dev, S3-compatible for production)
+- [x] **[Next.js API]** Create Zod validation schemas (`lib/validations/material.ts`)
+- [x] **[Next.js API]** Create material service module (`lib/services/material.service.ts`)
+- [x] **[Next.js API]** Implement `POST /api/lessons/[lessonId]/materials/upload` route handler (`app/api/lessons/[lessonId]/materials/upload/route.ts`) — parse `FormData` with `request.formData()`, validate file type & size, write to disk with `fs.writeFile`, create Prisma record
+- [x] **[Next.js API]** Implement `GET /api/lessons/[lessonId]/materials` route handler
+- [x] **[Next.js API]** Implement `GET /api/materials/[materialId]/download` route handler (`app/api/materials/[materialId]/download/route.ts`) — stream file with `ReadableStream` or `NextResponse` with appropriate content headers
+- [x] **[Next.js API]** Implement `DELETE /api/materials/[materialId]` route handler — remove file from disk (`fs.unlink`) + delete Prisma record
+- [x] **[Next.js API]** Add file size and type validation middleware (max 50MB, allowed extensions: `.pdf`, `.mp4`, `.docx`, etc.)
 
 ### 2F — Enrollment
 
-- [ ] **[Next.js API]** Create Zod validation schemas (`lib/validations/enrollment.ts`)
-- [ ] **[Next.js API]** Create enrollment service module (`lib/services/enrollment.service.ts`)
-- [ ] **[Next.js API]** Implement `POST /api/courses/[courseId]/enroll` route handler (`app/api/courses/[courseId]/enroll/route.ts`) — STUDENT, creates enrollment with Prisma, handles unique constraint error for duplicate enrollment
-- [ ] **[Next.js API]** Implement `DELETE /api/courses/[courseId]/enroll` route handler — STUDENT, sets status to `DROPPED`
-- [ ] **[Next.js API]** Implement `GET /api/enrollments/my` route handler (`app/api/enrollments/my/route.ts`) — student's enrolled courses with Prisma `include` for course + teacher summary
-- [ ] **[Next.js API]** Implement `GET /api/courses/[courseId]/students` route handler (`app/api/courses/[courseId]/students/route.ts`) — owner/ADMIN
-- [ ] **[Next.js API]** Create enrollment check helper (`lib/auth/check-enrollment.ts`) for protecting lesson/material/chat access
+- [x] **[Next.js API]** Create Zod validation schemas (`lib/validations/enrollment.ts`)
+- [x] **[Next.js API]** Create enrollment service module (`lib/services/enrollment.service.ts`)
+- [x] **[Next.js API]** Implement `POST /api/courses/[courseId]/enroll` route handler (`app/api/courses/[courseId]/enroll/route.ts`) — STUDENT, creates enrollment with Prisma, handles unique constraint error for duplicate enrollment
+- [x] **[Next.js API]** Implement `DELETE /api/courses/[courseId]/enroll` route handler — STUDENT, sets status to `DROPPED`
+- [x] **[Next.js API]** Implement `GET /api/enrollments/my` route handler (`app/api/enrollments/my/route.ts`) — student's enrolled courses with Prisma `include` for course + teacher summary
+- [x] **[Next.js API]** Implement `GET /api/courses/[courseId]/students` route handler (`app/api/courses/[courseId]/students/route.ts`) — owner/ADMIN
+- [x] **[Next.js API]** Create enrollment check helper (`lib/auth/check-enrollment.ts`) for protecting lesson/material/chat access
 
 ---
 
