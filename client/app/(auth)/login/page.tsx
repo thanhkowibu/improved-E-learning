@@ -10,9 +10,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -52,6 +53,7 @@ const inputCls =
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LoginPage() {
+  const router = useRouter();
   const { login } = useAuth();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") ?? "/courses";
@@ -69,19 +71,15 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginInput) {
     setServerError(null);
+    const toastId = toast.loading("Signing in…");
     try {
-      // AuthContext.login navigates to /courses by default,
-      // but we override with ?next if present.
       await login(data.email, data.password);
-      // Navigation is handled inside login() — redirect to `nextPath`.
-      // To respect ?next, we replicate the push here after login succeeds.
-      // NOTE: login() already pushes to /courses; for next-aware behaviour
-      // we call router.replace inside a workaround via window.location.
-      if (nextPath !== "/courses") {
-        window.location.replace(nextPath);
-      }
+      toast.success("Welcome back!", { id: toastId });
+      router.push(nextPath);
     } catch (err: unknown) {
-      setServerError(err instanceof Error ? err.message : "Login failed.");
+      const msg = err instanceof Error ? err.message : "Login failed.";
+      setServerError(msg);
+      toast.error(msg, { id: toastId });
     }
   }
 

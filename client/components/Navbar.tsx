@@ -3,34 +3,81 @@
 /**
  * components/Navbar.tsx
  *
- * Responsive top navigation bar.
+ * Unified top navigation bar — handles both public (guest) and authenticated
+ * (role-aware) states in a single sticky header.
  *
- * Guest state   → Logo + nav links + "Log in" (outline) + "Get Started" (solid)
- * Auth state    → Logo + nav links + Avatar dropdown (name, role, logout)
+ * Layout (desktop):
+ *   [Logo]  [Nav links — role-aware]        [Bell | Avatar dropdown]
  *
- * Layout adapted from reference: sticky top bar, logo left, links center,
- * actions right, with a subtle bottom border shadow.
+ * Role nav sets:
+ *   Guest    → Courses
+ *   STUDENT  → Courses, My Learning, Dashboard
+ *   TEACHER  → Courses, Manage Courses, Create Course, Dashboard
+ *   ADMIN    → All Users, All Courses, Analytics, Dashboard
+ *
+ * Design system:
+ *   - Sky Blue primary (#0ea5e9)
+ *   - White background, subtle border-b
+ *   - Active link: sky accent underline + tinted text
+ *   - Typography: text-xl font-extrabold tracking-tight logo
  */
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePathname } from "next/navigation";
+import { Bell, ChevronDown, GraduationCap, LogOut, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-// ─── Role badge colours ────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+// ─── Role nav maps ────────────────────────────────────────────────────────────
+
+const GUEST_NAV: NavItem[] = [
+  { href: "/courses", label: "Courses" },
+];
+
+const STUDENT_NAV: NavItem[] = [
+  { href: "/courses", label: "Courses" },
+  { href: "/my-courses", label: "My Learning" },
+  { href: "/dashboard", label: "Dashboard" },
+];
+
+const TEACHER_NAV: NavItem[] = [
+  { href: "/courses", label: "Courses" },
+  { href: "/my-courses", label: "Manage" },
+  { href: "/courses/new", label: "Create Course" },
+  { href: "/dashboard", label: "Dashboard" },
+];
+
+const ADMIN_NAV: NavItem[] = [
+  { href: "/admin/users", label: "Users" },
+  { href: "/admin/courses", label: "Courses" },
+  { href: "/admin/analytics", label: "Analytics" },
+  { href: "/dashboard", label: "Dashboard" },
+];
+
+function getNav(role?: string): NavItem[] {
+  switch (role) {
+    case "TEACHER": return TEACHER_NAV;
+    case "ADMIN": return ADMIN_NAV;
+    case "STUDENT": return STUDENT_NAV;
+    default: return GUEST_NAV;
+  }
+}
+
+// ─── Role badge config ────────────────────────────────────────────────────────
 
 const ROLE_STYLES: Record<string, string> = {
   ADMIN: "bg-violet-100 text-violet-700",
-  TEACHER: "bg-amber-100 text-amber-700",
-  STUDENT: "bg-sky-100 text-sky-700",
+  TEACHER: "bg-amber-100  text-amber-700",
+  STUDENT: "bg-sky-100    text-sky-700",
 };
-
-// ─── Nav links ────────────────────────────────────────────────────────────────
-
-const NAV_LINKS = [
-  { href: "/courses", label: "Courses" },
-  { href: "/my-courses", label: "My Learning" },
-];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -43,21 +90,43 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
+// ─── NavLink ──────────────────────────────────────────────────────────────────
+
+function NavLink({ item }: { item: NavItem }) {
+  const pathname = usePathname();
+  // Exact match only — prevents "/courses" highlighting on "/courses/new" etc.
+  const active = pathname === item.href;
+
+  return (
+    <Link
+      href={item.href}
+      className={cn(
+        "relative px-1 py-1 text-sm font-semibold transition-colors duration-150",
+        active
+          ? "text-sky-600"
+          : "text-slate-600 hover:text-slate-900"
+      )}
+    >
+      {item.label}
+      {/* Active underline */}
+      {active && (
+        <span className="absolute -bottom-[1px] left-0 right-0 h-0.5 rounded-full bg-sky-500" />
+      )}
+    </Link>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Navbar() {
   const { user, isAuthenticated, logout, isLoading } = useAuth();
-  const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navItems = getNav(user?.role);
 
-  // Close dropdown when clicking outside.
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
     }
@@ -67,165 +136,152 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-6">
+      <div className="container mx-auto px-6 md:px-12 lg:px-24 max-w-7xl">
+        <div className="flex h-16 items-center gap-8">
+
           {/* ── Logo ── */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-slate-900 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2.5 shrink-0 group"
           >
-            {/* Graduation cap icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="h-7 w-7 text-sky-500"
-            >
-              <path d="M11.7 2.805a.75.75 0 0 1 .6 0A60.65 60.65 0 0 1 22.83 8.72a.75.75 0 0 1-.231 1.337 49.948 49.948 0 0 0-9.902 3.912l-.003.002c-.114.06-.227.119-.34.18a.75.75 0 0 1-.707 0A50.88 50.88 0 0 0 7.5 12.173v-.224c0-.131.067-.248.172-.311a54.615 54.615 0 0 1 4.653-2.52.75.75 0 0 0-.65-1.352 56.123 56.123 0 0 0-4.78 2.589 1.858 1.858 0 0 0-.859 1.228 49.803 49.803 0 0 0-4.634-1.527.75.75 0 0 1-.231-1.337A60.653 60.653 0 0 1 11.7 2.805Z" />
-              <path d="M13.06 15.473a48.45 48.45 0 0 1 7.666-3.282c.134 1.414.22 2.843.255 4.284a.75.75 0 0 1-.46.711 47.87 47.87 0 0 0-8.105 4.342.75.75 0 0 1-.832 0 47.87 47.87 0 0 0-8.104-4.342.75.75 0 0 1-.461-.71c.035-1.442.121-2.87.255-4.286.921.304 1.83.634 2.726.99v1.27a1.5 1.5 0 0 0-.14 2.508c-.09.38-.222.753-.397 1.11.452.213.901.434 1.346.66a6.727 6.727 0 0 0 .551-1.608 1.5 1.5 0 0 0 .14-2.67v-.645a48.549 48.549 0 0 1 3.44 1.668 2.25 2.25 0 0 0 2.12 0Z" />
-            </svg>
-            <span className="text-lg font-bold tracking-tight">LearnAI</span>
+            <div className="h-8 w-8 rounded-lg bg-sky-500 flex items-center justify-center shadow-sm group-hover:bg-sky-600 transition-colors">
+              <GraduationCap size={18} className="text-white" />
+            </div>
+            <span className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">
+              Learn<span className="text-sky-500">AI</span>
+            </span>
           </Link>
 
           {/* ── Nav links (desktop) ── */}
-          <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => {
-              const active = pathname.startsWith(link.href);
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    active
-                      ? "text-sky-600 bg-sky-50"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
+          <nav className="hidden md:flex items-center gap-6 flex-1" aria-label="Main navigation">
+            {navItems.map((item) => (
+              <NavLink key={item.href} item={item} />
+            ))}
           </nav>
 
           {/* ── Right actions ── */}
-          <div className="flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2">
             {isLoading ? (
-              /* Skeleton while hydrating */
-              <div className="h-8 w-24 rounded-full bg-slate-100 animate-pulse" />
+              <div className="h-9 w-28 rounded-xl bg-slate-100 animate-pulse" />
             ) : isAuthenticated && user ? (
-              /* ── Avatar + dropdown ── */
-              <div className="relative" ref={dropdownRef}>
+              <>
+                {/* Notification bell */}
                 <button
-                  id="navbar-avatar-btn"
-                  onClick={() => setDropdownOpen((o) => !o)}
-                  className="flex items-center gap-2 rounded-full pl-1 pr-3 py-1 bg-slate-50 border border-slate-200 hover:border-sky-300 hover:bg-sky-50 transition-colors focus-visible:ring-2 focus-visible:ring-sky-400"
-                  aria-haspopup="true"
-                  aria-expanded={dropdownOpen}
+                  className="relative h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                  aria-label="Notifications"
                 >
-                  {/* Avatar circle */}
-                  <div className="h-8 w-8 rounded-full bg-sky-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                    {getInitials(user.fullName)}
-                  </div>
-                  <span className="hidden sm:block text-sm font-medium text-slate-700 max-w-[120px] truncate">
-                    {user.fullName}
-                  </span>
-                  {/* Chevron */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${
-                      dropdownOpen ? "rotate-180" : ""
-                    }`}
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <Bell size={18} />
+                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-sky-500 ring-2 ring-white" />
                 </button>
 
-                {/* Dropdown panel */}
-                {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-lg ring-1 ring-slate-200 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
-                    {/* User info header */}
-                    <div className="px-4 py-3 border-b border-slate-100">
-                      <p className="text-sm font-semibold text-slate-900 truncate">
-                        {user.fullName}
+                {/* Avatar dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    id="navbar-avatar-btn"
+                    onClick={() => setDropdownOpen((o) => !o)}
+                    className="flex items-center gap-2 rounded-xl pl-1 pr-3 py-1.5 hover:bg-slate-100 transition-colors focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:outline-none"
+                    aria-haspopup="true"
+                    aria-expanded={dropdownOpen}
+                  >
+                    {/* Avatar */}
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
+                      {getInitials(user.fullName)}
+                    </div>
+                    {/* Name + role */}
+                    <div className="hidden sm:block text-left">
+                      <p className="text-sm font-semibold text-slate-800 leading-none">
+                        {user.fullName.split(" ")[0]}
                       </p>
-                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
-                      <span
-                        className={`mt-1 inline-block text-xs font-medium px-2 py-0.5 rounded-full ${
-                          ROLE_STYLES[user.role] ?? "bg-slate-100 text-slate-600"
-                        }`}
+                      <p
+                        className={cn(
+                          "text-[10px] font-medium mt-0.5 px-1.5 rounded-sm inline-block",
+                          ROLE_STYLES[user.role]
+                        )}
                       >
                         {user.role}
-                      </span>
+                      </p>
                     </div>
-
-                    {/* Links */}
-                    <div className="py-1">
-                      {user.role === "ADMIN" && (
-                        <Link
-                          href="/admin/users"
-                          onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 text-slate-400">
-                            <path d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM1.49 15.326a.78.78 0 0 1-.358-.442 3 3 0 0 1 4.308-3.516 6.484 6.484 0 0 0-1.905 3.959c-.023.222-.014.442.025.654a4.97 4.97 0 0 1-2.07-.655ZM16.44 15.98a4.97 4.97 0 0 0 2.07-.654.78.78 0 0 0 .357-.442 3 3 0 0 0-4.308-3.517 6.484 6.484 0 0 1 1.907 3.96 2.32 2.32 0 0 1-.026.654ZM18 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5.304 16.19a.844.844 0 0 1-.277-.71 5 5 0 0 1 9.947 0 .843.843 0 0 1-.277.71A6.975 6.975 0 0 1 10 18a6.974 6.974 0 0 1-4.696-1.81Z" />
-                          </svg>
-                          Admin Panel
-                        </Link>
+                    <ChevronDown
+                      size={14}
+                      className={cn(
+                        "text-slate-400 transition-transform duration-200",
+                        dropdownOpen && "rotate-180"
                       )}
-                      {(user.role === "TEACHER" || user.role === "ADMIN") && (
-                        <Link
-                          href="/courses/new"
-                          onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 text-slate-400">
-                            <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
-                          </svg>
-                          Create Course
-                        </Link>
-                      )}
-                    </div>
+                    />
+                  </button>
 
-                    {/* Logout */}
-                    <div className="border-t border-slate-100 py-1">
-                      <button
-                        id="navbar-logout-btn"
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          logout();
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                          <path fillRule="evenodd" d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z" clipRule="evenodd" />
-                          <path fillRule="evenodd" d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z" clipRule="evenodd" />
-                        </svg>
-                        Sign out
-                      </button>
+                  {/* Dropdown panel */}
+                  {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200/80 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                      {/* User info */}
+                      <div className="px-4 py-3.5 border-b border-slate-100 bg-slate-50">
+                        <p className="text-sm font-bold text-slate-900 truncate">{user.fullName}</p>
+                        <p className="text-xs text-slate-500 truncate mt-0.5">{user.email}</p>
+                        <span
+                          className={cn(
+                            "mt-1.5 inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full",
+                            ROLE_STYLES[user.role]
+                          )}
+                        >
+                          {user.role}
+                        </span>
+                      </div>
+
+                      {/* Quick nav */}
+                      <div className="py-1.5">
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                            <GraduationCap size={14} className="text-slate-500" />
+                          </div>
+                          Dashboard
+                        </Link>
+                        <Link
+                          href="/settings"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                            <Settings size={14} className="text-slate-500" />
+                          </div>
+                          Profile & Settings
+                        </Link>
+                      </div>
+
+                      {/* Logout */}
+                      <div className="border-t border-slate-100 py-1.5">
+                        <button
+                          id="navbar-logout-btn"
+                          onClick={() => { setDropdownOpen(false); logout(); }}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          <div className="h-7 w-7 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+                            <LogOut size={14} className="text-red-500" />
+                          </div>
+                          Sign out
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </>
             ) : (
-              /* ── Guest buttons ── */
+              /* Guest CTA buttons */
               <>
                 <Link
                   id="navbar-login-btn"
                   href="/login"
-                  className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-sky-600 border border-sky-300 rounded-lg hover:bg-sky-50 transition-colors"
+                  className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-semibold text-sky-600 border border-sky-300 rounded-xl hover:bg-sky-50 transition-colors"
                 >
                   Log in
                 </Link>
                 <Link
                   id="navbar-register-btn"
                   href="/register"
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-sky-500 rounded-lg hover:bg-sky-600 active:bg-sky-700 transition-colors shadow-sm"
+                  className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-sky-500 rounded-xl hover:bg-sky-600 active:bg-sky-700 transition-colors shadow-sm"
                 >
                   Get Started
                 </Link>

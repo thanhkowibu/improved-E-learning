@@ -9,8 +9,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { registerSchema, type RegisterInput, type RegisterOutput } from "@/lib/validations/auth";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -53,6 +55,7 @@ const inputCls =
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function RegisterPage() {
+  const router = useRouter();
   const { register: registerUser } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -71,11 +74,15 @@ export default function RegisterPage() {
 
   async function onSubmit(data: RegisterOutput) {
     setServerError(null);
+    const toastId = toast.loading("Creating your account…");
     try {
       await registerUser(data);
-      // Navigation to /courses is handled inside AuthContext.register → login()
+      toast.success("Account created successfully!", { id: toastId });
+      router.push("/courses");
     } catch (err: unknown) {
-      setServerError(err instanceof Error ? err.message : "Registration failed.");
+      const msg = err instanceof Error ? err.message : "Registration failed.";
+      setServerError(msg);
+      toast.error(msg, { id: toastId });
     }
   }
 

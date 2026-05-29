@@ -132,9 +132,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setToken(json.data.accessToken);
       setUser(json.data.user as AuthUser);
-      router.push("/courses");
     },
-    [router]
+    []
   );
 
   // ─── register ─────────────────────────────────────────────────────────────

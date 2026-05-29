@@ -179,20 +179,19 @@
 
 ### 3A — Shared Components & Layout
 
-- [ ] **[Next.js]** Build responsive Sidebar navigation (role-aware: show different links for ADMIN/TEACHER/STUDENT)
-- [ ] **[Next.js]** Build top Navbar with user profile dropdown
-- [ ] **[Next.js]** Create reusable UI components using Shadcn UI: `Button`, `Card`, `Dialog` (Modal), `Input`, `Badge`, `Skeleton` (Spinner), `EmptyState`
-- [ ] **[Next.js]** Create data-fetching hooks with loading/error states (`useCourses`, `useModules`, etc.) using `fetch('/api/...')` to internal API routes
-- [ ] **[Next.js]** Set up toast notification system using Shadcn UI `Toaster` + `sonner` for success/error feedback
+- [x] **[Next.js]** Build top Navbar with user profile dropdown
+- [x] **[Next.js]** Create reusable UI components using Shadcn UI: `Button`, `Card`, `Dialog` (Modal), `Input`, `Badge`, `Skeleton` (Spinner), `EmptyState`
+- [x] **[Next.js]** Create data-fetching hooks with loading/error states (`useCourses`, `useModules`, etc.) using `fetch('/api/...')` to internal API routes
+- [x] **[Next.js]** Set up toast notification system using Shadcn UI `Toaster` + `sonner` for success/error feedback
 
 ### 3B — Course Pages
 
-- [ ] **[Next.js]** Build Course Catalog page (`app/(dashboard)/courses/page.tsx`) — grid of published courses with search, fetches from `GET /api/courses`
-- [ ] **[Next.js]** Build Course Detail page (`app/(dashboard)/courses/[courseId]/page.tsx`) — module/lesson sidebar + content area, fetches from `GET /api/courses/[courseId]`
-- [ ] **[Next.js]** Build Create Course page (`app/(dashboard)/courses/new/page.tsx`) — form for TEACHER/ADMIN, submits to `POST /api/courses`
-- [ ] **[Next.js]** Build Edit Course page (`app/(dashboard)/courses/[courseId]/edit/page.tsx`) — submits to `PATCH /api/courses/[courseId]`
-- [ ] **[Next.js]** Add "Enroll" / "Unenroll" button on course detail (for STUDENT) — calls `POST/DELETE /api/courses/[courseId]/enroll`
-- [ ] **[Next.js]** Build My Courses page (`app/(dashboard)/my-courses/page.tsx`) — enrolled courses for students (from `GET /api/enrollments/my`), owned courses for teachers (from `GET /api/courses` filtered)
+- [x] **[Next.js]** Build Course Catalog page (`app/(dashboard)/courses/page.tsx`) — grid of published courses with search, fetches from `GET /api/courses`
+- [x] **[Next.js]** Build Course Detail page (`app/(dashboard)/courses/[courseId]/page.tsx`) — module/lesson sidebar + content area, fetches from `GET /api/courses/[courseId]`
+- [x] **[Next.js]** Build Create Course page (`app/(dashboard)/courses/new/page.tsx`) — form for TEACHER/ADMIN, submits to `POST /api/courses`
+- [x] **[Next.js]** Build Edit Course page (`app/(dashboard)/courses/[courseId]/edit/page.tsx`) — submits to `PATCH /api/courses/[courseId]`
+- [x] **[Next.js]** Add "Enroll" / "Unenroll" button on course detail (for STUDENT) — calls `POST/DELETE /api/courses/[courseId]/enroll`
+- [x] **[Next.js]** Build My Courses page (`app/(dashboard)/my-courses/page.tsx`) — enrolled courses for students (from `GET /api/enrollments/my`), owned courses for teachers (from `GET /api/courses` filtered)
 
 ### 3C — Module & Lesson Management (Teacher)
 
