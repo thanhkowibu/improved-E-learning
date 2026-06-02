@@ -39,6 +39,7 @@ import CourseForm, {
   type CourseFormValues,
   type CourseFormHandle,
 } from "@/components/CourseForm";
+import CurriculumEditor from "@/components/curriculum/CurriculumEditor";
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -279,6 +280,11 @@ export default function EditCoursePage() {
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* ── Curriculum Editor (full width, below the form/sidebar grid) ── */}
+      <div className="mt-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+        <CurriculumEditor courseId={courseId} />
       </div>
     </div>
   );

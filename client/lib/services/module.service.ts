@@ -43,6 +43,15 @@ export async function getModulesByCourse(courseId: string) {
     where: { courseId },
     orderBy: { orderIndex: "asc" },
     include: {
+      lessons: {
+        select: {
+          id: true,
+          title: true,
+          orderIndex: true,
+          moduleId: true,
+        },
+        orderBy: { orderIndex: "asc" },
+      },
       _count: { select: { lessons: true } },
     },
   });

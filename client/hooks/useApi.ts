@@ -78,6 +78,9 @@ export function useApi() {
     patch: <T = unknown>(path: string, body?: unknown, init?: Omit<RequestOptions, "method" | "body">) =>
       request<T>(path, { ...init, method: "PATCH", body }),
 
+    put: <T = unknown>(path: string, body?: unknown, init?: Omit<RequestOptions, "method" | "body">) =>
+      request<T>(path, { ...init, method: "PUT", body }),
+
     del: <T = unknown>(path: string, init?: Omit<RequestOptions, "method" | "body">) =>
       request<T>(path, { ...init, method: "DELETE" }),
 

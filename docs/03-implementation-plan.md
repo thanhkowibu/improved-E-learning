@@ -195,10 +195,10 @@
 
 ### 3C — Module & Lesson Management (Teacher)
 
-- [ ] **[Next.js]** Build Module management UI within Course Edit (add/edit/delete/reorder modules) — calls `/api/courses/[courseId]/modules` endpoints
-- [ ] **[Next.js]** Build Lesson editor within Module (add/edit/delete/reorder lessons) — calls `/api/modules/[moduleId]/lessons` endpoints
-- [ ] **[Next.js]** Integrate a Markdown editor for lesson content (e.g., `@uiw/react-md-editor` or similar)
-- [ ] **[Next.js]** Build drag-and-drop reordering for modules and lessons (e.g., `@dnd-kit/core`)
+- [x] **[Next.js]** Build Module management UI within Course Edit (add/edit/delete/reorder modules) — calls `/api/courses/[courseId]/modules` endpoints
+- [x] **[Next.js]** Build Lesson editor within Module (add/edit/delete/reorder lessons) — calls `/api/modules/[moduleId]/lessons` endpoints
+- [x] **[Next.js]** Integrate a Markdown editor for lesson content (e.g., `@uiw/react-md-editor` or similar)
+- [x] **[Next.js]** Build drag-and-drop reordering for modules and lessons (e.g., `@dnd-kit/core`)
 
 ### 3D — Material Management (Teacher)
 

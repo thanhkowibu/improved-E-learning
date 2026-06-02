@@ -409,3 +409,70 @@ custom `_app.tsx` for two reasons:
 | TypeScript support | `declare global { interface BigInt { toJSON(): string } }` | Eliminates TS2339 "property does not exist" error on the prototype assignment |
 | Scope | Process-global, applies to all BigInt values | One fix covers all current and future Prisma models with BigInt columns |
 | Alternative rejected | Per-route `Number()` cast | Silent precision loss for large values; repeated boilerplate in every route |
+
+---
+
+## ADR-008 · CurriculumEditor — SSR Safety & State Decoupling
+
+**Date:** 2026-06-02
+**Phase:** 3C (Module & Lesson Management UI)
+**Status:** Adopted
+
+### Context
+
+Two independent problems needed to be solved simultaneously when building the Curriculum Editor:
+
+1. **The SSR Problem** — `@uiw/react-md-editor` reads `window` at import-time to detect the browser environment. In Next.js App Router, component modules are evaluated during server-side rendering (SSR). This causes an immediate crash:
+   ```
+   ReferenceError: window is not defined
+   ```
+   This is a well-known class of problem with any rich-text editor (CodeMirror, Quill, TipTap, etc.).
+
+2. **The State Coupling Problem** — The Edit Course page already contains a `<CourseForm>` wrapped in `react-hook-form`. If the `CurriculumEditor` were embedded inside the same form's state tree (e.g., as additional fields), every lesson content keystroke would trigger `react-hook-form`'s internal re-render cycle, degrading editor performance and risking form state corruption.
+
+### Decision A: `next/dynamic` with `{ ssr: false }` for the Markdown Editor
+
+```tsx
+// components/curriculum/LessonEditorDialog.tsx
+
+const MDEditor = dynamic(
+  () => import("@uiw/react-md-editor").then((m) => m.default),
+  { ssr: false }   // ← never evaluated on the server
+);
+```
+
+`next/dynamic` is Next.js's built-in code-splitting primitive. When `ssr: false` is set:
+
+- The module is **excluded from the server bundle entirely**. It is never imported during SSR, so `window is not defined` cannot occur.
+- The component is loaded **lazily in the browser** after hydration, at the point where it is first rendered.
+- A `loading` fallback is rendered during the client-side load gap — here, a simple skeleton with a spinner.
+
+The editor is also wrapped in `data-color-mode="light"` to force a consistent appearance regardless of OS dark mode setting.
+
+### Decision B: State Decoupled from `CourseForm`
+
+`CurriculumEditor` is a **self-contained component** that:
+- Fetches its own data via `GET /api/courses/:courseId/modules`
+- Maintains its own `modules: Module[]` state
+- Is rendered as a sibling of `CourseForm` in the page layout — **not** a child of `CourseForm`'s `<form>` element
+
+This means:
+- Changes to lessons (typing in the Markdown editor) do **not** trigger CourseForm's re-render cycle
+- Saving a lesson (`PATCH /api/lessons/:lessonId`) does **not** interact with the course form's `isDirty` state
+- The two editors are independently focusable and independently submittable
+
+### Key Design & Optimization Decisions
+
+| Decision | Choice Made | Rationale |
+|---|---|---|
+| SSR fix for MD editor | `next/dynamic({ ssr: false })` | Prevents `window is not defined` at import time; excluded from server bundle entirely |
+| State location | `CurriculumEditor` owns its own `useState<Module[]>` | Decouples from CourseForm's `react-hook-form` state; prevents cross-component re-renders |
+| Lesson reorder UX | Up/Down arrow buttons (not DND) | Avoids nested `DndContext` which crashes with conflicting pointer sensors and event propagation |
+| Module reorder UX | `@dnd-kit/sortable` with `PointerSensor` | DND only at the module level; `activationConstraint: { distance: 6 }` prevents accidental drags on button clicks |
+| Optimistic UI | Module/lesson order updated before API confirms | Instant visual feedback; original order restored on API failure |
+| Markdown editor import | `.then((m) => m.default)` in dynamic | Required when the module uses a default export — resolves the ESM interop correctly |
+| `data-color-mode="light"` wrapper | Always use light mode | Prevents jarring dark-mode appearance mismatch when OS is in dark mode but site is light-only |
+| Module reorder HTTP verb | `PUT /api/courses/:courseId/modules` | Consistent with the server-side `reorderModules` service (idempotent bulk-replace semantics) |
+| Lesson edit URL | `PATCH /api/lessons/:lessonId` (not `/modules/:id/lessons/:id`) | The lesson route is directly addressable; no need to include moduleId in the URL — server resolves it from the lesson record |
+| `useApi.put` addition | Added `put` method to `useApi` hook | Mirrors `patch`/`del` — keeps all authenticated fetch calls through one consistent helper with token injection |
+
