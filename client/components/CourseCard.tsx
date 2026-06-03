@@ -43,6 +43,7 @@ export interface CourseCardData {
   progress?: number;
   /** For enrolled variant */
   enrollmentStatus?: "ACTIVE" | "COMPLETED" | "DROPPED";
+  nextLessonId?: string | null;
 }
 
 interface CourseCardProps {
@@ -98,11 +99,11 @@ function StatusBadge({ course, variant }: { course: CourseCardData; variant: Cou
 
 // ─── CTA button ───────────────────────────────────────────────────────────────
 
-function CtaButton({ courseId, variant }: { courseId: string; variant: CourseCardVariant }) {
+function CtaButton({ course, variant }: { course: CourseCardData; variant: CourseCardVariant }) {
   const base = "w-full rounded-xl font-semibold text-sm transition-all duration-150";
   if (variant === "manage") {
     return (
-      <Link href={`/courses/${courseId}/edit`} className="block mt-4">
+      <Link href={`/courses/${course.id}/edit`} className="block mt-4">
         <Button variant="outline" className={cn(base, "border-sky-300 text-sky-600 hover:bg-sky-50 hover:border-sky-400")}>
           Manage
         </Button>
@@ -110,8 +111,11 @@ function CtaButton({ courseId, variant }: { courseId: string; variant: CourseCar
     );
   }
   if (variant === "enrolled") {
+    const href = course.nextLessonId
+      ? `/courses/${course.id}/lessons/${course.nextLessonId}`
+      : `/courses/${course.id}/learn`;
     return (
-      <Link href={`/courses/${courseId}`} className="block mt-4">
+      <Link href={href} className="block mt-4">
         <Button className={cn(base, "bg-sky-500 hover:bg-sky-600 text-white")}>
           Continue Learning
         </Button>
@@ -120,7 +124,7 @@ function CtaButton({ courseId, variant }: { courseId: string; variant: CourseCar
   }
   // catalog
   return (
-    <Link href={`/courses/${courseId}`} className="block mt-4">
+    <Link href={`/courses/${course.id}`} className="block mt-4">
       <Button variant="outline" className={cn(base, "border-sky-300 text-sky-600 hover:bg-sky-50 hover:border-sky-400")}>
         View Course
       </Button>
@@ -218,7 +222,7 @@ export default function CourseCard({
         )}
 
         {/* CTA */}
-        <CtaButton courseId={course.id} variant={variant} />
+        <CtaButton course={course} variant={variant} />
       </CardContent>
     </Card>
   );

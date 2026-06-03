@@ -3,8 +3,9 @@
 /**
  * components/curriculum/LessonEditorDialog.tsx
  *
- * A Shadcn Dialog that lets a TEACHER edit a lesson's title and Markdown
- * content. Submits to PATCH /api/lessons/:lessonId.
+ * A Shadcn Dialog split into two tabs:
+ *   "Content"   — lesson title + Markdown editor (existing)
+ *   "Materials" — file upload zone + material list (new LessonMaterials)
  *
  * SSR Fix:
  *   @uiw/react-md-editor reads `window` at import time. We use next/dynamic
@@ -16,7 +17,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileText, BookOpen } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,10 +25,17 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useApi } from "@/hooks/useApi";
+import LessonMaterials from "./LessonMaterials";
 
 // ─── Dynamic import (SSR-safe) ────────────────────────────────────────────────
 
@@ -80,6 +88,8 @@ export default function LessonEditorDialog({
 }: Props) {
   const api = useApi();
   const [isSaving, setIsSaving] = useState(false);
+  // Reset to "content" tab each time a new lesson is opened.
+  const [activeTab, setActiveTab] = useState("content");
 
   const {
     register,
@@ -91,10 +101,11 @@ export default function LessonEditorDialog({
     defaultValues: { title: "", content: "" },
   });
 
-  // Sync form values whenever the selected lesson changes.
+  // Sync form values and reset to content tab whenever the selected lesson changes.
   useEffect(() => {
     if (lesson) {
       reset({ title: lesson.title, content: lesson.content ?? "" });
+      setActiveTab("content");
     }
   }, [lesson, reset]);
 
@@ -120,77 +131,128 @@ export default function LessonEditorDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="sm:max-w-3xl w-full max-h-[90vh] overflow-y-auto"
-      >
-        <DialogHeader>
-          <DialogTitle>Edit Lesson</DialogTitle>
+      <DialogContent className="sm:max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+        <DialogHeader className="shrink-0">
+          <DialogTitle className="truncate max-w-lg">
+            {lesson?.title ?? "Edit Lesson"}
+          </DialogTitle>
         </DialogHeader>
 
-        <form
-          id="lesson-editor-form"
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-5 py-2"
+        {/* ── Tabs ── */}
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex-1 overflow-hidden flex flex-col min-h-0"
         >
-          {/* Title */}
-          <div className="space-y-1.5">
-            <Label htmlFor="lesson-title">Lesson Title</Label>
-            <Input
-              id="lesson-title"
-              placeholder="e.g. Introduction to Variables"
-              {...register("title", { required: "Title is required." })}
-              className={errors.title ? "border-red-400 focus-visible:ring-red-400" : ""}
-            />
-            {errors.title && (
-              <p className="text-xs text-red-500">{errors.title.message}</p>
-            )}
-          </div>
+          <TabsList className="shrink-0 w-fit">
+            <TabsTrigger value="content" className="gap-1.5">
+              <BookOpen size={13} />
+              Content
+            </TabsTrigger>
+            <TabsTrigger value="materials" className="gap-1.5">
+              <FileText size={13} />
+              Materials
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Markdown content — SSR-safe via next/dynamic */}
-          <div className="space-y-1.5">
-            <Label>Lesson Content (Markdown)</Label>
-            {/* data-color-mode="light" forces the editor into light mode
-                regardless of the OS preference, keeping it consistent with our
-                light-only theme. */}
-            <div data-color-mode="light" className="rounded-lg overflow-hidden border border-slate-200">
-              <Controller
-                name="content"
-                control={control}
-                render={({ field }) => (
-                  <MDEditor
-                    value={field.value}
-                    onChange={(v) => field.onChange(v ?? "")}
-                    height={320}
-                    preview="edit"
-                  />
+          {/* ── Content Tab ── */}
+          <TabsContent
+            value="content"
+            className="flex-1 overflow-y-auto mt-0 pt-2"
+          >
+            <form
+              id="lesson-editor-form"
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-5"
+            >
+              {/* Title */}
+              <div className="space-y-1.5">
+                <Label htmlFor="lesson-title">Lesson Title</Label>
+                <Input
+                  id="lesson-title"
+                  placeholder="e.g. Introduction to Variables"
+                  {...register("title", { required: "Title is required." })}
+                  className={
+                    errors.title
+                      ? "border-red-400 focus-visible:ring-red-400"
+                      : ""
+                  }
+                />
+                {errors.title && (
+                  <p className="text-xs text-red-500">{errors.title.message}</p>
                 )}
-              />
-            </div>
-            <p className="text-xs text-slate-400">
-              Supports full Markdown syntax — headings, code blocks, lists, and more.
-            </p>
-          </div>
-        </form>
+              </div>
 
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isSaving}
+              {/* Markdown content — SSR-safe via next/dynamic */}
+              <div className="space-y-1.5">
+                <Label>Lesson Content (Markdown)</Label>
+                {/*
+                 * data-color-mode="light" forces the editor into light mode
+                 * regardless of the OS preference, keeping it consistent with
+                 * our light-only theme.
+                 */}
+                <div
+                  data-color-mode="light"
+                  className="rounded-lg overflow-hidden border border-slate-200"
+                >
+                  <Controller
+                    name="content"
+                    control={control}
+                    render={({ field }) => (
+                      <MDEditor
+                        value={field.value}
+                        onChange={(v) => field.onChange(v ?? "")}
+                        height={320}
+                        preview="edit"
+                      />
+                    )}
+                  />
+                </div>
+                <p className="text-xs text-slate-400">
+                  Supports full Markdown syntax — headings, code blocks, lists,
+                  and more.
+                </p>
+              </div>
+            </form>
+          </TabsContent>
+
+          {/* ── Materials Tab ── */}
+          <TabsContent
+            value="materials"
+            className="flex-1 overflow-y-auto mt-0 pt-2"
           >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            form="lesson-editor-form"
-            disabled={isSaving}
-            className="bg-sky-500 hover:bg-sky-600 text-white gap-2"
-          >
-            {isSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-            Save Lesson
-          </Button>
-        </DialogFooter>
+            {lesson ? (
+              <LessonMaterials lessonId={lesson.id} />
+            ) : (
+              <p className="text-sm text-slate-400 text-center py-8">
+                No lesson selected.
+              </p>
+            )}
+          </TabsContent>
+        </Tabs>
+
+        {/* ── Footer — only shown on Content tab ── */}
+        {activeTab === "content" && (
+          <DialogFooter className="shrink-0 border-t border-slate-100 pt-4 mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSaving}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="lesson-editor-form"
+              disabled={isSaving}
+              className="bg-sky-500 hover:bg-sky-600 text-white gap-2"
+            >
+              {isSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Save Lesson
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -159,7 +159,7 @@ export async function getCourseById(courseId: string) {
         },
       },
       _count: {
-        select: { enrollments: true },
+        select: { enrollments: true, modules: true },
       },
     },
   });

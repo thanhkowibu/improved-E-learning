@@ -202,23 +202,23 @@
 
 ### 3D — Material Management (Teacher)
 
-- [ ] **[Next.js]** Build file upload component with drag-and-drop zone and progress bar — submits `FormData` to `POST /api/lessons/[lessonId]/materials/upload`
-- [ ] **[Next.js]** Display material list per lesson with download links (to `GET /api/materials/[materialId]/download`)
-- [ ] **[Next.js]** Add delete material functionality with confirmation modal — calls `DELETE /api/materials/[materialId]`
+- [x] **[Next.js]** Build file upload component with drag-and-drop zone and progress bar — submits `FormData` to `POST /api/lessons/[lessonId]/materials/upload`
+- [x] **[Next.js]** Display material list per lesson with download links (to `GET /api/materials/[materialId]/download`)
+- [x] **[Next.js]** Add delete material functionality with confirmation modal — calls `DELETE /api/materials/[materialId]`
 
 ### 3E — Student Lesson View
 
-- [ ] **[Next.js]** Build lesson content viewer (renders Markdown content) — fetches from `GET /api/lessons/[lessonId]`
-- [ ] **[Next.js]** Display attached materials with download buttons
-- [ ] **[Next.js]** Build lesson navigation (prev/next within module)
-- [ ] **[Next.js]** Highlight current lesson in sidebar
+- [x] **[Next.js]** Build lesson content viewer (renders Markdown content) — fetches from `GET /api/lessons/[lessonId]`
+- [x] **[Next.js]** Display attached materials with download buttons
+- [x] **[Next.js]** Build lesson navigation (prev/next within module)
 
 ### 3F — Admin Dashboard
 
-- [ ] **[Next.js]** Build Admin user management page (`app/(dashboard)/admin/users/page.tsx`) — fetches from `GET /api/users`
-- [ ] **[Next.js]** Display user table with role badges and status
-- [ ] **[Next.js]** Add ability to deactivate/reactivate users — calls `DELETE /api/users/[userId]` or `PATCH /api/users/[userId]`
-- [ ] **[Next.js]** Show platform statistics (total users, courses, enrollments) — fetch counts via a dedicated `GET /api/admin/stats` route handler or Server Component with direct Prisma queries
+- [x] **[Next.js]** Build Admin user management page (`app/(dashboard)/admin/users/page.tsx`) — fetches from `GET /api/users`
+- [x] **[Next.js]** Display user table with role badges and status
+- [x] **[Next.js]** Add ability to deactivate/reactivate users — calls `DELETE /api/users/[userId]` or `PATCH /api/users/[userId]`
+- [x] **[Next.js]** Show platform statistics (total users, courses, enrollments) — fetch counts via a dedicated `GET /api/admin/stats` route handler or Server Component with direct Prisma queries
+- [x] **[Next.js]** Build Admin Analytics Dashboard (`app/(dashboard)/admin/analytics/page.tsx`) — Visualizations for users, courses, enrollments using Shadcn/Recharts
 
 ---
 

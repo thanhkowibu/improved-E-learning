@@ -107,7 +107,7 @@ export async function getMyEnrollments(
     where.status = statusFilter;
   }
 
-  return prisma.enrollment.findMany({
+  const enrollments = await prisma.enrollment.findMany({
     where,
     orderBy: { enrolledAt: "desc" },
     include: {
@@ -120,12 +120,79 @@ export async function getMyEnrollments(
               avatarUrl: true,
             },
           },
+          modules: {
+            orderBy: { orderIndex: "asc" },
+            select: {
+              lessons: {
+                orderBy: { orderIndex: "asc" },
+                select: {
+                  id: true,
+                },
+              },
+            },
+          },
           _count: {
             select: { modules: true, enrollments: true },
           },
         },
       },
     },
+  });
+
+  // Fetch completed progress for the student.
+  const progressRecords = await prisma.lessonProgress.findMany({
+    where: {
+      studentId,
+      isCompleted: true,
+    },
+    select: {
+      lessonId: true,
+    },
+  });
+
+  const completedLessonIds = new Set(progressRecords.map((r) => r.lessonId));
+
+  return enrollments.map((e) => {
+    // Flatten lessons in order
+    const lessons = e.course.modules.flatMap((m) => m.lessons);
+    const totalLessons = lessons.length;
+    const completedCount = lessons.filter((l) => completedLessonIds.has(l.id)).length;
+    const progress = totalLessons === 0 ? 0 : Math.round((completedCount / totalLessons) * 100);
+
+    // Find the next incomplete lesson
+    let nextLessonId: string | null = null;
+    for (const m of e.course.modules) {
+      for (const l of m.lessons) {
+        if (!completedLessonIds.has(l.id)) {
+          nextLessonId = l.id;
+          break;
+        }
+      }
+      if (nextLessonId) break;
+    }
+
+    return {
+      id: e.id,
+      studentId: e.studentId,
+      courseId: e.courseId,
+      status: e.status,
+      enrolledAt: e.enrolledAt,
+      progress,
+      nextLessonId,
+      course: {
+        id: e.course.id,
+        title: e.course.title,
+        description: e.course.description,
+        thumbnailUrl: e.course.thumbnailUrl,
+        teacherId: e.course.teacherId,
+        aiEnabled: e.course.aiEnabled,
+        isPublished: e.course.isPublished,
+        createdAt: e.course.createdAt,
+        updatedAt: e.course.updatedAt,
+        teacher: e.course.teacher,
+        _count: e.course._count,
+      },
+    };
   });
 }
 

@@ -20,6 +20,8 @@ import type { CourseCardData, CourseCardVariant } from "@/components/CourseCard"
 interface EnrollmentItem {
   id: string;
   status: "ACTIVE" | "COMPLETED" | "DROPPED";
+  progress: number;
+  nextLessonId: string | null;
   course: {
     id: string;
     title: string;
@@ -73,8 +75,8 @@ export function useMyCourses(): UseMyCoursesReturn {
               teacher: e.course.teacher,
               _count: e.course._count,
               enrollmentStatus: e.status,
-              // Mock progress — real progress tracking added in Phase 3C
-              progress: Math.floor(Math.random() * 60) + 10,
+              progress: e.progress,
+              nextLessonId: e.nextLessonId,
             }))
           );
         } else {

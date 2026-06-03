@@ -52,9 +52,10 @@ model User {
   updatedAt      DateTime @updatedAt
 
   // Relations
-  courses     Course[]     @relation("TeacherCourses")
-  enrollments Enrollment[] @relation("StudentEnrollments")
-  chatThreads ChatThread[] @relation("StudentChatThreads")
+  courses        Course[]         @relation("TeacherCourses")
+  enrollments    Enrollment[]     @relation("StudentEnrollments")
+  chatThreads    ChatThread[]     @relation("StudentChatThreads")
+  lessonProgress LessonProgress[] @relation("StudentLessonProgress")
 
   @@index([email])
   @@index([role])
@@ -110,8 +111,9 @@ model Lesson {
   updatedAt  DateTime @updatedAt
 
   // Relations
-  module    Module     @relation("ModuleLessons", fields: [moduleId], references: [id], onDelete: Cascade)
-  materials Material[] @relation("LessonMaterials")
+  module    Module           @relation("ModuleLessons", fields: [moduleId], references: [id], onDelete: Cascade)
+  materials Material[]       @relation("LessonMaterials")
+  progress  LessonProgress[] @relation("LessonProgress")
 
   @@index([moduleId])
   @@map("lessons")
@@ -172,7 +174,7 @@ model ChatThread {
 model ChatMessage {
   id        String   @id @default(uuid())
   threadId  String
-  role      String   // "user" | "model" — matches Gemini API role names
+  role      String // "user" | "model" — matches Gemini API role names
   content   String
   createdAt DateTime @default(now())
 
@@ -181,4 +183,22 @@ model ChatMessage {
 
   @@index([threadId])
   @@map("chat_messages")
+}
+
+model LessonProgress {
+  id          String   @id @default(uuid())
+  studentId   String
+  lessonId    String
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  student User   @relation("StudentLessonProgress", fields: [studentId], references: [id], onDelete: Cascade)
+  lesson  Lesson @relation("LessonProgress", fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, lessonId])
+  @@index([studentId])
+  @@index([lessonId])
+  @@map("lesson_progress")
 }

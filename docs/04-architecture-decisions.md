@@ -476,3 +476,51 @@ This means:
 | Lesson edit URL | `PATCH /api/lessons/:lessonId` (not `/modules/:id/lessons/:id`) | The lesson route is directly addressable; no need to include moduleId in the URL — server resolves it from the lesson record |
 | `useApi.put` addition | Added `put` method to `useApi` hook | Mirrors `patch`/`del` — keeps all authenticated fetch calls through one consistent helper with token injection |
 
+---
+
+## ADR-009 · XMLHttpRequest over fetch for Upload Progress
+
+**Date:** 2026-06-03
+**Phase:** 3D (Material Management UI)
+**Status:** Adopted
+
+### Context
+
+The Material upload UI requires a real-time progress bar so the teacher can see how much of the file has been transmitted. Two browser APIs can perform file uploads from a web page:
+
+1. **`fetch()`** (modern Fetch API)
+2. **`XMLHttpRequest`** (legacy, but still widely supported)
+
+### The Gap in the Fetch API
+
+The Fetch API does not expose upload progress. Its `Response` object provides a `body` `ReadableStream` for *download* progress (reading the server response), but there is no equivalent interface for *upload* progress — how many bytes of the request body have been sent to the server.
+
+This is a known, documented limitation. The [WHATWG Fetch specification](https://fetch.spec.whatwg.org/) does not include upload progress. A `fetch`-based progress bar would require a polyfill or a third-party streaming library (e.g., `axios`), adding a dependency.
+
+### Decision: XMLHttpRequest
+
+`XMLHttpRequest` exposes the `xhr.upload` property, which is an `XMLHttpRequestUpload` object that fires standard `ProgressEvent` events:
+
+```ts
+xhr.upload.onprogress = (e: ProgressEvent) => {
+  if (e.lengthComputable) {
+    setUploadProgress(Math.round((e.loaded / e.total) * 100));
+  }
+};
+```
+
+This is called repeatedly as bytes are transmitted, with `e.loaded` (bytes sent so far) and `e.total` (total file size). The values drive the `<Progress>` component's `value` prop directly — no additional state transformation needed.
+
+### Why Not Axios?
+
+`axios` wraps XHR and also exposes `onUploadProgress`. It is a valid alternative, but adding a ~13 KB dependency purely for upload progress tracking is not justified when the XHR API is built into every browser and already available in our codebase.
+
+### Key Design & Optimization Decisions
+
+| Decision | Choice Made | Rationale |
+|---|---|---|
+| Upload API | `XMLHttpRequest` | Only browser API with native `xhr.upload.onprogress` — no extra dependency |
+| Auth header | Manually read `lms_auth_token` from `localStorage` and set via `xhr.setRequestHeader` | `useApi` is a hook and cannot be called inside an XHR callback; direct `localStorage` read is the correct pattern |
+| Body format | `FormData` with `formData.append("file", file)` | Matches `request.formData()` on the server — browser sets correct `multipart/form-data` boundary automatically |
+| Fetch alternative rejected | `fetch()` | No upload progress event in the Fetch specification |
+| Axios rejected | Not added | ~13 KB dependency for a single feature; XHR achieves the same result natively |

@@ -6,6 +6,8 @@
  * Single column (form only) on mobile.
  */
 
+import { Suspense } from "react";
+
 export default function AuthLayout({
   children,
 }: {
@@ -79,7 +81,19 @@ export default function AuthLayout({
           <span className="text-xl font-bold">LearnAI</span>
         </div>
 
-        <div className="w-full max-w-md">{children}</div>
+        <div className="w-full max-w-md">
+          <Suspense fallback={
+            <div className="flex flex-col items-center justify-center p-8 gap-3">
+              <div className="relative">
+                <div className="h-10 w-10 rounded-full border-4 border-slate-100" />
+                <div className="absolute inset-0 h-10 w-10 rounded-full border-4 border-sky-500 border-t-transparent animate-spin" />
+              </div>
+              <p className="text-xs text-slate-400">Loading form…</p>
+            </div>
+          }>
+            {children}
+          </Suspense>
+        </div>
       </div>
     </div>
   );
