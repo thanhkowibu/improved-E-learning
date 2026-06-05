@@ -179,7 +179,7 @@ Follow the existing ADR format:
 [Why this approach over alternatives?]
 ```
 
-The file currently contains ADR-001 through ADR-010. The next entry should be **ADR-011**.
+The file currently contains ADR-001 through ADR-011. The next entry should be **ADR-012**.
 
 ---
 

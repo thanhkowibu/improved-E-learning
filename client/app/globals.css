@@ -4,6 +4,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@plugin "@tailwindcss/typography";
+
 /* ============================================================
    Design Tokens — LearnAI LMS
    Primary palette: Sky Blue academic theme

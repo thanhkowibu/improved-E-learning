@@ -1,0 +1,84 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import rehypeKatex from "rehype-katex";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "model";
+  text: string;
+}
+
+interface MessageListProps {
+  messages: ChatMessage[];
+  isLoading: boolean;
+}
+
+export function MessageList({ messages, isLoading }: MessageListProps) {
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
+
+  return (
+    <ScrollArea className="h-full min-h-0 w-full">
+      <div className="flex min-h-full flex-col gap-4 px-4 py-5">
+        {messages.map((message) => {
+          const isUser = message.role === "user";
+
+          return (
+            <div
+              key={message.id}
+              className={cn(
+                "flex w-full",
+                isUser ? "justify-end" : "justify-start"
+              )}
+            >
+              <div
+                className={cn(
+                  "max-w-[min(80%,42rem)] rounded-lg px-4 py-3 text-sm leading-6 shadow-sm",
+                  "break-words",
+                  isUser
+                    ? "bg-blue-600 text-white"
+                    : "bg-muted/50 text-foreground"
+                )}
+              >
+                {isUser ? (
+                  <p className="whitespace-pre-wrap">{message.text}</p>
+                ) : (
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeKatex]}
+                    >
+                      {message.text}
+                    </ReactMarkdown>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+
+        {isLoading ? (
+          <div className="flex w-full justify-start">
+            <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-3 text-sm text-muted-foreground shadow-sm">
+              <Loader2 className="size-4 animate-spin text-blue-600" />
+              <span>Thinking</span>
+            </div>
+          </div>
+        ) : null}
+
+        <div ref={bottomRef} />
+      </div>
+    </ScrollArea>
+  );
+}

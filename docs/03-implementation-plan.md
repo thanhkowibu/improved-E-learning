@@ -304,27 +304,31 @@
 
 ## Phase 5: AI Tutor Chat UI (Frontend)
 
-> Build the chat interface that students use to interact with the Gemini-powered AI Tutor. All API calls go to internal Next.js API routes (`/api/...`).
+> Build the chat interface that students use to interact with the Gemini-powered AI Tutor. The UI follows a **dual-layout strategy**: a standalone Chat Page for focused conversations, and a slide-out Sheet panel on the Lesson View for in-context Q&A. Both layouts compose the same reusable component library. All API calls go to internal Next.js API routes (`/api/...`).
 
-### 5A — Chat Interface
+### 5A — Component-Driven Chat Core
 
-- [ ] **[Next.js]** Build Chat panel/page (`app/(dashboard)/courses/[courseId]/chat/page.tsx`)
-- [ ] **[Next.js]** Build thread sidebar (list of previous conversations with create-new button) — fetches from `GET /api/courses/[courseId]/chat/threads`
-- [ ] **[Next.js]** Build chat message list with role-based styling (user messages right-aligned, assistant left-aligned)
-- [ ] **[Next.js]** Build message input with send button and Enter-to-submit — posts to `POST /api/chat/threads/[threadId]/ask`
-- [ ] **[Next.js]** Render Markdown in assistant responses (code blocks, lists, bold, LaTeX math via `react-markdown` + `remark-math` + `rehype-katex`)
-- [ ] **[Next.js]** Show loading/typing indicator while waiting for Gemini response
-- [ ] **[Next.js]** Auto-scroll to latest message
-- [ ] **[Next.js]** Handle error states (AI unavailable, rate limits, safety filters, network errors) with user-friendly messages
+> Build a reusable component library in `components/chat/` first, then assemble them into the standalone chat page. This ensures the same components can be embedded in the Lesson View Sheet (Phase 5B) without duplication.
 
-### 5B — Chat UX Polish
+- [x] **[Next.js]** Install markdown rendering dependencies: `npm install react-markdown remark-gfm remark-math rehype-katex`
+- [x] **[Next.js]** Build `<MessageList>` component (`components/chat/MessageList.tsx`) — renders chat messages with role-based styling (user messages right-aligned, assistant left-aligned), Markdown rendering in assistant responses (code blocks, lists, bold, LaTeX math via `react-markdown` + `remark-gfm` + `remark-math` + `rehype-katex`), auto-scroll to latest message
+- [x] **[Next.js]** Build `<ChatInput>` component (`components/chat/ChatInput.tsx`) — message input with send button, Enter-to-submit, Ctrl+Enter for newline, disabled state while awaiting response
+- [x] **[Next.js]** Build `<ThreadSidebar>` component (`components/chat/ThreadSidebar.tsx`) — list of previous conversations with create-new button, fetches from `GET /api/courses/[courseId]/chat/threads`, thread selection callback
+- [ ] **[Next.js]** Build `<ChatWidget>` component (`components/chat/ChatWidget.tsx`) — composes `<ThreadSidebar>`, `<MessageList>`, and `<ChatInput>` into a complete chat experience; accepts `courseId` prop; manages thread selection, message fetching (`GET /api/chat/threads/[threadId]/messages`), and message sending (`POST /api/chat/threads/[threadId]/ask`) as internal state
+- [ ] **[Next.js]** Show loading/typing indicator in `<MessageList>` while waiting for Gemini response
+- [ ] **[Next.js]** Handle error states (AI unavailable, rate limits, safety filters, network errors) with user-friendly inline messages
+- [ ] **[Next.js]** Build standalone Chat page (`app/(dashboard)/courses/[courseId]/chat/page.tsx`) — a `"use client"` page that renders `<ChatWidget courseId={courseId} />` in a full-page layout with course title header
 
-- [ ] **[Next.js]** Add "AI Tutor not configured" empty state when course has `aiEnabled === false`
-- [ ] **[Next.js]** Add thread delete with confirmation — calls `DELETE /api/chat/threads/[threadId]`
-- [ ] **[Next.js]** Add "Ask AI Tutor" button on lesson pages (opens chat with course context)
-- [ ] **[Next.js]** Mobile-responsive chat layout (full-screen chat on mobile)
-- [ ] **[Next.js]** Add keyboard shortcuts (Ctrl+Enter to send, Escape to close)
-- [ ] **[Next.js]** Display Gemini safety filter warnings gracefully when a response is blocked
+### 5B — UX Polish & Lesson View Integration
+
+> Integrate the chat into the lesson study flow using a Shadcn `<Sheet>` slide-out panel, allowing students to read lesson content and chat with the AI Tutor simultaneously (NotebookLM-style).
+
+- [ ] **[Next.js]** Integrate `<ChatWidget>` into the Lesson View page (`app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx`) using a Shadcn `<Sheet side="right">`. When the user clicks "Ask AI Tutor", a slide-out panel opens on the right side allowing them to read the lesson and chat simultaneously — the Sheet receives the `courseId` and renders `<ChatWidget>` inside it
+- [ ] **[Next.js]** Add "AI Tutor not configured" empty state inside `<ChatWidget>` when course has `aiEnabled === false` or no materials have `geminiFileUri`
+- [ ] **[Next.js]** Add thread delete with confirmation in `<ThreadSidebar>` — calls `DELETE /api/chat/threads/[threadId]`
+- [ ] **[Next.js]** Mobile-responsive chat layout: standalone page uses full-screen layout; Sheet panel uses `side="bottom"` or full-screen on mobile breakpoints
+- [ ] **[Next.js]** Add keyboard shortcuts (Ctrl+Enter to send, Escape to close Sheet)
+- [ ] **[Next.js]** Display Gemini safety filter warnings gracefully when a response is blocked (inline alert in `<MessageList>`)
 
 ### 5C — Teacher AI Management
 

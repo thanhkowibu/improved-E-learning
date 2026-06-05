@@ -586,3 +586,64 @@ The analytics page only needs to aggregate data for display. A dedicated stats e
 3. Client-side fetch + loading states for data that is available server-side.
 
 The Server Component approach is simpler, faster (no network round-trip), and equally secure (auth checked before any Prisma query).
+
+---
+
+## ADR-011 · Dual-Layout Chat UI — Standalone Page + Shadcn Sheet on Lesson View
+
+**Date:** 2026-06-05
+**Phase:** 5A/5B (AI Tutor Chat UI)
+**Status:** Adopted
+
+### Context
+
+The AI Tutor chat needs to be accessible in two distinct user workflows:
+
+1. **Focused conversation** — The student navigates to a dedicated chat page to have an extended Q&A session about the course.
+2. **In-context Q&A** — While studying a lesson, the student has a quick question and wants to ask the AI without leaving the lesson content.
+
+A single-page approach would force the student to navigate away from the lesson, losing their reading position. A panel-only approach would lack the space for thread management and extended conversations.
+
+### Decision: Dual Layout with Shared Component Library
+
+Build reusable chat components in `components/chat/` and compose them into **two layouts**:
+
+| Layout | Route / Location | UX Pattern |
+|---|---|---|
+| **Standalone Chat Page** | `app/(dashboard)/courses/[courseId]/chat/page.tsx` | Full-page layout with `<ThreadSidebar>` + `<MessageList>` + `<ChatInput>` — for focused, multi-thread conversations |
+| **Lesson View Sheet** | `app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx` | Shadcn `<Sheet side="right">` containing `<ChatWidget>` — slide-out panel so the student can read the lesson and chat simultaneously (NotebookLM-style) |
+
+Both layouts render the same `<ChatWidget>` component, which internally manages thread selection, message fetching, and message sending.
+
+### Component Architecture
+
+```
+components/chat/
+├── ChatWidget.tsx       # Complete chat experience (composes the below)
+├── ThreadSidebar.tsx    # Thread list + create-new
+├── MessageList.tsx      # Message rendering with Markdown + auto-scroll
+└── ChatInput.tsx        # Input field + send button + keyboard shortcuts
+```
+
+### Why Shadcn `<Sheet>` for the Lesson View
+
+| Concern | Modal / Dialog | Shadcn Sheet | Separate Page |
+|---|---|---|---|
+| Co-visibility with lesson content | ❌ Blocks lesson | ✅ Side-by-side | ❌ Navigates away |
+| Implementation cost | Low | Low (Shadcn primitive) | Low |
+| Mobile adaptation | Awkward | `side="bottom"` or full-screen | Full-screen |
+| State preservation | Lesson state preserved | Lesson state preserved | Lesson state lost |
+| Consistent with NotebookLM UX | No | ✅ Yes | No |
+
+The `<Sheet>` component is already available via Shadcn UI and renders as a slide-out overlay that does not unmount the underlying page content. This preserves the student's scroll position and reading context while they interact with the AI Tutor.
+
+### Key Design Decisions
+
+| Decision | Choice Made | Rationale |
+|---|---|---|
+| Component location | `components/chat/` (reusable library) | Same components used in both standalone page and Sheet panel — zero duplication |
+| Sheet trigger | "Ask AI Tutor" button on lesson page | Discoverable but non-intrusive; only visible when `aiEnabled === true` |
+| Sheet side | `right` (desktop), `bottom` or full-screen (mobile) | Right panel preserves lesson reading flow on wide screens |
+| Markdown rendering | `react-markdown` + `remark-gfm` + `remark-math` + `rehype-katex` | Supports code blocks, tables, LaTeX math — essential for educational Q&A |
+| Thread management in Sheet | Simplified — single active thread, thread list collapsed | Sheet has limited width; full thread management available on standalone page |
+
