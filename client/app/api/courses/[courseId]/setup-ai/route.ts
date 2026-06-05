@@ -41,8 +41,6 @@ function isEligibleGeminiMaterial(material: {
     extension === ".txt" ||
     extension === ".text" ||
     extension === ".md" ||
-    extension === ".docx" ||
-    extension === ".doc" ||
     extension === ".csv" ||
     extension === ".xlsx" ||
     extension === ".pptx"

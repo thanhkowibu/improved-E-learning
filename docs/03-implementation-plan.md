@@ -251,44 +251,44 @@
 - [x] **[Next.js API]** Implement `uploadFileToGemini(filePath: string, displayName: string)` using `ai.files.upload({ file: filePath, config: { displayName } })` → returns `file.uri` and `file.name`
 - [x] **[Next.js API]** Implement `getGeminiFile(fileName: string)` using `ai.files.get({ name })` → check file state (`ACTIVE` vs `PROCESSING`)
 - [x] **[Next.js API]** Implement `deleteGeminiFile(fileName: string)` using `ai.files.delete({ name })`
-- [ ] **[Next.js API]** Implement `listGeminiFiles()` for debugging/admin purposes
+- [x] **[Next.js API]** Implement `listGeminiFiles()` for debugging/admin purposes
 - [x] **[Next.js API]** Handle file processing wait: poll `ai.files.get()` until `state === "ACTIVE"` before using in chat (with `setTimeout`-based polling and a max timeout)
 - [x] **[Next.js API]** Handle Gemini File API errors (file too large, unsupported format, quota exceeded) with graceful error responses
 
 ### 4C — Course AI Setup Endpoint
 
-- [ ] **[Next.js API]** Implement `POST /api/courses/[courseId]/setup-ai` route handler (`app/api/courses/[courseId]/setup-ai/route.ts`):
+- [x] **[Next.js API]** Implement `POST /api/courses/[courseId]/setup-ai` route handler (`app/api/courses/[courseId]/setup-ai/route.ts`):
   - Iterates through all course materials (PDFs) via Prisma query
   - Uploads each to Gemini via `ai.files.upload()`
   - Stores returned `file.uri` in `materials.geminiFileUri` via Prisma update
   - Sets `courses.aiEnabled = true` via Prisma update
   - Returns count of files uploaded and their status
-- [ ] **[Next.js API]** Update material upload flow: auto-upload new PDFs to Gemini if `course.aiEnabled === true`, save `geminiFileUri`
-- [ ] **[Next.js API]** Update material delete flow: call `ai.files.delete()` if `geminiFileUri` exists, then clear the field in Prisma
-- [ ] **[Next.js API]** Update course delete flow: delete all Gemini files associated with course materials before Prisma cascade delete
-- [ ] **[Next.js API]** Add async handling for file uploads (Gemini File API can be slow for large PDFs) — consider using a background job pattern or streaming progress
+- [x] **[Next.js API]** Update material upload flow: auto-upload new PDFs to Gemini if `course.aiEnabled === true`, save `geminiFileUri`
+- [x] **[Next.js API]** Update material delete flow: call `ai.files.delete()` if `geminiFileUri` exists, then clear the field in Prisma
+- [x] **[Next.js API]** Update course delete flow: delete all Gemini files associated with course materials before Prisma cascade delete
+- [x] **[Next.js API]** Add async handling for file uploads (Gemini File API can be slow for large PDFs) — consider using a background job pattern or streaming progress
 
 ### 4D — Chat Session & Message Handling
 
-- [ ] **[Next.js API]** Create system prompt template for the AI Tutor (`lib/gemini/prompts.ts`): _"You are a helpful tutor for the course '{courseTitle}'. Answer questions based ONLY on the provided course materials. If the answer is not in the materials, say so clearly. Cite specific sections where possible."_
-- [ ] **[Next.js API]** Implement chat logic in `lib/gemini/gemini.service.ts`:
+- [x] **[Next.js API]** Create system prompt template for the AI Tutor (`lib/gemini/prompts.ts`): _"You are a helpful tutor for the course '{courseTitle}'. Answer questions based ONLY on the provided course materials. If the answer is not in the materials, say so clearly. Cite specific sections where possible."_
+- [x] **[Next.js API]** Implement chat logic in `lib/gemini/gemini.service.ts`:
   1. Load all `geminiFileUri` references for the course's materials via Prisma
   2. Build the `contents` array: system instruction + file references (as `Part` objects with `fileData: { fileUri }`) + conversation history from `chat_messages`
   3. Call `ai.models.generateContent({ model, contents, config: { systemInstruction } })` (or use chat sessions with `ai.chats.create()`)
   4. Return the assistant response text
-- [ ] **[Next.js API]** Handle Gemini-specific response parsing: extract `response.text`, handle `finishReason`, safety ratings
-- [ ] **[Next.js API]** Implement token counting awareness: log `response.usageMetadata` (promptTokenCount, candidatesTokenCount)
-- [ ] **[Next.js API]** Handle Gemini API errors gracefully (rate limits `429`, safety blocks, context length exceeded, network timeouts)
-- [ ] **[Next.js API]** Add retry logic with exponential backoff for transient Gemini API failures
+- [x] **[Next.js API]** Handle Gemini-specific response parsing: extract `response.text`, handle `finishReason`, safety ratings
+- [x] **[Next.js API]** Implement token counting awareness: log `response.usageMetadata` (promptTokenCount, candidatesTokenCount)
+- [x] **[Next.js API]** Handle Gemini API errors gracefully (rate limits `429`, safety blocks, context length exceeded, network timeouts)
+- [x] **[Next.js API]** Add retry logic with exponential backoff for transient Gemini API failures
 
 ### 4E — Chat CRUD Endpoints
 
-- [ ] **[Next.js API]** Create Zod validation schemas (`lib/validations/chat.ts` — `threadCreateSchema`, `askMessageSchema`)
-- [ ] **[Next.js API]** Create chat service module (`lib/services/chat.service.ts`) — orchestrates between Prisma queries and Gemini service
-- [ ] **[Next.js API]** Implement `POST /api/courses/[courseId]/chat/threads` route handler (`app/api/courses/[courseId]/chat/threads/route.ts`) — create a new local thread via Prisma
-- [ ] **[Next.js API]** Implement `GET /api/courses/[courseId]/chat/threads` route handler — list student's threads for this course via Prisma
-- [ ] **[Next.js API]** Implement `GET /api/chat/threads/[threadId]/messages` route handler (`app/api/chat/threads/[threadId]/messages/route.ts`) — get conversation history via Prisma
-- [ ] **[Next.js API]** Implement `POST /api/chat/threads/[threadId]/ask` route handler (`app/api/chat/threads/[threadId]/ask/route.ts`):
+- [x] **[Next.js API]** Create Zod validation schemas (`lib/validations/chat.ts` — `threadCreateSchema`, `askMessageSchema`)
+- [x] **[Next.js API]** Create chat service module (`lib/services/chat.service.ts`) — orchestrates between Prisma queries and Gemini service
+- [x] **[Next.js API]** Implement `POST /api/courses/[courseId]/chat/threads` route handler (`app/api/courses/[courseId]/chat/threads/route.ts`) — create a new local thread via Prisma
+- [x] **[Next.js API]** Implement `GET /api/courses/[courseId]/chat/threads` route handler — list student's threads for this course via Prisma
+- [x] **[Next.js API]** Implement `GET /api/chat/threads/[threadId]/messages` route handler (`app/api/chat/threads/[threadId]/messages/route.ts`) — get conversation history via Prisma
+- [x] **[Next.js API]** Implement `POST /api/chat/threads/[threadId]/ask` route handler (`app/api/chat/threads/[threadId]/ask/route.ts`):
   1. Validate enrollment + `aiEnabled` on course via Prisma
   2. Save user message to `ChatMessage` via Prisma
   3. Load full thread history from `ChatMessage` via Prisma
@@ -296,9 +296,9 @@
   5. Call Gemini `generateContent` with system prompt + files + history using `@google/genai`
   6. Save assistant response to `ChatMessage` via Prisma
   7. Return both messages
-- [ ] **[Next.js API]** Implement `DELETE /api/chat/threads/[threadId]` route handler — delete thread via Prisma cascade (deletes messages)
-- [ ] **[Next.js API]** Add enrollment validation: student must be enrolled in the course to chat (reuse `checkEnrollment` helper)
-- [ ] **[Next.js API]** Add course AI readiness check: verify `aiEnabled === true` and at least one material has `geminiFileUri` before allowing chat
+- [x] **[Next.js API]** Implement `DELETE /api/chat/threads/[threadId]` route handler — delete thread via Prisma cascade (deletes messages)
+- [x] **[Next.js API]** Add enrollment validation: student must be enrolled in the course to chat (reuse `checkEnrollment` helper)
+- [x] **[Next.js API]** Add course AI readiness check: verify `aiEnabled === true` and at least one material has `geminiFileUri` before allowing chat
 
 ---
 
