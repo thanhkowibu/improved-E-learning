@@ -1,8 +1,8 @@
 # Database Schema — E-Learning LMS (PostgreSQL)
 
-> **Version:** 2.0  
-> **Last Updated:** 2026-05-18  
-> **Engine:** PostgreSQL 16 + SQLAlchemy ORM (async)
+> **Version:** 3.0  
+> **Last Updated:** 2026-06-04  
+> **Engine:** PostgreSQL 16 + Prisma ORM
 
 ---
 
@@ -18,17 +18,22 @@
 └────┬─────┘             │              │ lessons  │
      │                   │              └────┬─────┘
      │ N:M               │                   │ 1:N
-     │          ┌────────┴────────┐     ┌────┴──────────┐
-     └──────────│  enrollments    │     │  materials     │
-                └─────────────────┘     │ gemini_file_uri│
-                                        └───────┬───────┘
-                                                │
-                ┌───────────────────────────────┘
+     │          ┌────────┴────────┐     ┌────┴──────────────┐
+     └──────────│  enrollments    │     │  materials        │
+                └─────────────────┘     │  gemini_file_uri  │
+                                        └────┬─────────────┘
+                                             │ 1:N
+                ┌────────────────────────────┘
                 │
-        ┌───────┴──────────┐
-        │ chat_threads     │
-        └──────────────────┘
+        ┌───────┴──────────┐     ┌──────────────────┐
+        │ chat_threads     │     │ lesson_progress   │
+        └──────────────────┘     │ (studentId,       │
+                                 │  lessonId,        │
+                                 │  isCompleted)     │
+                                 └──────────────────┘
 ```
+
+> `lesson_progress` links `users` ↔ `lessons` (Many-to-Many through progress tracking).
 
 ---
 
@@ -291,6 +296,37 @@ CREATE INDEX idx_chat_messages_thread ON chat_messages(thread_id);
 
 ---
 
+### 9. `lesson_progress`
+
+Tracks which lessons a student has completed. Used to calculate course progress percentages on dashboards and analytics.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `UUID` | `PK` | |
+| `student_id` | `UUID` | `FK → users.id, NOT NULL` | Student who completed the lesson |
+| `lesson_id` | `UUID` | `FK → lessons.id, NOT NULL` | Completed lesson |
+| `is_completed` | `BOOLEAN` | `DEFAULT FALSE` | Whether the lesson is marked complete |
+| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
+| `updated_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
+
+```sql
+CREATE TABLE lesson_progress (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_id     UUID NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+    is_completed  BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    UNIQUE(student_id, lesson_id)
+);
+
+CREATE INDEX idx_lesson_progress_student ON lesson_progress(student_id);
+CREATE INDEX idx_lesson_progress_lesson  ON lesson_progress(lesson_id);
+```
+
+---
+
 ## Relationship Summary
 
 | Relationship | Type | FK |
@@ -300,6 +336,7 @@ CREATE INDEX idx_chat_messages_thread ON chat_messages(thread_id);
 | `modules` → `lessons` | One-to-Many | `lessons.module_id` |
 | `lessons` → `materials` | One-to-Many | `materials.lesson_id` |
 | `users` ↔ `courses` (enrollment) | Many-to-Many | `enrollments(student_id, course_id)` |
+| `users` ↔ `lessons` (progress) | Many-to-Many | `lesson_progress(student_id, lesson_id)` |
 | `users` + `courses` → `chat_threads` | One-to-Many | `chat_threads(student_id, course_id)` |
 | `chat_threads` → `chat_messages` | One-to-Many | `chat_messages.thread_id` |
 
@@ -310,4 +347,4 @@ CREATE INDEX idx_chat_messages_thread ON chat_messages(thread_id);
 1. **UUIDs everywhere** — Avoids sequential ID enumeration; safe for public-facing APIs.
 2. **Cascade deletes** — Deleting a course removes its modules, lessons, materials, enrollments, and chat threads.
 3. **Gemini URIs are nullable** — They are populated asynchronously after Gemini File API calls succeed.
-4. **Context window usage** — With Gemini 1.5 Pro's 2M token context window, `chat_threads` and `chat_messages` are stored locally, and the history is passed along with `gemini_file_uri`s on every request, avoiding the need for an external stateful Assistant API.
+4. **Context window usage** — Gemini models support large context windows. `chat_threads` and `chat_messages` are stored locally, and the history is passed along with `gemini_file_uri`s on every request, avoiding the need for an external stateful Assistant API.

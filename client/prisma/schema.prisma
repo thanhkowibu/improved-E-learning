@@ -120,15 +120,16 @@ model Lesson {
 }
 
 model Material {
-  id            String       @id @default(uuid())
-  lessonId      String
-  title         String
-  materialType  MaterialType @default(PDF)
-  fileUrl       String
-  fileSizeBytes BigInt?
-  geminiFileUri String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id             String       @id @default(uuid())
+  lessonId       String
+  title          String
+  materialType   MaterialType @default(PDF)
+  fileUrl        String
+  fileSizeBytes  BigInt?
+  geminiFileUri  String?
+  geminiFileName String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   // Relations
   lesson Lesson @relation("LessonMaterials", fields: [lessonId], references: [id], onDelete: Cascade)

@@ -524,3 +524,65 @@ This is called repeatedly as bytes are transmitted, with `e.loaded` (bytes sent 
 | Body format | `FormData` with `formData.append("file", file)` | Matches `request.formData()` on the server — browser sets correct `multipart/form-data` boundary automatically |
 | Fetch alternative rejected | `fetch()` | No upload progress event in the Fetch specification |
 | Axios rejected | Not added | ~13 KB dependency for a single feature; XHR achieves the same result natively |
+
+---
+
+## ADR-010 · LessonProgress Model & Hybrid Dashboard Data Fetching
+
+**Date:** 2026-06-03
+**Phase:** 3E/3F (Student Lesson View & Dashboards)
+**Status:** Adopted
+
+### Context
+
+During Phase 3E, it became clear that student dashboards and analytics needed a way to track which lessons a student had completed. The original database schema did not include a progress tracking model.
+
+Separately, Phase 3F required choosing a data-fetching strategy for the three role-based dashboards (Student, Teacher, Admin) and the analytics page.
+
+### Decision A: `LessonProgress` Model
+
+A new `LessonProgress` model was added to `prisma/schema.prisma`:
+
+```prisma
+model LessonProgress {
+  id          String   @id @default(uuid())
+  studentId   String
+  lessonId    String
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  student User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  lesson  Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, lessonId])
+  @@map("lesson_progress")
+}
+```
+
+**Key design decisions:**
+- `@@unique([studentId, lessonId])` — enforces one progress record per student-lesson pair; `upsert` is used for idempotent toggling.
+- `isCompleted` boolean (not an enum) — sufficient for the current requirement; expandable to a status enum later if needed.
+- Cascade deletes on both `User` and `Lesson` FKs — cleaning up orphan records automatically.
+
+Two API routes were added:
+- `GET /api/lessons/[lessonId]/progress` — reads the current student's completion status.
+- `POST /api/lessons/[lessonId]/progress` — upserts the completion status (toggle).
+
+### Decision B: Hybrid Dashboard Data Fetching
+
+The dashboards use two different strategies depending on their interactivity needs:
+
+| Component | Strategy | Why |
+|---|---|---|
+| `dashboard/page.tsx` → `AdminDashboard` / `TeacherDashboard` / `StudentDashboard` | Client component (`"use client"`) with `useApi` hooks | Interactive dashboards with role-based conditional rendering; `useAuth` provides the role at runtime |
+| `admin/analytics/page.tsx` | Server Component with direct Prisma queries | Read-only analytics page; no interactivity needed; avoids creating a dedicated `/api/admin/stats` endpoint |
+
+**Why no `GET /api/admin/stats` endpoint?**
+
+The analytics page only needs to aggregate data for display. A dedicated stats endpoint would add:
+1. A route handler that just wraps Prisma queries with no mutation logic.
+2. An additional auth + role check layer (already handled by `getAuthUser()` in the Server Component).
+3. Client-side fetch + loading states for data that is available server-side.
+
+The Server Component approach is simpler, faster (no network round-trip), and equally secure (auth checked before any Prisma query).

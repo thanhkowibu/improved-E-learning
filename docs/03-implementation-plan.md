@@ -1,7 +1,7 @@
 # Implementation Plan — E-Learning LMS
 
-> **Version:** 3.0  
-> **Last Updated:** 2026-05-20  
+> **Version:** 3.1  
+> **Last Updated:** 2026-06-04  
 > **Strategy:** Core LMS first → AI integration later  
 > **Stack:** Next.js 15 App Router (fullstack) · Prisma ORM · PostgreSQL · Google Gemini API (`@google/genai`) · TypeScript · Tailwind CSS & Shadcn UI
 
@@ -12,12 +12,14 @@
 > **Decision:** Drop the separate Python/FastAPI backend entirely. The application is now a **100% Next.js fullstack monolith** using App Router Route Handlers (and Server Actions where appropriate) for the API layer, with **Prisma ORM** as the data access layer.
 >
 > **Rationale:**
+>
 > - **Single language & runtime:** TypeScript end-to-end eliminates context-switching between Python and TypeScript, and allows sharing types, validation schemas (Zod), and utilities across frontend and backend.
 > - **Simplified deployment:** One deployable unit (Next.js) instead of orchestrating two separate services. Ideal for Vercel deployment or a single Docker container.
 > - **Prisma advantages:** Type-safe database client auto-generated from the schema, built-in migrations (`prisma migrate`), and excellent DX with auto-completion.
 > - **Next.js App Router capabilities:** Route Handlers (`app/api/.../route.ts`) provide a robust API layer. Server Components and Server Actions enable direct server-side data fetching and mutations without an API round-trip where appropriate.
 >
 > **Key Architectural Changes (vs. v2.0 plan):**
+>
 > - ~~`api-service/` directory (FastAPI)~~ → All backend logic lives inside `app/api/` route handlers and `lib/` service modules.
 > - ~~SQLAlchemy models + Alembic migrations~~ → `prisma/schema.prisma` + `npx prisma migrate dev`.
 > - ~~Pydantic schemas~~ → **Zod** validation schemas (shared between API routes and frontend forms).
@@ -31,11 +33,13 @@
 
 > **Decision:** Replace the OpenAI Assistants API with Google Gemini API.  
 > **Rationale:**
-> - Gemini 1.5 Pro offers a **2M token context window** — large enough to pass full course PDFs directly as context without vector stores or embeddings.
+>
+> - Gemini models offer **large context windows** — large enough to pass full course PDFs directly as context without vector stores or embeddings.
 > - Gemini provides a **generous free tier** (15 RPM / 1M TPM on Flash) — ideal for an educational project.
 > - **Simpler architecture:** No vector stores, no assistants, no polling for run completion. Just upload files via the File API and pass them into a chat session.
 >
 > **Key Architectural Changes:**
+>
 > - `courses` table: Remove `assistant_id` and `vector_store_id`.
 > - `materials` table: Replace `openai_file_id` with `gemini_file_uri` (the URI returned by `genai.uploadFile`).
 > - `chat_threads` table: Remove `openai_thread_id` — conversation history is managed locally in `chat_messages` and rebuilt per request.
@@ -206,19 +210,27 @@
 - [x] **[Next.js]** Display material list per lesson with download links (to `GET /api/materials/[materialId]/download`)
 - [x] **[Next.js]** Add delete material functionality with confirmation modal — calls `DELETE /api/materials/[materialId]`
 
-### 3E — Student Lesson View
+### 3E — Student Lesson View ✅
 
 - [x] **[Next.js]** Build lesson content viewer (renders Markdown content) — fetches from `GET /api/lessons/[lessonId]`
 - [x] **[Next.js]** Display attached materials with download buttons
 - [x] **[Next.js]** Build lesson navigation (prev/next within module)
+- [x] **[Next.js]** Implement `LessonProgress` model (`studentId`, `lessonId`, `isCompleted`) for tracking completion — added to Prisma schema with `@@unique([studentId, lessonId])`
+- [x] **[Next.js]** Build `POST /api/lessons/[lessonId]/progress` and `GET /api/lessons/[lessonId]/progress` route handlers for toggling and reading lesson completion status
+- [x] **[Next.js]** Integrate progress tracking into the lesson view and student dashboard
 
-### 3F — Admin Dashboard
+> **Implementation Note:** The `LessonProgress` model was an ad-hoc addition during Phase 3E to support progress tracking on the student dashboard. See `prisma/schema.prisma` for the full model definition and `docs/01-database-schema.md` for the schema documentation.
 
+### 3F — Dashboards ✅
+
+- [x] **[Next.js]** Build role-based dashboard hub (`app/(dashboard)/dashboard/page.tsx`) — client component with `useAuth` that conditionally renders `<StudentDashboard>`, `<TeacherDashboard>`, or `<AdminDashboard>` based on `user.role`
 - [x] **[Next.js]** Build Admin user management page (`app/(dashboard)/admin/users/page.tsx`) — fetches from `GET /api/users`
 - [x] **[Next.js]** Display user table with role badges and status
 - [x] **[Next.js]** Add ability to deactivate/reactivate users — calls `DELETE /api/users/[userId]` or `PATCH /api/users/[userId]`
-- [x] **[Next.js]** Show platform statistics (total users, courses, enrollments) — fetch counts via a dedicated `GET /api/admin/stats` route handler or Server Component with direct Prisma queries
-- [x] **[Next.js]** Build Admin Analytics Dashboard (`app/(dashboard)/admin/analytics/page.tsx`) — Visualizations for users, courses, enrollments using Shadcn/Recharts
+- [x] **[Next.js]** Show platform statistics (total users, courses, enrollments) — **decided against** a dedicated `GET /api/admin/stats` endpoint; admin dashboard fetches data via existing `GET /api/users` and `GET /api/courses` endpoints with `useApi` hooks
+- [x] **[Next.js]** Build Admin Analytics Dashboard (`app/(dashboard)/admin/analytics/page.tsx`) — **Server Component with direct Prisma queries** for enrollment counts per course (admin/teacher) and lesson progress percentages (student); visualised with Recharts via a client `<AnalyticsChart>` wrapper
+
+> **Architecture Note (Dashboard Data Fetching):** The dashboard page (`dashboard/page.tsx`) is a `"use client"` component that uses `useAuth` for role detection and `useApi` hooks for client-side data fetching. The analytics page (`admin/analytics/page.tsx`) is a **Server Component** that uses `getAuthUser()` + direct Prisma queries — no dedicated stats API route was created. This hybrid approach avoids an unnecessary API layer for read-only analytics while keeping the interactive dashboards client-rendered.
 
 ---
 
@@ -228,20 +240,20 @@
 
 ### 4A — Gemini Service Layer
 
-- [ ] **[Next.js API]** Install `@google/genai` SDK (`npm install @google/genai`)
-- [ ] **[Next.js API]** Add `GEMINI_API_KEY` to `.env.local` and validate at startup in `lib/gemini/client.ts`
-- [ ] **[Next.js API]** Create `lib/gemini/gemini.service.ts` as a centralized wrapper for all Gemini API interactions
-- [ ] **[Next.js API]** Configure the Gemini client: instantiate `GoogleGenAI` with `apiKey` from environment variable
-- [ ] **[Next.js API]** Select model: use `gemini-2.0-flash` for fast/free-tier responses, with `gemini-1.5-pro` as a configurable option
+- [x] **[Next.js API]** Install `@google/genai` SDK (`npm install @google/genai`)
+- [x] **[Next.js API]** Add `GEMINI_API_KEY` to `.env.local` and validate at startup in `lib/gemini/client.ts`
+- [x] **[Next.js API]** Create `lib/gemini/gemini.service.ts` as a centralized wrapper for all Gemini API interactions
+- [x] **[Next.js API]** Configure the Gemini client: instantiate `GoogleGenAI` with `apiKey` from environment variable
+- [x] **[Next.js API]** Select model: use `gemini-3.1-flash-lite` — fast, cost-effective, and optimized for grounded Q&A tasks
 
 ### 4B — Gemini File API Integration
 
-- [ ] **[Next.js API]** Implement `uploadFileToGemini(filePath: string, displayName: string)` using `ai.files.upload({ file: filePath, config: { displayName } })` → returns `file.uri` and `file.name`
-- [ ] **[Next.js API]** Implement `getGeminiFile(fileName: string)` using `ai.files.get({ name })` → check file state (`ACTIVE` vs `PROCESSING`)
-- [ ] **[Next.js API]** Implement `deleteGeminiFile(fileName: string)` using `ai.files.delete({ name })`
+- [x] **[Next.js API]** Implement `uploadFileToGemini(filePath: string, displayName: string)` using `ai.files.upload({ file: filePath, config: { displayName } })` → returns `file.uri` and `file.name`
+- [x] **[Next.js API]** Implement `getGeminiFile(fileName: string)` using `ai.files.get({ name })` → check file state (`ACTIVE` vs `PROCESSING`)
+- [x] **[Next.js API]** Implement `deleteGeminiFile(fileName: string)` using `ai.files.delete({ name })`
 - [ ] **[Next.js API]** Implement `listGeminiFiles()` for debugging/admin purposes
-- [ ] **[Next.js API]** Handle file processing wait: poll `ai.files.get()` until `state === "ACTIVE"` before using in chat (with `setTimeout`-based polling and a max timeout)
-- [ ] **[Next.js API]** Handle Gemini File API errors (file too large, unsupported format, quota exceeded) with graceful error responses
+- [x] **[Next.js API]** Handle file processing wait: poll `ai.files.get()` until `state === "ACTIVE"` before using in chat (with `setTimeout`-based polling and a max timeout)
+- [x] **[Next.js API]** Handle Gemini File API errors (file too large, unsupported format, quota exceeded) with graceful error responses
 
 ### 4C — Course AI Setup Endpoint
 
@@ -515,15 +527,15 @@ Phase 4 (Gemini AI)   Phase 3 (LMS UI)
 
 ## Estimated Timeline
 
-| Phase | Effort | Depends On |
-|---|---|---|
-| Phase 0 — Foundation | 1 day | — |
-| Phase 1 — Schema & Auth | 2-3 days | Phase 0 |
-| Phase 2 — LMS APIs | 3-4 days | Phase 1 |
-| Phase 3 — LMS UI | 4-5 days | Phase 1C + Phase 2 |
-| Phase 4 — Gemini AI | 2-3 days | Phase 2 |
-| Phase 5 — Chat UI | 3-4 days | Phase 3 + Phase 4 |
-| Phase 6 — Testing & Deploy | 2-3 days | All |
-| **Total** | **~17-23 days** | |
+| Phase                      | Effort          | Depends On         |
+| -------------------------- | --------------- | ------------------ |
+| Phase 0 — Foundation       | 1 day           | —                  |
+| Phase 1 — Schema & Auth    | 2-3 days        | Phase 0            |
+| Phase 2 — LMS APIs         | 3-4 days        | Phase 1            |
+| Phase 3 — LMS UI           | 4-5 days        | Phase 1C + Phase 2 |
+| Phase 4 — Gemini AI        | 2-3 days        | Phase 2            |
+| Phase 5 — Chat UI          | 3-4 days        | Phase 3 + Phase 4  |
+| Phase 6 — Testing & Deploy | 2-3 days        | All                |
+| **Total**                  | **~17-23 days** |                    |
 
 > **Note:** The fullstack monolith architecture saves ~3-4 days compared to the v2.0 plan because: (1) no separate FastAPI service to build, configure, and deploy; (2) no CORS or inter-service communication setup; (3) shared TypeScript types eliminate schema duplication; (4) Prisma migrations are faster to iterate on than SQLAlchemy/Alembic.
