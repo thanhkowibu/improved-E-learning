@@ -314,10 +314,10 @@
 - [x] **[Next.js]** Build `<MessageList>` component (`components/chat/MessageList.tsx`) — renders chat messages with role-based styling (user messages right-aligned, assistant left-aligned), Markdown rendering in assistant responses (code blocks, lists, bold, LaTeX math via `react-markdown` + `remark-gfm` + `remark-math` + `rehype-katex`), auto-scroll to latest message
 - [x] **[Next.js]** Build `<ChatInput>` component (`components/chat/ChatInput.tsx`) — message input with send button, Enter-to-submit, Ctrl+Enter for newline, disabled state while awaiting response
 - [x] **[Next.js]** Build `<ThreadSidebar>` component (`components/chat/ThreadSidebar.tsx`) — list of previous conversations with create-new button, fetches from `GET /api/courses/[courseId]/chat/threads`, thread selection callback
-- [ ] **[Next.js]** Build `<ChatWidget>` component (`components/chat/ChatWidget.tsx`) — composes `<ThreadSidebar>`, `<MessageList>`, and `<ChatInput>` into a complete chat experience; accepts `courseId` prop; manages thread selection, message fetching (`GET /api/chat/threads/[threadId]/messages`), and message sending (`POST /api/chat/threads/[threadId]/ask`) as internal state
-- [ ] **[Next.js]** Show loading/typing indicator in `<MessageList>` while waiting for Gemini response
-- [ ] **[Next.js]** Handle error states (AI unavailable, rate limits, safety filters, network errors) with user-friendly inline messages
-- [ ] **[Next.js]** Build standalone Chat page (`app/(dashboard)/courses/[courseId]/chat/page.tsx`) — a `"use client"` page that renders `<ChatWidget courseId={courseId} />` in a full-page layout with course title header
+- [x] **[Next.js]** Build `<ChatWidget>` component (`components/chat/ChatWidget.tsx`) — composes `<ThreadSidebar>`, `<MessageList>`, and `<ChatInput>` into a complete chat experience; accepts `courseId` prop; manages thread selection, message fetching (`GET /api/chat/threads/[threadId]/messages`), and message sending (`POST /api/chat/threads/[threadId]/ask`) as internal state
+- [x] **[Next.js]** Show loading/typing indicator in `<MessageList>` while waiting for Gemini response
+- [x] **[Next.js]** Handle error states (AI unavailable, rate limits, safety filters, network errors) with user-friendly inline messages
+- [x] **[Next.js]** Build standalone Chat page (`app/(dashboard)/courses/[courseId]/chat/page.tsx`) — a `"use client"` page that renders `<ChatWidget courseId={courseId} />` in a full-page layout with course title header
 
 ### 5B — UX Polish & Lesson View Integration
 

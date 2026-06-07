@@ -12,7 +12,6 @@
  *   4. PUT /api/lessons/[lessonId]/progress — toggle completion (optimistic UI)
  */
 
-import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -30,26 +29,18 @@ import {
   File as FileIcon,
   CheckCircle2,
   Circle,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/useApi";
+import ReactMarkdown from "react-markdown";
 
 // ─── Dynamic import — SSR safe ────────────────────────────────────────────────
-
-const MarkdownPreview = dynamic(
-  () => import("@uiw/react-md-editor").then((m) => m.default.Markdown),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="min-h-48 w-full rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
-      </div>
-    ),
-  }
-);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,7 +58,12 @@ interface ModuleInfo {
   id: string;
   title: string;
   courseId: string;
-  course: { id: string; title: string; teacherId: string; isPublished: boolean };
+  course: {
+    id: string;
+    title: string;
+    teacherId: string;
+    isPublished: boolean;
+  };
 }
 
 interface LessonDetail {
@@ -114,10 +110,12 @@ function formatBytes(bytes: string | number | null): string {
 
 function MaterialIcon({ mimeType }: { mimeType?: string }) {
   const t = mimeType ?? "";
-  if (t.startsWith("video/")) return <FileVideo size={15} className="text-violet-500 shrink-0" />;
+  if (t.startsWith("video/"))
+    return <FileVideo size={15} className="text-violet-500 shrink-0" />;
   if (t.includes("zip") || t.includes("rar") || t.includes("tar"))
     return <Archive size={15} className="text-orange-500 shrink-0" />;
-  if (t.includes("pdf")) return <FileText size={15} className="text-red-500 shrink-0" />;
+  if (t.includes("pdf"))
+    return <FileText size={15} className="text-red-500 shrink-0" />;
   return <FileIcon size={15} className="text-sky-500 shrink-0" />;
 }
 
@@ -147,7 +145,10 @@ function LessonSkeleton() {
       <Skeleton className="h-10 w-44 rounded-xl" />
       <div className="space-y-3">
         {[1, 2, 3, 4, 5].map((i) => (
-          <Skeleton key={i} className={`h-4 rounded ${i % 2 === 0 ? "w-3/4" : "w-full"}`} />
+          <Skeleton
+            key={i}
+            className={`h-4 rounded ${i % 2 === 0 ? "w-3/4" : "w-full"}`}
+          />
         ))}
       </div>
     </div>
@@ -174,7 +175,7 @@ function MarkCompleteButton({
         "gap-2 rounded-xl px-5 h-10 font-semibold text-sm transition-all duration-200",
         isCompleted
           ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-200"
-          : "border border-slate-200 bg-white text-slate-600 hover:border-emerald-400 hover:text-emerald-700 hover:bg-emerald-50"
+          : "border border-slate-200 bg-white text-slate-600 hover:border-emerald-400 hover:text-emerald-700 hover:bg-emerald-50",
       )}
     >
       {isPending ? (
@@ -206,6 +207,7 @@ export default function LessonViewPage() {
   const [isNavLoading, setIsNavLoading] = useState(true);
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isTutorOpen, setIsTutorOpen] = useState(false);
 
   // Progress state
   const [isCompleted, setIsCompleted] = useState(false);
@@ -241,26 +243,34 @@ export default function LessonViewPage() {
   // ── Fetch current progress ─────────────────────────────────────────────────
   const fetchProgress = useCallback(async () => {
     if (!lessonId) return;
-    const res = await api.get<ProgressResponse>(`/api/lessons/${lessonId}/progress`);
+    const res = await api.get<ProgressResponse>(
+      `/api/lessons/${lessonId}/progress`,
+    );
     if (res.success && res.data) {
       setIsCompleted(res.data.isCompleted);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId]);
 
-  useEffect(() => { fetchLesson(); }, [fetchLesson]);
-  useEffect(() => { fetchModules(); }, [fetchModules]);
-  useEffect(() => { fetchProgress(); }, [fetchProgress]);
+  useEffect(() => {
+    fetchLesson();
+  }, [fetchLesson]);
+  useEffect(() => {
+    fetchModules();
+  }, [fetchModules]);
+  useEffect(() => {
+    fetchProgress();
+  }, [fetchProgress]);
 
   // ── Toggle completion ──────────────────────────────────────────────────────
   const handleToggleComplete = useCallback(async () => {
     const newValue = !isCompleted;
-    setIsCompleted(newValue);   // Optimistic update
+    setIsCompleted(newValue); // Optimistic update
     setIsProgressPending(true);
 
     const res = await api.put<ProgressResponse>(
       `/api/lessons/${lessonId}/progress`,
-      { isCompleted: newValue }
+      { isCompleted: newValue },
     );
 
     if (!res.success) {
@@ -276,7 +286,9 @@ export default function LessonViewPage() {
     return modules
       .slice()
       .sort((a, b) => a.orderIndex - b.orderIndex)
-      .flatMap((m) => m.lessons.slice().sort((a, b) => a.orderIndex - b.orderIndex));
+      .flatMap((m) =>
+        m.lessons.slice().sort((a, b) => a.orderIndex - b.orderIndex),
+      );
   }, [modules]);
 
   const siblingLessons = useMemo<LessonStub[]>(() => {
@@ -293,12 +305,11 @@ export default function LessonViewPage() {
 
   const currentGlobalIndex = useMemo(
     () => allLessons.findIndex((l) => l.id === lessonId),
-    [allLessons, lessonId]
+    [allLessons, lessonId],
   );
 
-  const prevLessonId = currentGlobalIndex > 0
-    ? allLessons[currentGlobalIndex - 1].id
-    : null;
+  const prevLessonId =
+    currentGlobalIndex > 0 ? allLessons[currentGlobalIndex - 1].id : null;
 
   const nextLessonId =
     currentGlobalIndex !== -1 && currentGlobalIndex < allLessons.length - 1
@@ -315,13 +326,16 @@ export default function LessonViewPage() {
 
   if (lessonError || !lesson) {
     return (
-      <div className={`${CONTENT_CLS} py-24 flex flex-col items-center gap-4 text-center`}>
+      <div
+        className={`${CONTENT_CLS} py-24 flex flex-col items-center gap-4 text-center`}
+      >
         <div className="h-16 w-16 rounded-2xl bg-red-50 flex items-center justify-center">
           <AlertCircle size={32} className="text-red-400" />
         </div>
         <p className="text-xl font-bold text-slate-800">Lesson not found</p>
         <p className="text-slate-500 text-sm max-w-sm">
-          {lessonError ?? "This lesson may have been removed or is unavailable."}
+          {lessonError ??
+            "This lesson may have been removed or is unavailable."}
         </p>
         <Link
           href={`/courses/${courseId}/learn`}
@@ -337,9 +351,11 @@ export default function LessonViewPage() {
   return (
     <div className="min-h-screen bg-white pb-24">
       <div className={`${CONTENT_CLS} pt-6`}>
-
         {/* ══ BREADCRUMB ══════════════════════════════════════════════════════ */}
-        <nav aria-label="breadcrumb" className="flex flex-wrap items-center gap-1.5 text-sm text-slate-500 mb-6">
+        <nav
+          aria-label="breadcrumb"
+          className="flex flex-wrap items-center gap-1.5 text-sm text-slate-500 mb-6"
+        >
           <Link
             href={`/courses/${courseId}/learn`}
             className="flex-shrink-0 flex items-center justify-center h-7 w-7 rounded-md border border-slate-200 hover:border-sky-300 hover:bg-sky-50 transition-colors mr-1"
@@ -347,7 +363,10 @@ export default function LessonViewPage() {
           >
             <BookOpen size={13} className="text-slate-500" />
           </Link>
-          <Link href={`/courses/${courseId}/learn`} className="hover:text-sky-600 transition-colors truncate max-w-[10rem]">
+          <Link
+            href={`/courses/${courseId}/learn`}
+            className="hover:text-sky-600 transition-colors truncate max-w-[10rem]"
+          >
             {lesson.module.course.title}
           </Link>
           <ChevronRight size={13} className="shrink-0 opacity-40" />
@@ -366,27 +385,27 @@ export default function LessonViewPage() {
           <div className="flex items-center gap-1.5 flex-1 min-w-0 overflow-x-auto pb-1 scrollbar-none">
             {isNavLoading
               ? [1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-9 w-9 rounded-lg shrink-0" />
-              ))
+                  <Skeleton key={i} className="h-9 w-9 rounded-lg shrink-0" />
+                ))
               : siblingLessons.map((sib, idx) => {
-                const isActive = sib.id === lessonId;
-                return (
-                  <Link
-                    key={sib.id}
-                    href={`/courses/${courseId}/lessons/${sib.id}`}
-                    title={sib.title}
-                    aria-label={`Lesson ${idx + 1}: ${sib.title}`}
-                    className={cn(
-                      "shrink-0 flex items-center justify-center h-9 w-9 rounded-lg border transition-all duration-150 text-sm font-semibold",
-                      isActive
-                        ? "bg-sky-600 border-sky-600 text-white shadow-sm shadow-sky-200"
-                        : "border-slate-200 bg-white text-slate-500 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-600"
-                    )}
-                  >
-                    <BookOpen size={14} />
-                  </Link>
-                );
-              })}
+                  const isActive = sib.id === lessonId;
+                  return (
+                    <Link
+                      key={sib.id}
+                      href={`/courses/${courseId}/lessons/${sib.id}`}
+                      title={sib.title}
+                      aria-label={`Lesson ${idx + 1}: ${sib.title}`}
+                      className={cn(
+                        "shrink-0 flex items-center justify-center h-9 w-9 rounded-lg border transition-all duration-150 text-sm font-semibold",
+                        isActive
+                          ? "bg-sky-600 border-sky-600 text-white shadow-sm shadow-sky-200"
+                          : "border-slate-200 bg-white text-slate-500 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-600",
+                      )}
+                    >
+                      <BookOpen size={14} />
+                    </Link>
+                  );
+                })}
           </div>
 
           {/* Top Prev / Next */}
@@ -440,7 +459,7 @@ export default function LessonViewPage() {
           onClick={() => setIsBookmarked((b) => !b)}
           className={cn(
             "inline-flex items-center gap-2 text-sm font-medium mb-8 transition-colors",
-            isBookmarked ? "text-sky-600" : "text-slate-400 hover:text-sky-500"
+            isBookmarked ? "text-sky-600" : "text-slate-400 hover:text-sky-500",
           )}
           aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this lesson"}
         >
@@ -464,7 +483,9 @@ export default function LessonViewPage() {
             prose-img:rounded-xl prose-img:shadow-sm"
         >
           {lesson.content ? (
-            <MarkdownPreview source={lesson.content} />
+            <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
+              <ReactMarkdown>{lesson.content}</ReactMarkdown>
+            </div>
           ) : (
             <div className="flex flex-col items-center gap-3 py-16 text-center rounded-2xl border border-dashed border-slate-200 bg-slate-50">
               <BookOpen size={28} className="text-slate-300" />
@@ -476,6 +497,27 @@ export default function LessonViewPage() {
         </div>
 
         {/* ══ MATERIALS ════════════════════════════════════════════════════════ */}
+        <div className="mt-12 mb-12 flex flex-col items-start justify-between gap-4 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-6 sm:flex-row sm:items-center">
+          <div>
+            <h2 className="text-base font-bold text-slate-900">
+              Have a question about this lesson?
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Our AI Tutor has read all the course materials and is ready to
+              help.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsTutorOpen(true)}
+            className="shrink-0 gap-2 border-indigo-200 bg-white text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800"
+          >
+            <Sparkles size={16} />
+            Ask AI Tutor
+          </Button>
+        </div>
+
         {lesson.materials.length > 0 && (
           <div className="mb-12">
             <Separator className="mb-6" />
@@ -494,9 +536,13 @@ export default function LessonViewPage() {
                 >
                   <MaterialIcon mimeType={mat.mimeType} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-800 truncate">{mat.title}</p>
+                    <p className="text-sm font-medium text-slate-800 truncate">
+                      {mat.title}
+                    </p>
                     {mat.fileSizeBytes !== null && (
-                      <p className="text-xs text-slate-400">{formatBytes(mat.fileSizeBytes)}</p>
+                      <p className="text-xs text-slate-400">
+                        {formatBytes(mat.fileSizeBytes)}
+                      </p>
                     )}
                   </div>
                   <a
@@ -569,8 +615,25 @@ export default function LessonViewPage() {
             onClick={handleToggleComplete}
           />
         </div>
-
       </div>
+
+      <Button
+        type="button"
+        onClick={() => setIsTutorOpen(true)}
+        className="group fixed right-8 bottom-8 z-50 h-14 rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 px-6 text-white shadow-xl shadow-indigo-500/30 transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50"
+      >
+        <Sparkles size={18} className="group-hover:animate-pulse" />
+        <span className="font-semibold tracking-tight">Ask AI Tutor</span>
+      </Button>
+
+      <Sheet open={isTutorOpen} onOpenChange={setIsTutorOpen}>
+        <SheetContent
+          side="right"
+          className="flex flex-col gap-0 p-0 data-[side=right]:!w-full data-[side=right]:!max-w-none sm:data-[side=right]:!w-4/5 lg:data-[side=right]:!w-2/3 2xl:data-[side=right]:!w-[60vw]"
+        >
+          <ChatWidget courseId={courseId} />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

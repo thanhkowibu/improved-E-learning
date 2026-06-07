@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { Bot, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -12,10 +14,19 @@ import {
   type ChatThreadSummary,
 } from "@/components/chat/ThreadSidebar";
 import { ChatInput } from "@/components/chat/ChatInput";
+import { buttonVariants } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useApi } from "@/hooks/useApi";
+import { cn } from "@/lib/utils";
 
 interface ChatWidgetProps {
   courseId: string;
+  isStandalone?: boolean;
 }
 
 interface ApiThread {
@@ -44,32 +55,98 @@ function toMessageListItem(message: ApiMessage): MessageListItem {
   };
 }
 
-export function ChatWidget({ courseId }: ChatWidgetProps) {
+function isAiUnavailableMessage(message: string): boolean {
+  const normalized = message.toLowerCase();
+
+  return (
+    normalized.includes("ai tutor is not enabled") ||
+    normalized.includes("ai tutor is not ready") ||
+    normalized.includes("no synced materials") ||
+    normalized.includes("not configured")
+  );
+}
+
+function ExpandButton({ courseId }: { courseId: string }) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Link
+              href={`/courses/${courseId}/chat`}
+              className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
+              aria-label="Open in full page"
+            >
+              <Maximize2 className="size-4" />
+            </Link>
+          }
+        />
+        <TooltipContent>Open in full page</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function WidgetHeader({
+  courseId,
+  isStandalone,
+}: {
+  courseId: string;
+  isStandalone: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between border-b py-3 pr-12 pl-4">
+      <div className="flex min-w-0 items-center gap-2">
+        <Bot className="size-4 shrink-0 text-blue-600" />
+        <span className="truncate text-sm font-semibold">AI Tutor</span>
+      </div>
+      {!isStandalone ? <ExpandButton courseId={courseId} /> : null}
+    </div>
+  );
+}
+
+export function ChatWidget({
+  courseId,
+  isStandalone = false,
+}: ChatWidgetProps) {
   const api = useApi();
   const [threads, setThreads] = useState<ChatThreadSummary[]>([]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [messages, setMessages] = useState<MessageListItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isThreadLoading, setIsThreadLoading] = useState(true);
+  const [aiUnavailableMessage, setAiUnavailableMessage] = useState<
+    string | null
+  >(null);
 
   const loadThreads = useCallback(async () => {
     setIsThreadLoading(true);
 
     try {
       const response = await api.get<ApiThread[]>(
-        `/api/courses/${courseId}/chat/threads`
+        `/api/courses/${courseId}/chat/threads`,
       );
 
       if (!response.success || !response.data) {
-        throw new Error(response.message ?? "Failed to load chat threads.");
+        const message = response.message ?? "Failed to load chat threads.";
+        if (isAiUnavailableMessage(message)) {
+          setAiUnavailableMessage(message);
+          setThreads([]);
+          setActiveThreadId(null);
+          setMessages([]);
+          return;
+        }
+
+        throw new Error(message);
       }
 
+      setAiUnavailableMessage(null);
       const loadedThreads = response.data;
       setThreads(loadedThreads);
       setActiveThreadId((current) => current ?? loadedThreads[0]?.id ?? null);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to load chat threads."
+        error instanceof Error ? error.message : "Failed to load chat threads.",
       );
     } finally {
       setIsThreadLoading(false);
@@ -85,7 +162,7 @@ export function ChatWidget({ courseId }: ChatWidgetProps) {
 
     try {
       const response = await api.get<ApiMessage[]>(
-        `/api/chat/threads/${activeThreadId}/messages`
+        `/api/chat/threads/${activeThreadId}/messages`,
       );
 
       if (!response.success || !response.data) {
@@ -95,7 +172,9 @@ export function ChatWidget({ courseId }: ChatWidgetProps) {
       setMessages(response.data.map(toMessageListItem));
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to load chat messages."
+        error instanceof Error
+          ? error.message
+          : "Failed to load chat messages.",
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,13 +194,20 @@ export function ChatWidget({ courseId }: ChatWidgetProps) {
     try {
       const response = await api.post<ApiThread>(
         `/api/courses/${courseId}/chat/threads`,
-        { courseId }
+        { courseId },
       );
 
       if (!response.success || !response.data) {
-        throw new Error(response.message ?? "Failed to create a new chat.");
+        const message = response.message ?? "Failed to create a new chat.";
+        if (isAiUnavailableMessage(message)) {
+          setAiUnavailableMessage(message);
+          return;
+        }
+
+        throw new Error(message);
       }
 
+      setAiUnavailableMessage(null);
       const createdThread = response.data;
       setThreads((current) => [createdThread, ...current]);
       setActiveThreadId(createdThread.id);
@@ -129,7 +215,36 @@ export function ChatWidget({ courseId }: ChatWidgetProps) {
       toast.success("New chat created.");
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to create a new chat."
+        error instanceof Error ? error.message : "Failed to create a new chat.",
+      );
+    }
+  }
+
+  async function handleDeleteThread(threadId: string) {
+    try {
+      const response = await api.del(`/api/chat/threads/${threadId}`);
+
+      if (!response.success) {
+        throw new Error(response.message ?? "Failed to delete chat.");
+      }
+
+      const remainingThreads = threads.filter(
+        (thread) => thread.id !== threadId,
+      );
+      setThreads(remainingThreads);
+
+      if (activeThreadId === threadId) {
+        const nextThreadId = remainingThreads[0]?.id ?? null;
+        setActiveThreadId(nextThreadId);
+        if (!nextThreadId) {
+          setMessages([]);
+        }
+      }
+
+      toast.success("Chat deleted.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete chat.",
       );
     }
   }
@@ -141,15 +256,21 @@ export function ChatWidget({ courseId }: ChatWidgetProps) {
       if (!threadId) {
         const createResponse = await api.post<ApiThread>(
           `/api/courses/${courseId}/chat/threads`,
-          { courseId }
+          { courseId },
         );
 
         if (!createResponse.success || !createResponse.data) {
-          throw new Error(
-            createResponse.message ?? "Failed to create a chat thread."
-          );
+          const message =
+            createResponse.message ?? "Failed to create a chat thread.";
+          if (isAiUnavailableMessage(message)) {
+            setAiUnavailableMessage(message);
+            return;
+          }
+
+          throw new Error(message);
         }
 
+        setAiUnavailableMessage(null);
         const createdThread = createResponse.data;
         threadId = createdThread.id;
         setThreads((current) => [createdThread, ...current]);
@@ -167,7 +288,7 @@ export function ChatWidget({ courseId }: ChatWidgetProps) {
 
       const response = await api.post<AskResponse>(
         `/api/chat/threads/${threadId}/ask`,
-        { message: text }
+        { message: text },
       );
 
       if (!response.success || !response.data) {
@@ -184,34 +305,71 @@ export function ChatWidget({ courseId }: ChatWidgetProps) {
       await loadThreads();
     } catch (error) {
       setMessages((current) =>
-        current.filter((message) => !message.id.startsWith("optimistic-"))
+        current.filter((message) => !message.id.startsWith("optimistic-")),
       );
       toast.error(
-        error instanceof Error ? error.message : "Failed to send message."
+        error instanceof Error ? error.message : "Failed to send message.",
       );
     } finally {
       setIsLoading(false);
     }
   }
 
-  return (
-    <div className="flex h-[600px] min-h-0 overflow-hidden rounded-lg border bg-background shadow-sm">
-      <ThreadSidebar
-        threads={threads}
-        activeThreadId={activeThreadId}
-        onSelectThread={setActiveThreadId}
-        onCreateNew={handleCreateThread}
-      />
-
-      <section className="flex min-w-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1">
-          <MessageList
-            messages={messages}
-            isLoading={isLoading || isThreadLoading}
-          />
+  if (aiUnavailableMessage) {
+    return (
+      <div
+        className={cn(
+          "flex h-full flex-col overflow-hidden rounded-lg border bg-background shadow-sm",
+          isStandalone ? "min-h-4" : "min-h-150",
+        )}
+      >
+        <WidgetHeader courseId={courseId} isStandalone={isStandalone} />
+        <div className="flex flex-1 items-center justify-center bg-slate-50/60 px-6 text-center">
+          <div className="max-w-sm">
+            <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <Bot className="size-6" />
+            </div>
+            <h2 className="text-lg font-bold text-slate-900">
+              AI Tutor Not Configured
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              The instructor has not enabled the AI Tutor or synced materials
+              for this course yet.
+            </p>
+          </div>
         </div>
-        <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
-      </section>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "flex h-full flex-col overflow-hidden rounded-lg border bg-background shadow-sm",
+        isStandalone ? "min-h-0" : "min-h-150",
+      )}
+    >
+      <WidgetHeader courseId={courseId} isStandalone={isStandalone} />
+
+      <div className="flex min-h-0 flex-1">
+        <ThreadSidebar
+          threads={threads}
+          activeThreadId={activeThreadId}
+          onSelectThread={setActiveThreadId}
+          onCreateNew={handleCreateThread}
+          onDeleteThread={handleDeleteThread}
+        />
+
+        <section className="flex min-w-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1">
+            <MessageList
+              messages={messages}
+              isLoading={isLoading || isThreadLoading}
+            />
+          </div>
+          <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
+        </section>
+      </div>
     </div>
   );
 }

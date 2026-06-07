@@ -24,6 +24,10 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.nativeEvent.isComposing) {
+      return;
+    }
+
     if (event.key !== "Enter" || event.shiftKey) {
       return;
     }

@@ -106,6 +106,7 @@ class ChatService {
   }
 
   async getUserThreads(userId: string, courseId: string) {
+    await this.assertCourseReady(courseId);
     await this.assertActiveEnrollment(userId, courseId);
 
     return prisma.chatThread.findMany({

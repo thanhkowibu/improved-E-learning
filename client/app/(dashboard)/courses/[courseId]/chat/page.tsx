@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { ChatBackButton } from "@/components/chat/ChatBackButton";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import prisma from "@/lib/prisma";
 
@@ -23,15 +24,18 @@ export default async function CourseChatPage({ params }: ChatPageProps) {
   }
 
   return (
-    <main className="mx-auto flex h-[calc(100vh-120px)] max-w-7xl flex-col gap-4 px-6 py-6 md:px-12 lg:px-24">
-      <header className="shrink-0">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-          AI Tutor: {course.title}
-        </h1>
+    <main className="mx-auto flex h-[calc(100dvh-72px)] max-w-7xl flex-col gap-3 overflow-hidden px-6 py-4 md:px-12 lg:px-24">
+      <header className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <ChatBackButton fallbackHref={`/courses/${course.id}`} />
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            AI Tutor: {course.title}
+          </h1>
+        </div>
       </header>
 
       <div className="min-h-0 flex-1">
-        <ChatWidget courseId={course.id} />
+        <ChatWidget courseId={course.id} isStandalone={true} />
       </div>
     </main>
   );

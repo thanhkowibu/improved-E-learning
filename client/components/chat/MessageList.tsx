@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 
 export interface ChatMessage {
@@ -19,6 +20,20 @@ export interface ChatMessage {
 interface MessageListProps {
   messages: ChatMessage[];
   isLoading: boolean;
+}
+
+function isGeminiWarning(text: string): boolean {
+  const normalized = text.toLowerCase();
+
+  return (
+    normalized.includes("safety filter") ||
+    normalized.includes("safety block") ||
+    normalized.includes("blocked the prompt") ||
+    normalized.includes("gemini blocked") ||
+    normalized.includes("finish reason: safety") ||
+    normalized.includes("ai tutor is not ready") ||
+    normalized.includes("failed to generate")
+  );
 }
 
 export function MessageList({ messages, isLoading }: MessageListProps) {
@@ -33,6 +48,7 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
       <div className="flex min-h-full flex-col gap-4 px-4 py-5">
         {messages.map((message) => {
           const isUser = message.role === "user";
+          const isWarning = !isUser && isGeminiWarning(message.text);
 
           return (
             <div
@@ -51,7 +67,15 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
                     : "bg-muted/50 text-foreground"
                 )}
               >
-                {isUser ? (
+                {isWarning ? (
+                  <Alert variant="destructive" className="border-red-200 bg-red-50/80">
+                    <AlertTriangle className="size-4" />
+                    <AlertTitle>Gemini safety warning</AlertTitle>
+                    <AlertDescription className="break-words">
+                      {message.text}
+                    </AlertDescription>
+                  </Alert>
+                ) : isUser ? (
                   <p className="whitespace-pre-wrap">{message.text}</p>
                 ) : (
                   <div className="prose prose-sm max-w-none dark:prose-invert">
