@@ -151,6 +151,15 @@ export async function getCourseById(courseId: string) {
               orderIndex: true,
               createdAt: true,
               updatedAt: true,
+              materials: {
+                orderBy: { createdAt: "asc" },
+                select: {
+                  id: true,
+                  title: true,
+                  fileUrl: true,
+                  geminiFileUri: true,
+                },
+              },
               // Deliberately exclude `content` from the list view
               // (heavy field — loaded separately on lesson detail).
               _count: { select: { materials: true } },

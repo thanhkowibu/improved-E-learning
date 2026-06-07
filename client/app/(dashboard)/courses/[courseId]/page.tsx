@@ -58,7 +58,13 @@ function DetailSkeleton() {
 
 // ─── Module Accordion ─────────────────────────────────────────────────────────
 
-function ModuleAccordion({ mod, index }: { mod: ModuleSummary; index: number }) {
+function ModuleAccordion({
+  mod,
+  index,
+}: {
+  mod: ModuleSummary;
+  index: number;
+}) {
   const [open, setOpen] = useState(index === 0);
 
   return (
@@ -71,24 +77,34 @@ function ModuleAccordion({ mod, index }: { mod: ModuleSummary; index: number }) 
           <span className="h-7 w-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xs font-bold shrink-0">
             {index + 1}
           </span>
-          <span className="font-semibold text-slate-900 text-sm">{mod.title}</span>
+          <span className="font-semibold text-slate-900 text-sm">
+            {mod.title}
+          </span>
           <span className="text-xs text-slate-400 ml-1">
             {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}
           </span>
         </div>
         <ChevronDown
           size={16}
-          className={cn("text-slate-400 transition-transform duration-200 shrink-0", open && "rotate-180")}
+          className={cn(
+            "text-slate-400 transition-transform duration-200 shrink-0",
+            open && "rotate-180",
+          )}
         />
       </button>
 
       {open && (
         <div className="border-t border-slate-100 divide-y divide-slate-50">
           {mod.lessons.length === 0 ? (
-            <p className="px-5 py-3 text-sm text-slate-400 italic">No lessons yet.</p>
+            <p className="px-5 py-3 text-sm text-slate-400 italic">
+              No lessons yet.
+            </p>
           ) : (
             mod.lessons.map((lesson) => (
-              <div key={lesson.id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50/60 transition-colors">
+              <div
+                key={lesson.id}
+                className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50/60 transition-colors"
+              >
                 <CheckCircle2 size={15} className="text-sky-400 shrink-0" />
                 <span className="text-sm text-slate-700">{lesson.title}</span>
               </div>
@@ -114,16 +130,20 @@ const TABS: { id: Tab; label: string }[] = [
 export default function CourseDetailPage() {
   const params = useParams();
   const courseId = params?.courseId as string;
-  const { course, enrollmentStatus, isLoading, error, refetchEnrollment } = useCourseDetail(courseId);
+  const { course, enrollmentStatus, isLoading, error, refetchEnrollment } =
+    useCourseDetail(courseId);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
-  const totalLessons = course?.modules.reduce((acc, m) => acc + m.lessons.length, 0) ?? 0;
+  const totalLessons =
+    course?.modules.reduce((acc, m) => acc + m.lessons.length, 0) ?? 0;
 
   if (isLoading) return <DetailSkeleton />;
 
   if (error || !course) {
     return (
-      <div className={`${CONTENT_CLS} py-24 flex flex-col items-center gap-4 text-center`}>
+      <div
+        className={`${CONTENT_CLS} py-24 flex flex-col items-center gap-4 text-center`}
+      >
         <div className="h-16 w-16 rounded-2xl bg-red-50 flex items-center justify-center">
           <AlertCircle size={32} className="text-red-400" />
         </div>
@@ -143,7 +163,7 @@ export default function CourseDetailPage() {
       {/* ══════════════════════════════════════════
           HERO — full-width background
       ══════════════════════════════════════════ */}
-      <div className="relative w-full bg-gradient-to-br from-sky-600 via-sky-500 to-sky-400 overflow-hidden">
+      <div className="relative w-full bg-linear-to-br from-sky-600 via-sky-500 to-sky-400 overflow-hidden">
         {/* Blurred thumbnail overlay */}
         {course.thumbnailUrl && (
           <div
@@ -155,14 +175,20 @@ export default function CourseDetailPage() {
         {/* Content — same padding as Navbar */}
         <div className={`relative ${CONTENT_CLS} py-12`}>
           <div className="flex flex-col md:flex-row gap-8 items-start">
-
             {/* ── Left: text ── */}
             <div className="flex-1 min-w-0">
               {/* Breadcrumb */}
               <nav className="flex items-center gap-1 text-sky-100 text-xs mb-5">
-                <Link href="/courses" className="hover:text-white transition-colors">Courses</Link>
+                <Link
+                  href="/courses"
+                  className="hover:text-white transition-colors"
+                >
+                  Courses
+                </Link>
                 <ChevronRight size={12} />
-                <span className="text-white font-medium truncate max-w-xs">{course.title}</span>
+                <span className="text-white font-medium truncate max-w-xs">
+                  {course.title}
+                </span>
               </nav>
 
               {!course.isPublished && (
@@ -189,7 +215,8 @@ export default function CourseDetailPage() {
                   <Users size={15} /> {course._count.enrollments} students
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Layers size={15} /> {course._count.modules} modules · {totalLessons} lessons
+                  <Layers size={15} /> {course._count.modules} modules ·{" "}
+                  {totalLessons} lessons
                 </span>
               </div>
 
@@ -206,27 +233,39 @@ export default function CourseDetailPage() {
             <div className="shrink-0 w-full md:w-64">
               <div className="rounded-2xl overflow-hidden shadow-2xl bg-white">
                 {course.thumbnailUrl ? (
-                  <img src={course.thumbnailUrl} alt={course.title} className="w-full aspect-video object-cover" />
+                  <img
+                    src={course.thumbnailUrl}
+                    alt={course.title}
+                    className="w-full aspect-video object-cover"
+                  />
                 ) : (
-                  <div className="w-full aspect-video bg-gradient-to-br from-sky-300 to-sky-500 flex items-center justify-center">
+                  <div className="w-full aspect-video bg-linear-to-br from-sky-300 to-sky-500 flex items-center justify-center">
                     <BookOpen size={40} className="text-white/80" />
                   </div>
                 )}
                 <div className="p-4 border-t border-slate-100">
-                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">Instructor</p>
+                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">
+                    Instructor
+                  </p>
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                      {course.teacher.fullName.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()}
+                    <div className="h-9 w-9 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      {course.teacher.fullName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">{course.teacher.fullName}</p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {course.teacher.fullName}
+                      </p>
                       <p className="text-xs text-slate-500">Teacher</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -243,7 +282,9 @@ export default function CourseDetailPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
                   "relative px-4 py-4 text-sm font-semibold transition-colors",
-                  activeTab === tab.id ? "text-sky-600" : "text-slate-500 hover:text-slate-800"
+                  activeTab === tab.id
+                    ? "text-sky-600"
+                    : "text-slate-500 hover:text-slate-800",
                 )}
               >
                 {tab.label}
@@ -260,25 +301,41 @@ export default function CourseDetailPage() {
           TAB CONTENT — same horizontal padding
       ══════════════════════════════════════════ */}
       <div className={`${CONTENT_CLS} py-10`}>
-
         {/* Overview */}
         {activeTab === "overview" && (
           <div className="max-w-3xl space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-slate-900 mb-3">About this course</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-3">
+                About this course
+              </h2>
               {course.description ? (
-                <p className="text-slate-600 leading-relaxed text-base whitespace-pre-wrap">{course.description}</p>
+                <p className="text-slate-600 leading-relaxed text-base whitespace-pre-wrap">
+                  {course.description}
+                </p>
               ) : (
-                <p className="text-slate-400 italic text-sm">No description provided.</p>
+                <p className="text-slate-400 italic text-sm">
+                  No description provided.
+                </p>
               )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {[
-                { label: "Modules", value: course.modules?.length || 0, icon: Layers },
+                {
+                  label: "Modules",
+                  value: course.modules?.length || 0,
+                  icon: Layers,
+                },
                 { label: "Lessons", value: totalLessons, icon: BookOpen },
-                { label: "Students", value: course._count.enrollments, icon: Users },
+                {
+                  label: "Students",
+                  value: course._count.enrollments,
+                  icon: Users,
+                },
               ].map(({ label, value, icon: Icon }) => (
-                <div key={label} className="rounded-2xl bg-slate-50 border border-slate-200 p-4 flex flex-col gap-1">
+                <div
+                  key={label}
+                  className="rounded-2xl bg-slate-50 border border-slate-200 p-4 flex flex-col gap-1"
+                >
                   <Icon size={18} className="text-sky-500" />
                   <p className="text-2xl font-bold text-slate-900">{value}</p>
                   <p className="text-xs text-slate-500">{label}</p>
@@ -291,7 +348,9 @@ export default function CourseDetailPage() {
         {/* Curriculum */}
         {activeTab === "curriculum" && (
           <div className="max-w-3xl">
-            <h2 className="text-xl font-bold text-slate-900 mb-5">Course Curriculum</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-5">
+              Course Curriculum
+            </h2>
             {course.modules.length === 0 ? (
               <div className="flex flex-col items-center gap-3 py-16 text-center">
                 <Layers size={32} className="text-slate-300" />
@@ -310,20 +369,32 @@ export default function CourseDetailPage() {
         {/* Instructor */}
         {activeTab === "teacher" && (
           <div className="max-w-xl">
-            <h2 className="text-xl font-bold text-slate-900 mb-5">Instructor</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-5">
+              Instructor
+            </h2>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 flex items-center gap-5">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xl font-bold shrink-0 shadow-md">
-                {course.teacher.fullName.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()}
+              <div className="h-16 w-16 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xl font-bold shrink-0 shadow-md">
+                {course.teacher.fullName
+                  .split(" ")
+                  .map((n) => n[0])
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase()}
               </div>
               <div>
-                <p className="text-lg font-bold text-slate-900">{course.teacher.fullName}</p>
-                <p className="text-sm text-slate-500 mt-0.5">Course Instructor</p>
-                <Badge className="mt-2 bg-sky-100 text-sky-700 hover:bg-sky-100 text-xs">Teacher</Badge>
+                <p className="text-lg font-bold text-slate-900">
+                  {course.teacher.fullName}
+                </p>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  Course Instructor
+                </p>
+                <Badge className="mt-2 bg-sky-100 text-sky-700 hover:bg-sky-100 text-xs">
+                  Teacher
+                </Badge>
               </div>
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

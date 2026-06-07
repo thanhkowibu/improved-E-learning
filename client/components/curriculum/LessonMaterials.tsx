@@ -17,6 +17,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   FileText,
   FileVideo,
@@ -103,6 +104,8 @@ function getToken(): string | null {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function LessonMaterials({ lessonId }: Props) {
+  const router = useRouter();
+
   // ── State ──────────────────────────────────────────────────────────────────
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -140,7 +143,6 @@ export default function LessonMaterials({ lessonId }: Props) {
     }
     setIsLoading(false);
     // lessonId is a stable primitive — the only thing that should re-trigger a fetch.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId]);
 
   useEffect(() => {
@@ -180,6 +182,8 @@ export default function LessonMaterials({ lessonId }: Props) {
           if (json.success && json.data) {
             setMaterials((prev) => [...prev, json.data]);
             toast.success(`"${file.name}" uploaded successfully.`);
+            router.refresh();
+            window.dispatchEvent(new CustomEvent("course-materials-changed"));
           } else {
             toast.error(json.error ?? "Upload failed.");
           }
@@ -247,6 +251,8 @@ export default function LessonMaterials({ lessonId }: Props) {
       if (res.status === 204 || res.ok) {
         toast.success("Material deleted.", { id: toastId });
         setMaterials((prev) => prev.filter((m) => m.id !== deletingId));
+        router.refresh();
+        window.dispatchEvent(new CustomEvent("course-materials-changed"));
       } else {
         const json = await res.json().catch(() => ({}));
         toast.error(json.error ?? "Failed to delete material.", { id: toastId });

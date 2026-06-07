@@ -16,7 +16,7 @@
  *    the server's optional URL validation.
  */
 
-import { useImperativeHandle, forwardRef } from "react";
+import { useEffect, useImperativeHandle, forwardRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -108,6 +108,8 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
       handleSubmit,
       control,
       reset,
+      setValue,
+      watch,
       formState: { errors },
     } = useForm<CourseFormInput, unknown, CourseFormValues>({
       resolver: zodResolver(courseFormSchema),
@@ -135,6 +137,20 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
         });
       },
     }));
+
+    const watchedAiEnabled = watch("aiEnabled");
+
+    useEffect(() => {
+      if (mode !== "edit" || typeof defaultValues?.aiEnabled !== "boolean") {
+        return;
+      }
+
+      setValue("aiEnabled", defaultValues.aiEnabled, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+    }, [defaultValues?.aiEnabled, mode, setValue]);
 
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-7" noValidate>
@@ -242,7 +258,7 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
                 render={({ field }) => (
                   <Switch
                     id="course-ai-enabled"
-                    checked={!!field.value}
+                    checked={!!watchedAiEnabled}
                     onCheckedChange={field.onChange}
                     className="data-[state=checked]:bg-violet-500"
                   />

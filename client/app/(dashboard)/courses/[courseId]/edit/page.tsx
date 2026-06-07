@@ -17,7 +17,7 @@
  * Access: Course owner (TEACHER) or ADMIN only.
  */
 
-import { useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -40,6 +40,7 @@ import CourseForm, {
   type CourseFormHandle,
 } from "@/components/CourseForm";
 import CurriculumEditor from "@/components/curriculum/CurriculumEditor";
+import { AITutorSettings } from "@/components/course/AITutorSettings";
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -65,11 +66,52 @@ export default function EditCoursePage() {
   const router = useRouter();
   const api = useApi();
   const { user } = useAuth();
-  const { course, isLoading, error } = useCourseDetail(courseId);
+  const { course, isLoading, error, refetchCourse } = useCourseDetail(courseId);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   // Ref to access CourseForm's imperative reset() handle
   const formRef = useRef<CourseFormHandle>(null);
+  const aiAttachments = useMemo(
+    () =>
+      course?.modules.flatMap((module) =>
+        module.lessons.flatMap((lesson) =>
+          lesson.materials.map((material) => ({
+            id: material.id,
+            name: material.title,
+            url: material.fileUrl,
+            geminiFileUri: material.geminiFileUri,
+          })),
+        ),
+      ) ?? [],
+    [course],
+  );
+
+  useEffect(() => {
+    function handleCourseDataChanged() {
+      refetchCourse();
+      router.refresh();
+    }
+
+    window.addEventListener(
+      "course-materials-changed",
+      handleCourseDataChanged,
+    );
+    window.addEventListener(
+      "course-ai-settings-changed",
+      handleCourseDataChanged,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "course-materials-changed",
+        handleCourseDataChanged,
+      );
+      window.removeEventListener(
+        "course-ai-settings-changed",
+        handleCourseDataChanged,
+      );
+    };
+  }, [refetchCourse, router]);
 
   // ── Role guard — after all hooks ─────────────────────────────────────────
   if (user && user.role === "STUDENT") {
@@ -104,6 +146,8 @@ export default function EditCoursePage() {
         isPublished: values.isPublished,
         aiEnabled: values.aiEnabled,
       });
+      await refetchCourse();
+      router.refresh();
     } else {
       toast.error(res.error ?? "Failed to save changes. Please try again.", {
         id: toastId,
@@ -283,11 +327,17 @@ export default function EditCoursePage() {
       </div>
 
       {/* ── Curriculum Editor (full width, below the form/sidebar grid) ── */}
+      <div className="mt-8">
+        <AITutorSettings
+          courseId={courseId}
+          isAIEnabled={course.aiEnabled}
+          attachments={aiAttachments}
+        />
+      </div>
+
       <div className="mt-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
         <CurriculumEditor courseId={courseId} />
       </div>
     </div>
   );
 }
-
-

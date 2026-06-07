@@ -34,8 +34,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChatWidget } from "@/components/chat/ChatWidget";
+import { StickyChatTrigger } from "@/components/chat/StickyChatTrigger";
 import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/useApi";
 import ReactMarkdown from "react-markdown";
@@ -358,23 +359,23 @@ export default function LessonViewPage() {
         >
           <Link
             href={`/courses/${courseId}/learn`}
-            className="flex-shrink-0 flex items-center justify-center h-7 w-7 rounded-md border border-slate-200 hover:border-sky-300 hover:bg-sky-50 transition-colors mr-1"
+            className="shrink-0 flex items-center justify-center h-7 w-7 rounded-md border border-slate-200 hover:border-sky-300 hover:bg-sky-50 transition-colors mr-1"
             aria-label="Back to course overview"
           >
             <BookOpen size={13} className="text-slate-500" />
           </Link>
           <Link
             href={`/courses/${courseId}/learn`}
-            className="hover:text-sky-600 transition-colors truncate max-w-[10rem]"
+            className="hover:text-sky-600 transition-colors truncate max-w-40"
           >
             {lesson.module.course.title}
           </Link>
           <ChevronRight size={13} className="shrink-0 opacity-40" />
-          <span className="truncate max-w-[10rem] text-slate-500">
+          <span className="truncate max-w-40 text-slate-500">
             {lesson.module.title}
           </span>
           <ChevronRight size={13} className="shrink-0 opacity-40" />
-          <span className="truncate max-w-[12rem] font-semibold text-slate-800">
+          <span className="truncate max-w-48 font-semibold text-slate-800">
             {lesson.title}
           </span>
         </nav>
@@ -617,19 +618,11 @@ export default function LessonViewPage() {
         </div>
       </div>
 
-      <Button
-        type="button"
-        onClick={() => setIsTutorOpen(true)}
-        className="group fixed right-8 bottom-8 z-50 h-14 rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 px-6 text-white shadow-xl shadow-indigo-500/30 transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50"
-      >
-        <Sparkles size={18} className="group-hover:animate-pulse" />
-        <span className="font-semibold tracking-tight">Ask AI Tutor</span>
-      </Button>
-
       <Sheet open={isTutorOpen} onOpenChange={setIsTutorOpen}>
+        <SheetTrigger render={<StickyChatTrigger />} />
         <SheetContent
-          side="right"
-          className="flex flex-col gap-0 p-0 data-[side=right]:!w-full data-[side=right]:!max-w-none sm:data-[side=right]:!w-4/5 lg:data-[side=right]:!w-2/3 2xl:data-[side=right]:!w-[60vw]"
+          side="left"
+          className="flex flex-col gap-0 p-0 data-[side=left]:w-full! data-[side=left]:max-w-none! sm:data-[side=left]:w-4/5! lg:data-[side=left]:w-2/3! 2xl:data-[side=left]:w-[60vw]!"
         >
           <ChatWidget courseId={courseId} />
         </SheetContent>

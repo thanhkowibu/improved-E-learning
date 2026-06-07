@@ -20,6 +20,14 @@ export interface LessonSummary {
   id: string;
   title: string;
   orderIndex: number;
+  materials: MaterialSummary[];
+}
+
+export interface MaterialSummary {
+  id: string;
+  title: string;
+  fileUrl: string;
+  geminiFileUri: string | null;
 }
 
 export interface ModuleSummary {
@@ -51,6 +59,7 @@ interface UseCourseDetailReturn {
   enrollmentStatus: EnrollmentStatus;
   isLoading: boolean;
   error: string | null;
+  refetchCourse: () => Promise<void>;
   refetchEnrollment: () => void;
 }
 
@@ -65,23 +74,29 @@ export function useCourseDetail(courseId: string): UseCourseDetailReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch the course once
-  useEffect(() => {
+  const fetchCourse = useCallback(async () => {
     if (!courseId) return;
     setIsLoading(true);
-    api
-      .get<CourseDetail>(`/api/courses/${courseId}`)
-      .then((res) => {
-        if (res.success && res.data) {
-          setCourse(res.data);
-        } else {
-          setError(res.error ?? "Course not found.");
-        }
-      })
-      .catch(() => setError("Failed to load course."))
-      .finally(() => setIsLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    setError(null);
+    try {
+      const res = await api.get<CourseDetail>(`/api/courses/${courseId}`);
+      if (res.success && res.data) {
+        setCourse(res.data);
+      } else {
+        setError(res.error ?? "Course not found.");
+      }
+    } catch {
+      setError("Failed to load course.");
+    } finally {
+      setIsLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
+
+  // Fetch the course once
+  useEffect(() => {
+    fetchCourse();
+  }, [fetchCourse]);
 
   // Check enrollment status for students
   const fetchEnrollment = useCallback(async () => {
@@ -98,5 +113,12 @@ export function useCourseDetail(courseId: string): UseCourseDetailReturn {
 
   useEffect(() => { fetchEnrollment(); }, [fetchEnrollment]);
 
-  return { course, enrollmentStatus, isLoading, error, refetchEnrollment: fetchEnrollment };
+  return {
+    course,
+    enrollmentStatus,
+    isLoading,
+    error,
+    refetchCourse: fetchCourse,
+    refetchEnrollment: fetchEnrollment,
+  };
 }

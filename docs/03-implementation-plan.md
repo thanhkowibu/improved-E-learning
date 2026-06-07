@@ -323,20 +323,20 @@
 
 > Integrate the chat into the lesson study flow using a Shadcn `<Sheet>` slide-out panel, allowing students to read lesson content and chat with the AI Tutor simultaneously (NotebookLM-style).
 
-- [ ] **[Next.js]** Integrate `<ChatWidget>` into the Lesson View page (`app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx`) using a Shadcn `<Sheet side="right">`. When the user clicks "Ask AI Tutor", a slide-out panel opens on the right side allowing them to read the lesson and chat simultaneously — the Sheet receives the `courseId` and renders `<ChatWidget>` inside it
-- [ ] **[Next.js]** Add "AI Tutor not configured" empty state inside `<ChatWidget>` when course has `aiEnabled === false` or no materials have `geminiFileUri`
-- [ ] **[Next.js]** Add thread delete with confirmation in `<ThreadSidebar>` — calls `DELETE /api/chat/threads/[threadId]`
-- [ ] **[Next.js]** Mobile-responsive chat layout: standalone page uses full-screen layout; Sheet panel uses `side="bottom"` or full-screen on mobile breakpoints
-- [ ] **[Next.js]** Add keyboard shortcuts (Ctrl+Enter to send, Escape to close Sheet)
-- [ ] **[Next.js]** Display Gemini safety filter warnings gracefully when a response is blocked (inline alert in `<MessageList>`)
+- [x] **[Next.js]** Integrate `<ChatWidget>` into the Lesson View page (`app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx`) using a Shadcn `<Sheet side="right">`. When the user clicks "Ask AI Tutor", a slide-out panel opens on the right side allowing them to read the lesson and chat simultaneously — the Sheet receives the `courseId` and renders `<ChatWidget>` inside it
+- [x] **[Next.js]** Add "AI Tutor not configured" empty state inside `<ChatWidget>` when course has `aiEnabled === false` or no materials have `geminiFileUri`
+- [x] **[Next.js]** Add thread delete with confirmation in `<ThreadSidebar>` — calls `DELETE /api/chat/threads/[threadId]`
+- [x] **[Next.js]** Mobile-responsive chat layout: standalone page uses full-screen layout; Sheet panel uses `side="bottom"` or full-screen on mobile breakpoints
+- [x] **[Next.js]** Add keyboard shortcuts (Ctrl+Enter to send, Escape to close Sheet)
+- [x] **[Next.js]** Display Gemini safety filter warnings gracefully when a response is blocked (inline alert in `<MessageList>`)
 
 ### 5C — Teacher AI Management
 
-- [ ] **[Next.js]** Add "Setup AI Tutor" button on course edit page — calls `POST /api/courses/[courseId]/setup-ai`
-- [ ] **[Next.js]** Show AI tutor status indicator (enabled / not enabled)
-- [ ] **[Next.js]** Show which materials are synced to Gemini (`geminiFileUri` badge — synced ✓ / not synced ✗)
-- [ ] **[Next.js]** Add "Re-sync Materials" action to re-upload files after updates
-- [ ] **[Next.js]** Show file processing status (PROCESSING → ACTIVE) with auto-refresh polling
+- [x] **[Next.js]** Add "Setup AI Tutor" button on course edit page — calls `POST /api/courses/[courseId]/setup-ai`
+- [x] **[Next.js]** Show AI tutor status indicator (enabled / not enabled)
+- [x] **[Next.js]** Show which materials are synced to Gemini (`geminiFileUri` badge — synced ✓ / not synced ✗)
+- [x] **[Next.js]** Add "Re-sync Materials" action to re-upload files after updates
+- [x] **[Next.js]** Show file processing status (PROCESSING → ACTIVE) with auto-refresh polling
 
 ---
 
