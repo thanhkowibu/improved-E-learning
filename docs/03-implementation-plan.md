@@ -356,7 +356,7 @@
 
 ### 6B — Inline PDF & Video Viewers
 
-- [ ] **[Next.js]** Build `<PdfViewer>` component (`components/viewers/PdfViewer.tsx`) — Use the browser-native `<iframe src={url} className="w-full h-[800px] rounded-xl border border-slate-200" />`. **Strictly avoid `react-pdf`** to prevent SSR/Webpack worker configuration hell.
+- [ ] **[Next.js]** Build `<PdfViewer>` component (`components/viewers/PdfViewer.tsx`) — Use the browser-native `<iframe src={url} className="w-full h-200 rounded-xl border border-slate-200" />`. **Strictly avoid `react-pdf`** to prevent SSR/Webpack worker configuration hell.
 - [ ] **[Next.js]** Build `<VideoPlayer>` component (`components/viewers/VideoPlayer.tsx`) — `"use client"` component using HTML5 `<video>` element with controls, playback speed selector, and fullscreen support; accepts cloud-hosted video URL as `src` prop
 - [ ] **[Next.js]** Integrate viewers into the Lesson View page (`app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx`) — render `<PdfViewer>` for `MaterialType.PDF` and `<VideoPlayer>` for `MaterialType.VIDEO` inline, alongside the existing download button
 - [ ] **[Next.js]** Add a "Preview" action button on material list items that opens the viewer in a Shadcn `<Dialog>` modal for quick viewing without navigating away
