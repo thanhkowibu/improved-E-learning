@@ -110,7 +110,7 @@ export default function CurriculumEditor({ courseId }: Props) {
 
   async function createModule() {
     const trimmed = newModuleTitle.trim();
-    if (!trimmed) return;
+    if (isCreatingModule || !trimmed) return;
     setIsCreatingModule(true);
     const toastId = toast.loading("Creating module…");
     const res = await api.post<Module>(`/api/courses/${courseId}/modules`, {
@@ -125,6 +125,11 @@ export default function CurriculumEditor({ courseId }: Props) {
       toast.error(res.error ?? "Failed to create module.", { id: toastId });
     }
     setIsCreatingModule(false);
+  }
+
+  function handleCreateModuleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    void createModule();
   }
 
   // ── DND drag-end handler ──────────────────────────────────────────────────
@@ -283,25 +288,31 @@ export default function CurriculumEditor({ courseId }: Props) {
       {/* ── Add Module ── */}
       <div className="mt-4">
         {isAddingModule ? (
-          <div className="flex items-center gap-2 p-3 rounded-xl border border-dashed border-sky-300 bg-sky-50/50">
+          <form
+            onSubmit={handleCreateModuleSubmit}
+            className="flex items-center gap-2 p-3 rounded-xl border border-dashed border-sky-300 bg-sky-50/50"
+          >
             <input
               autoFocus
               value={newModuleTitle}
               onChange={(e) => setNewModuleTitle(e.target.value)}
+              disabled={isCreatingModule}
               onKeyDown={(e) => {
-                if (e.key === "Enter") createModule();
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void createModule();
+                }
                 if (e.key === "Escape") {
                   setIsAddingModule(false);
                   setNewModuleTitle("");
                 }
               }}
               placeholder="New module title…"
-              className="flex-1 bg-transparent border-none outline-none text-sm text-slate-900 placeholder-slate-400"
+              className="flex-1 bg-transparent border-none outline-none text-sm text-slate-900 placeholder-slate-400 disabled:cursor-not-allowed disabled:opacity-60"
             />
             <Button
-              type="button"
+              type="submit"
               size="sm"
-              onClick={createModule}
               disabled={isCreatingModule || !newModuleTitle.trim()}
               className="h-8 bg-sky-500 hover:bg-sky-600 text-white gap-1 shrink-0"
             >
@@ -310,18 +321,19 @@ export default function CurriculumEditor({ courseId }: Props) {
               ) : (
                 <Plus size={12} />
               )}
-              Add Module
+              {isCreatingModule ? "Adding..." : "Add Module"}
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => { setIsAddingModule(false); setNewModuleTitle(""); }}
+              disabled={isCreatingModule}
               className="h-8 text-slate-500 shrink-0"
             >
               Cancel
             </Button>
-          </div>
+          </form>
         ) : (
           <Button
             type="button"

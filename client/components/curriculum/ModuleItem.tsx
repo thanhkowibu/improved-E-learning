@@ -153,7 +153,7 @@ export default function ModuleItem({
 
   async function createLesson() {
     const trimmed = newLessonTitle.trim();
-    if (!trimmed) return;
+    if (isCreatingLesson || !trimmed) return;
     setIsCreatingLesson(true);
     const toastId = toast.loading("Adding lesson…");
     const res = await api.post<Lesson>(
@@ -169,6 +169,11 @@ export default function ModuleItem({
       toast.error(res.error ?? "Failed to add lesson.", { id: toastId });
     }
     setIsCreatingLesson(false);
+  }
+
+  function handleCreateLessonSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    void createLesson();
   }
 
   // ── Delete lesson ─────────────────────────────────────────────────────────
@@ -395,22 +400,28 @@ export default function ModuleItem({
           {/* ── Add Lesson inline form ── */}
           <div className="px-4 py-3 border-t border-dashed border-slate-200 bg-slate-50/40">
             {isAddingLesson ? (
-              <div className="flex items-center gap-2">
+              <form onSubmit={handleCreateLessonSubmit} className="flex items-center gap-2">
                 <Input
                   autoFocus
                   value={newLessonTitle}
                   onChange={(e) => setNewLessonTitle(e.target.value)}
+                  disabled={isCreatingLesson}
                   placeholder="Lesson title…"
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") createLesson();
-                    if (e.key === "Escape") { setIsAddingLesson(false); setNewLessonTitle(""); }
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void createLesson();
+                    }
+                    if (e.key === "Escape") {
+                      setIsAddingLesson(false);
+                      setNewLessonTitle("");
+                    }
                   }}
                   className="h-8 text-sm"
                 />
                 <Button
-                  type="button"
+                  type="submit"
                   size="sm"
-                  onClick={createLesson}
                   disabled={isCreatingLesson || !newLessonTitle.trim()}
                   className="h-8 bg-sky-500 hover:bg-sky-600 text-white shrink-0 gap-1"
                 >
@@ -419,18 +430,19 @@ export default function ModuleItem({
                   ) : (
                     <Check size={12} />
                   )}
-                  Add
+                  {isCreatingLesson ? "Adding..." : "Add"}
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon-sm"
                   onClick={() => { setIsAddingLesson(false); setNewLessonTitle(""); }}
+                  disabled={isCreatingLesson}
                   className="text-slate-400 hover:text-slate-700 shrink-0"
                 >
                   <X size={14} />
                 </Button>
-              </div>
+              </form>
             ) : (
               <button
                 type="button"
