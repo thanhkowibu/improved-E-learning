@@ -12,6 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AnalyticsChartProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[];
   role: "ADMIN" | "TEACHER" | "STUDENT";
 }
