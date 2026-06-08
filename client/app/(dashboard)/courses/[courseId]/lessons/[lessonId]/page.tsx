@@ -30,13 +30,23 @@ import {
   CheckCircle2,
   Circle,
   Sparkles,
+  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import { StickyChatTrigger } from "@/components/chat/StickyChatTrigger";
+import { PdfViewer } from "@/components/viewers/PdfViewer";
+import { VideoPlayer } from "@/components/viewers/VideoPlayer";
 import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/useApi";
 import ReactMarkdown from "react-markdown";
@@ -48,11 +58,9 @@ import ReactMarkdown from "react-markdown";
 interface MaterialItem {
   id: string;
   title: string;
-  fileName: string;
   fileUrl: string;
-  mimeType: string;
   fileSizeBytes: string | number | null;
-  materialType: string;
+  materialType: "PDF" | "VIDEO" | "LINK" | "OTHER";
 }
 
 interface ModuleInfo {
@@ -109,15 +117,48 @@ function formatBytes(bytes: string | number | null): string {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function MaterialIcon({ mimeType }: { mimeType?: string }) {
-  const t = mimeType ?? "";
-  if (t.startsWith("video/"))
+function MaterialIcon({ materialType }: { materialType?: MaterialItem["materialType"] }) {
+  if (materialType === "VIDEO")
     return <FileVideo size={15} className="text-violet-500 shrink-0" />;
-  if (t.includes("zip") || t.includes("rar") || t.includes("tar"))
-    return <Archive size={15} className="text-orange-500 shrink-0" />;
-  if (t.includes("pdf"))
+  if (materialType === "PDF")
     return <FileText size={15} className="text-red-500 shrink-0" />;
+  if (materialType === "OTHER")
+    return <Archive size={15} className="text-orange-500 shrink-0" />;
   return <FileIcon size={15} className="text-sky-500 shrink-0" />;
+}
+
+function isPreviewableMaterial(material: MaterialItem) {
+  return material.materialType === "PDF" || material.materialType === "VIDEO";
+}
+
+function MaterialViewer({
+  material,
+  className,
+}: {
+  material: MaterialItem;
+  className?: string;
+}) {
+  if (material.materialType === "PDF") {
+    return (
+      <PdfViewer
+        url={material.fileUrl}
+        title={material.title}
+        className={className}
+      />
+    );
+  }
+
+  if (material.materialType === "VIDEO") {
+    return (
+      <VideoPlayer
+        src={material.fileUrl}
+        title={material.title}
+        className={className}
+      />
+    );
+  }
+
+  return null;
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -209,6 +250,9 @@ export default function LessonViewPage() {
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
+  const [previewMaterial, setPreviewMaterial] = useState<MaterialItem | null>(
+    null,
+  );
 
   // Progress state
   const [isCompleted, setIsCompleted] = useState(false);
@@ -522,50 +566,122 @@ export default function LessonViewPage() {
         {lesson.materials.length > 0 && (
           <div className="mb-12">
             <Separator className="mb-6" />
-            <h2 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <FileText size={16} className="text-sky-500" />
-              Lesson Materials
-              <span className="text-xs font-normal text-slate-400 ml-1">
-                ({lesson.materials.length})
-              </span>
-            </h2>
+            <div className="mb-4 flex flex-col gap-1">
+              <h2 className="flex items-center gap-2 text-base font-bold text-slate-800">
+                <FileText size={16} className="text-sky-500" />
+                Lesson Materials
+                <span className="ml-1 text-xs font-normal text-slate-400">
+                  ({lesson.materials.length})
+                </span>
+              </h2>
+              <p className="text-sm text-slate-500">
+                Preview PDFs and videos inline, or download files for offline use.
+              </p>
+            </div>
             <ul className="space-y-2">
-              {lesson.materials.map((mat) => (
-                <li
-                  key={mat.id}
-                  className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 hover:bg-sky-50/50 hover:border-sky-200 transition-all group"
-                >
-                  <MaterialIcon mimeType={mat.mimeType} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-800 truncate">
-                      {mat.title}
-                    </p>
-                    {mat.fileSizeBytes !== null && (
-                      <p className="text-xs text-slate-400">
-                        {formatBytes(mat.fileSizeBytes)}
-                      </p>
-                    )}
-                  </div>
-                  <a
-                    href={`/api/materials/${mat.id}/download`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0"
-                    aria-label={`Download ${mat.title}`}
+              {lesson.materials.map((mat) => {
+                const canPreview = isPreviewableMaterial(mat);
+
+                return (
+                  <li
+                    key={mat.id}
+                    className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 transition-all hover:border-sky-200 hover:bg-sky-50/50 sm:flex-row sm:items-center"
                   >
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1.5 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-lg text-xs font-medium"
-                    >
-                      <Download size={13} />
-                      Download
-                    </Button>
-                  </a>
-                </li>
-              ))}
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <MaterialIcon materialType={mat.materialType} />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-slate-800">
+                          {mat.title}
+                        </p>
+                        {mat.fileSizeBytes !== null && (
+                          <p className="text-xs text-slate-400">
+                            {formatBytes(mat.fileSizeBytes)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-2 self-end sm:self-auto">
+                      {canPreview && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setPreviewMaterial(mat)}
+                          className="gap-1.5 rounded-lg text-xs font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-600"
+                        >
+                          <Eye size={13} />
+                          Preview
+                        </Button>
+                      )}
+                      <a
+                        href={`/api/materials/${mat.id}/download`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0"
+                        aria-label={`Download ${mat.title}`}
+                      >
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1.5 rounded-lg text-xs font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-600"
+                        >
+                          <Download size={13} />
+                          Download
+                        </Button>
+                      </a>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
+
+            {lesson.materials.some(isPreviewableMaterial) && (
+              <div className="mt-6 space-y-6">
+                {lesson.materials.filter(isPreviewableMaterial).map((mat) => (
+                  <section
+                    key={mat.id}
+                    className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                  >
+                    <div className="flex flex-col gap-3 border-b border-slate-100 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <MaterialIcon materialType={mat.materialType} />
+                        <h3 className="truncate text-sm font-semibold text-slate-800">
+                          {mat.title}
+                        </h3>
+                      </div>
+                      <a
+                        href={`/api/materials/${mat.id}/download`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0"
+                      >
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="gap-1.5 rounded-lg border-slate-200 text-xs text-slate-600 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
+                        >
+                          <Download size={13} />
+                          Download
+                        </Button>
+                      </a>
+                    </div>
+                    <div className="p-4">
+                      <MaterialViewer
+                        material={mat}
+                        className={
+                          mat.materialType === "PDF"
+                            ? "h-[38rem] md:h-[46rem]"
+                            : undefined
+                        }
+                      />
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -627,6 +743,39 @@ export default function LessonViewPage() {
           <ChatWidget courseId={courseId} />
         </SheetContent>
       </Sheet>
+
+      <Dialog
+        open={previewMaterial !== null}
+        onOpenChange={(open) => {
+          if (!open) setPreviewMaterial(null);
+        }}
+      >
+        <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-6xl overflow-hidden p-0 sm:max-w-6xl">
+          {previewMaterial && (
+            <>
+              <DialogHeader className="border-b border-slate-100 px-5 py-4">
+                <DialogTitle className="flex min-w-0 items-center gap-2 pr-10">
+                  <MaterialIcon materialType={previewMaterial.materialType} />
+                  <span className="truncate">{previewMaterial.title}</span>
+                </DialogTitle>
+                <DialogDescription>
+                  Previewing this material in the app. Use Download if you need an offline copy.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="max-h-[calc(92vh-7rem)] overflow-auto p-4">
+                <MaterialViewer
+                  material={previewMaterial}
+                  className={
+                    previewMaterial.materialType === "PDF"
+                      ? "h-[calc(92vh-10rem)] min-h-[32rem]"
+                      : undefined
+                  }
+                />
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

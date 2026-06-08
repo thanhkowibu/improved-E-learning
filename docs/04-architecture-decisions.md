@@ -647,3 +647,24 @@ The `<Sheet>` component is already available via Shadcn UI and renders as a slid
 | Markdown rendering | `react-markdown` + `remark-gfm` + `remark-math` + `rehype-katex` | Supports code blocks, tables, LaTeX math — essential for educational Q&A |
 | Thread management in Sheet | Simplified — single active thread, thread list collapsed | Sheet has limited width; full thread management available on standalone page |
 
+---
+
+## ADR-012 · UploadThing Cloud Storage Backend
+
+**Date:** 2026-06-08
+**Phase:** 6A (Cloud Storage Migration)
+**Status:** Adopted
+
+### Context
+
+The LMS currently stores course materials through a local filesystem adapter. That is sufficient for local development, but it is not durable or portable across hosted Next.js deployments, and it complicates future production file serving.
+
+### Decision
+
+Adopt UploadThing as the cloud storage backend for course material uploads. The initial backend setup defines an App Router file router at `app/api/uploadthing/core.ts` and exposes UploadThing's `GET` and `POST` route handlers from `app/api/uploadthing/route.ts`.
+
+The UploadThing route accepts PDF, video, and image uploads. Upload access is limited to authenticated teachers and admins using the existing JWT auth helper.
+
+### Rationale
+
+UploadThing provides a typed Next.js App Router integration, direct-to-cloud uploads, and route-level middleware hooks that fit the existing authorization model. This lets the application migrate away from local `public/uploads` storage while keeping file upload policy close to the API boundary.

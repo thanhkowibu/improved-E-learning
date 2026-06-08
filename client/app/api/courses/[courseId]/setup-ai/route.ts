@@ -8,6 +8,9 @@
  * Access: Course owner (TEACHER) or ADMIN
  */
 
+import { randomUUID } from "crypto";
+import fs from "fs/promises";
+import os from "os";
 import path from "path";
 import { type NextRequest } from "next/server";
 import { MaterialType, UserRole } from "@prisma/client";
@@ -17,7 +20,6 @@ import { requireRole } from "@/lib/auth/require-role";
 import { verifyCourseOwner } from "@/lib/auth/check-ownership";
 import prisma from "@/lib/prisma";
 import { geminiService } from "@/lib/gemini/gemini.service";
-import { resolveFilePath } from "@/lib/services/storage.service";
 import {
   ok,
   unauthorized,
@@ -30,11 +32,19 @@ export const runtime = "nodejs";
 
 type RouteContext = { params: Promise<{ courseId: string }> };
 
+function getExtensionFromFileUrl(fileUrl: string): string {
+  try {
+    return path.extname(new URL(fileUrl).pathname).toLowerCase();
+  } catch {
+    return path.extname(fileUrl).toLowerCase();
+  }
+}
+
 function isEligibleGeminiMaterial(material: {
   materialType: MaterialType;
   fileUrl: string;
 }): boolean {
-  const extension = path.extname(material.fileUrl).toLowerCase();
+  const extension = getExtensionFromFileUrl(material.fileUrl);
 
   return (
     material.materialType === MaterialType.PDF ||
@@ -45,6 +55,29 @@ function isEligibleGeminiMaterial(material: {
     extension === ".xlsx" ||
     extension === ".pptx"
   );
+}
+
+async function downloadMaterialToTempFile(material: {
+  id: string;
+  title: string;
+  fileUrl: string;
+}) {
+  const response = await fetch(material.fileUrl);
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to download material "${material.id}" from UploadThing (${response.status}).`,
+    );
+  }
+
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "learnai-gemini-"));
+  const extension = getExtensionFromFileUrl(material.fileUrl) || path.extname(material.title);
+  const filePath = path.join(tempDir, `${randomUUID()}${extension || ".upload"}`);
+  const buffer = Buffer.from(await response.arrayBuffer());
+
+  await fs.writeFile(filePath, buffer);
+
+  return { filePath, tempDir };
 }
 
 export async function POST(request: NextRequest, context: RouteContext) {
@@ -86,37 +119,42 @@ export async function POST(request: NextRequest, context: RouteContext) {
         continue;
       }
 
-      const filePath = resolveFilePath(material.fileUrl);
-      const uploadedFile = await geminiService.uploadFileToGemini(
-        filePath,
-        material.title,
-      );
+      const tempFile = await downloadMaterialToTempFile(material);
 
-      if (!uploadedFile.name) {
-        throw new Error(
-          `Gemini upload for material "${material.id}" did not return a file name.`,
+      try {
+        const uploadedFile = await geminiService.uploadFileToGemini(
+          tempFile.filePath,
+          material.title,
         );
-      }
 
-      const activeFile = await geminiService.waitForFileActive(
-        uploadedFile.name,
-      );
+        if (!uploadedFile.name) {
+          throw new Error(
+            `Gemini upload for material "${material.id}" did not return a file name.`,
+          );
+        }
 
-      if (!activeFile.uri) {
-        throw new Error(
-          `Gemini file "${activeFile.name ?? uploadedFile.name}" became ACTIVE but did not return a URI.`,
+        const activeFile = await geminiService.waitForFileActive(
+          uploadedFile.name,
         );
+
+        if (!activeFile.uri) {
+          throw new Error(
+            `Gemini file "${activeFile.name ?? uploadedFile.name}" became ACTIVE but did not return a URI.`,
+          );
+        }
+
+        await prisma.material.update({
+          where: { id: material.id },
+          data: {
+            geminiFileUri: activeFile.uri,
+            geminiFileName: activeFile.name ?? uploadedFile.name,
+          },
+        });
+
+        uploadedCount += 1;
+      } finally {
+        await fs.rm(tempFile.tempDir, { recursive: true, force: true });
       }
-
-      await prisma.material.update({
-        where: { id: material.id },
-        data: {
-          geminiFileUri: activeFile.uri,
-          geminiFileName: activeFile.name ?? uploadedFile.name,
-        },
-      });
-
-      uploadedCount += 1;
     }
 
     const updatedCourse = await prisma.course.update({

@@ -61,7 +61,7 @@ const MDEditor = dynamic(
 export interface Lesson {
   id: string;
   title: string;
-  content: string | null;
+  content?: string | null;
   orderIndex: number;
   moduleId: string;
 }
@@ -90,24 +90,76 @@ export default function LessonEditorDialog({
   const [isSaving, setIsSaving] = useState(false);
   // Reset to "content" tab each time a new lesson is opened.
   const [activeTab, setActiveTab] = useState("content");
+  const [editorRevision, setEditorRevision] = useState(0);
 
   const {
     register,
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: { title: "", content: "" },
   });
 
-  // Sync form values and reset to content tab whenever the selected lesson changes.
+  // Sync form values whenever the dialog opens. The module list deliberately
+  // omits lesson.content, so fetch the full lesson before hydrating the editor.
   useEffect(() => {
-    if (lesson) {
-      reset({ title: lesson.title, content: lesson.content ?? "" });
+    if (!open) return;
+
+    if (!lesson) {
+      reset({ title: "", content: "" });
       setActiveTab("content");
+      return;
     }
-  }, [lesson, reset]);
+
+    let isCancelled = false;
+
+    function applyFormValues(nextLesson: Lesson) {
+      const nextValues = {
+        title: nextLesson.title,
+        content: nextLesson.content ?? "",
+      };
+
+      reset(nextValues);
+      setValue("title", nextValues.title, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+      setValue("content", nextValues.content, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+      setEditorRevision((revision) => revision + 1);
+    }
+
+    const selectedLesson = lesson;
+
+    applyFormValues(selectedLesson);
+    setActiveTab("content");
+
+    async function loadFullLesson() {
+      const res = await api.get<Lesson>(`/api/lessons/${selectedLesson.id}`);
+      if (isCancelled) return;
+
+      if (res.success && res.data) {
+        applyFormValues(res.data);
+      } else {
+        toast.error(res.error ?? res.message ?? "Failed to load lesson content.");
+      }
+    }
+
+    void loadFullLesson();
+
+    return () => {
+      isCancelled = true;
+    };
+    // api is intentionally omitted because useApi returns a new object in some renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, lesson?.id, reset, setValue]);
 
   async function onSubmit(values: FormValues) {
     if (!lesson) return;
@@ -200,6 +252,7 @@ export default function LessonEditorDialog({
                     control={control}
                     render={({ field }) => (
                       <MDEditor
+                        key={`${lesson?.id ?? "lesson"}-${editorRevision}`}
                         value={field.value}
                         onChange={(v) => field.onChange(v ?? "")}
                         height={320}

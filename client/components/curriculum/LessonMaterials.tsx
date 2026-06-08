@@ -1,37 +1,20 @@
 "use client";
 
-/**
- * components/curriculum/LessonMaterials.tsx
- *
- * Handles all Material operations for a single lesson:
- *   - Fetch: GET /api/lessons/:lessonId/materials
- *   - Upload: POST /api/lessons/:lessonId/materials/upload  (via XHR for progress)
- *   - Download: GET /api/materials/:materialId/download
- *   - Delete: DELETE /api/materials/:materialId  (with AlertDialog confirmation)
- *
- * XHR vs fetch for upload:
- *   The native fetch() API does not expose upload progress events. We use
- *   XMLHttpRequest instead, which fires xhr.upload.onprogress with loaded/total
- *   byte counts so we can drive the Progress bar in real-time.
- *   See ADR-009 in docs/04-architecture-decisions.md.
- */
-
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  AlertCircle,
+  Archive,
+  Download,
+  File,
   FileText,
   FileVideo,
-  Archive,
-  File,
-  Download,
-  Trash2,
-  UploadCloud,
+  Eye,
   Loader2,
-  AlertCircle,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,286 +31,235 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { UploadDropzone } from "@/lib/uploadthing";
+import { MaterialPreviewModal } from "./MaterialPreviewModal";
 
 interface Material {
   id: string;
   title: string;
-  fileName: string;
   fileUrl: string;
-  mimeType: string;
+  materialType: "PDF" | "VIDEO" | "LINK" | "OTHER";
   fileSizeBytes: string | number | null;
+}
+
+interface UploadedThingFile {
+  name: string;
+  size: number;
+  type?: string;
+  url?: string;
+  ufsUrl?: string;
 }
 
 interface Props {
   lessonId: string;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-/** Return the appropriate Lucide icon component based on MIME type. */
-function FileIcon({ mimeType }: { mimeType?: string }) {
-  // Safe fallback: If mimeType is undefined (empty), automatically assign an empty string
-  const safeType = mimeType || "";
-
-  if (safeType.startsWith("video/")) {
-    return <FileVideo size={16} className="text-violet-500 shrink-0" />;
+function FileIcon({
+  materialType,
+}: {
+  materialType?: Material["materialType"];
+}) {
+  if (materialType === "VIDEO") {
+    return <FileVideo size={16} className="shrink-0 text-violet-500" />;
   }
-  if (safeType.includes("zip") || safeType.includes("rar") || safeType.includes("tar")) {
-    return <Archive size={16} className="text-orange-500 shrink-0" />;
+  if (materialType === "PDF") {
+    return <FileText size={16} className="shrink-0 text-red-500" />;
   }
-  if (safeType.includes("pdf")) {
-    return <FileText size={16} className="text-red-500 shrink-0" />;
+  if (materialType === "OTHER") {
+    return <Archive size={16} className="shrink-0 text-orange-500" />;
   }
 
-  // Icon default for remaining files (docx, xlsx, txt, or when mimeType is not available)
-  return <File size={16} className="text-blue-500 shrink-0" />;
+  return <File size={16} className="shrink-0 text-blue-500" />;
 }
 
-/** Format a byte count into a human-readable string (KB / MB). */
 function formatBytes(bytes: string | number | null): string {
   if (bytes === null || bytes === undefined) return "";
   const n = typeof bytes === "string" ? parseInt(bytes, 10) : bytes;
-  if (isNaN(n)) return "";
+  if (Number.isNaN(n)) return "";
   if (n < 1024) return `${n} B`;
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/** Read the stored JWT from localStorage for attaching to XHR headers. */
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("lms_auth_token");
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export default function LessonMaterials({ lessonId }: Props) {
   const router = useRouter();
-
-  // ── State ──────────────────────────────────────────────────────────────────
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-
-  // Upload state
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null); // 0-100 or null
-  const [uploadingName, setUploadingName] = useState<string | null>(null);
-
-  // Deletion state — holds the material pending confirmation
+  const [isSavingUpload, setIsSavingUpload] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // ── Fetch materials ────────────────────────────────────────────────────────
+  const [previewMaterial, setPreviewMaterial] = useState<Material | null>(null);
 
   const loadMaterials = useCallback(async () => {
     setIsLoading(true);
     setLoadError(null);
+
     try {
       const token = getToken();
       const res = await fetch(`/api/lessons/${lessonId}/materials`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      const json = await res.json();
-      if (json.success && json.data) {
+      const json = (await res.json().catch(() => null)) as {
+        success?: boolean;
+        data?: Material[];
+        message?: string;
+      } | null;
+
+      if (res.ok && json?.success && json.data) {
         setMaterials(json.data);
       } else {
-        setLoadError(json.error ?? "Failed to load materials.");
+        setLoadError(json?.message ?? "Failed to load materials.");
       }
     } catch {
       setLoadError("Failed to load materials.");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-    // lessonId is a stable primitive — the only thing that should re-trigger a fetch.
   }, [lessonId]);
 
   useEffect(() => {
-    loadMaterials();
+    void loadMaterials();
   }, [loadMaterials]);
 
-  // ── Upload via XHR (required for progress tracking) ────────────────────────
+  async function persistUploadedFile(uploaded: UploadedThingFile) {
+    const fileUrl = uploaded.url ?? uploaded.ufsUrl;
+    if (!fileUrl) {
+      toast.error(
+        "Upload completed, but UploadThing did not return a file URL.",
+      );
+      return;
+    }
 
-  /**
-   * XHR is the ONLY browser API that exposes upload progress via the
-   * xhr.upload.onprogress event. The Fetch API provides no equivalent.
-   * We attach the JWT manually since we bypass the useApi hook here.
-   */
-  function uploadFile(file: File) {
-    const token = getToken();
-    const formData = new FormData();
-    formData.append("file", file);
+    setIsSavingUpload(true);
+    try {
+      const token = getToken();
+      const res = await fetch(`/api/lessons/${lessonId}/materials/upload`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          name: uploaded.name,
+          url: fileUrl,
+          size: uploaded.size,
+          type: uploaded.type,
+        }),
+      });
+      const json = (await res.json().catch(() => null)) as {
+        success?: boolean;
+        data?: Material;
+        message?: string;
+      } | null;
 
-    setUploadingName(file.name);
-    setUploadProgress(0);
-
-    const xhr = new XMLHttpRequest();
-
-    // Real-time progress — called repeatedly as bytes are sent.
-    xhr.upload.onprogress = (e: ProgressEvent) => {
-      if (e.lengthComputable) {
-        setUploadProgress(Math.round((e.loaded / e.total) * 100));
+      if (!res.ok || !json?.success || !json.data) {
+        toast.error(
+          json?.message ?? "Upload saved to cloud, but database sync failed.",
+        );
+        return;
       }
-    };
 
-    xhr.onload = () => {
-      setUploadProgress(null);
-      setUploadingName(null);
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const json = JSON.parse(xhr.responseText);
-          if (json.success && json.data) {
-            setMaterials((prev) => [...prev, json.data]);
-            toast.success(`"${file.name}" uploaded successfully.`);
-            router.refresh();
-            window.dispatchEvent(new CustomEvent("course-materials-changed"));
-          } else {
-            toast.error(json.error ?? "Upload failed.");
-          }
-        } catch {
-          toast.error("Upload failed — unexpected response.");
-        }
-      } else {
-        try {
-          const json = JSON.parse(xhr.responseText);
-          toast.error(json.error ?? `Upload failed (${xhr.status}).`);
-        } catch {
-          toast.error(`Upload failed (${xhr.status}).`);
-        }
-      }
-    };
-
-    xhr.onerror = () => {
-      setUploadProgress(null);
-      setUploadingName(null);
-      toast.error("Network error during upload.");
-    };
-
-    xhr.open("POST", `/api/lessons/${lessonId}/materials/upload`);
-    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-    xhr.send(formData);
+      setMaterials((prev) => [...prev, json.data as Material]);
+      toast.success(`"${uploaded.name}" uploaded successfully.`);
+      router.refresh();
+      window.dispatchEvent(new CustomEvent("course-materials-changed"));
+    } catch {
+      toast.error("Upload saved to cloud, but database sync failed.");
+    } finally {
+      setIsSavingUpload(false);
+    }
   }
-
-  // ── Drag-and-drop handlers ─────────────────────────────────────────────────
-
-  function handleDragOver(e: React.DragEvent) {
-    e.preventDefault();
-    setIsDragOver(true);
-  }
-
-  function handleDragLeave() {
-    setIsDragOver(false);
-  }
-
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault();
-    setIsDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) uploadFile(file);
-  }
-
-  function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) uploadFile(file);
-    // Reset so the same file can be re-selected if needed
-    e.target.value = "";
-  }
-
-  // ── Delete material ────────────────────────────────────────────────────────
 
   async function confirmDelete() {
     if (!deletingId) return;
+
     setIsDeleting(true);
-    const toastId = toast.loading("Deleting…");
+    const toastId = toast.loading("Deleting...");
     try {
       const token = getToken();
       const res = await fetch(`/api/materials/${deletingId}`, {
         method: "DELETE",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
+
       if (res.status === 204 || res.ok) {
         toast.success("Material deleted.", { id: toastId });
         setMaterials((prev) => prev.filter((m) => m.id !== deletingId));
         router.refresh();
         window.dispatchEvent(new CustomEvent("course-materials-changed"));
       } else {
-        const json = await res.json().catch(() => ({}));
-        toast.error(json.error ?? "Failed to delete material.", { id: toastId });
+        const json = (await res.json().catch(() => null)) as {
+          message?: string;
+        } | null;
+        toast.error(json?.message ?? "Failed to delete material.", {
+          id: toastId,
+        });
       }
     } catch {
       toast.error("Network error during deletion.", { id: toastId });
+    } finally {
+      setIsDeleting(false);
+      setDeletingId(null);
     }
-    setIsDeleting(false);
-    setDeletingId(null);
   }
-
-  // ── Render ────────────────────────────────────────────────────────────────
-
-  const isUploading = uploadProgress !== null;
 
   return (
     <div className="space-y-5 py-2">
-      {/* ── Upload Zone ── */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => !isUploading && fileInputRef.current?.click()}
-        onKeyDown={(e) => e.key === "Enter" && !isUploading && fileInputRef.current?.click()}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        className={[
-          "relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-8 px-4 transition-colors cursor-pointer select-none",
-          isDragOver
-            ? "border-sky-400 bg-sky-50"
-            : "border-slate-200 bg-slate-50/50 hover:border-sky-300 hover:bg-sky-50/40",
-          isUploading ? "pointer-events-none opacity-80" : "",
-        ].join(" ")}
-      >
-        {isUploading ? (
-          <>
-            <Loader2 size={24} className="text-sky-500 animate-spin" />
-            <p className="text-sm font-medium text-slate-700">
-              Uploading <span className="text-sky-600">{uploadingName}</span>…
-            </p>
-            <div className="w-full max-w-xs">
-              <Progress value={uploadProgress} className="h-2" />
-            </div>
-            <p className="text-xs text-slate-400 tabular-nums">{uploadProgress}%</p>
-          </>
-        ) : (
-          <>
-            <UploadCloud size={28} className="text-slate-400" />
-            <div className="text-center">
-              <p className="text-sm font-medium text-slate-700">
-                Drop a file here, or{" "}
-                <span className="text-sky-600 underline underline-offset-2">browse</span>
-              </p>
-              <p className="text-xs text-slate-400 mt-0.5">
-                PDF, video, ZIP, and other formats up to 100 MB
-              </p>
-            </div>
-          </>
-        )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          className="sr-only"
-          onChange={handleFileInput}
-          tabIndex={-1}
+      <div className="relative">
+        <UploadDropzone
+          endpoint="courseMaterialUploader"
+          onClientUploadComplete={async (res) => {
+            const uploaded = res[0];
+            if (!uploaded) return;
+            await persistUploadedFile({
+              name: uploaded.name,
+              size: uploaded.size,
+              type: uploaded.type,
+              url: uploaded.url,
+              ufsUrl: uploaded.ufsUrl,
+            });
+          }}
+          onUploadError={(error) => {
+            toast.error(error.message || "Upload failed.");
+          }}
+          appearance={{
+            container:
+              "min-h-44 cursor-pointer rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-8 transition-all hover:cursor-pointer hover:border-sky-500/40 hover:bg-sky-500/5 " +
+              "ut-state-dragover:border-sky-500 ut-state-dragover:bg-sky-500/10 ut-state-dragover:scale-[1.01]",
+            uploadIcon: "size-10 text-sky-500",
+            label:
+              "cursor-pointer text-sm font-medium text-sky-500 transition-colors hover:cursor-pointer hover:text-primary/80",
+            allowedContent: "text-xs text-muted-foreground",
+            button:
+              "inline-flex h-9 cursor-pointer items-center justify-center rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs transition-colors hover:cursor-pointer hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+          }}
+          content={{
+            allowedContent:
+              "PDF, video, and image files are stored in UploadThing.",
+          }}
         />
+        {isSavingUpload && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-white/70 backdrop-blur-sm">
+            <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
+              <Loader2 size={15} className="animate-spin text-sky-600" />
+              Saving material...
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ── Material List ── */}
       {isLoading ? (
         <div className="space-y-2">
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="h-12 rounded-lg bg-slate-100 animate-pulse"
+              className="h-12 animate-pulse rounded-lg bg-slate-100"
             />
           ))}
         </div>
@@ -337,14 +269,14 @@ export default function LessonMaterials({ lessonId }: Props) {
           <span>{loadError}</span>
           <button
             type="button"
-            onClick={loadMaterials}
+            onClick={() => void loadMaterials()}
             className="ml-auto text-xs underline hover:no-underline"
           >
             Retry
           </button>
         </div>
       ) : materials.length === 0 ? (
-        <p className="text-center text-xs text-slate-400 py-4">
+        <p className="py-4 text-center text-xs text-slate-400">
           No materials attached yet. Upload your first file above.
         </p>
       ) : (
@@ -352,32 +284,41 @@ export default function LessonMaterials({ lessonId }: Props) {
           {materials.map((mat) => (
             <li
               key={mat.id}
-              className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-2.5 shadow-xs hover:bg-slate-50/80 transition-colors"
+              className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-2.5 shadow-xs transition-colors hover:bg-slate-50/80"
             >
-              <FileIcon mimeType={mat.mimeType} />
+              <FileIcon materialType={mat.materialType} />
 
-              {/* File info */}
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger render={
-                      <span className="block text-sm font-medium text-slate-800 truncate cursor-default">
-                        {mat.title}
-                      </span>
-                    } />
-                    <TooltipContent>
-                      {mat.title}
-                    </TooltipContent>
+                    <TooltipTrigger
+                      render={
+                        <span className="block cursor-default truncate text-sm font-medium text-slate-800">
+                          {mat.title}
+                        </span>
+                      }
+                    />
+                    <TooltipContent>{mat.title}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
                 {mat.fileSizeBytes !== null && (
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="mt-0.5 text-xs text-slate-400">
                     {formatBytes(mat.fileSizeBytes)}
                   </p>
                 )}
               </div>
 
-              {/* Download */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setPreviewMaterial(mat)}
+                className="shrink-0 text-slate-400 hover:bg-sky-50 hover:text-sky-600"
+                aria-label={`Preview ${mat.title}`}
+              >
+                <Eye size={15} />
+              </Button>
+
               <a
                 href={`/api/materials/${mat.id}/download`}
                 target="_blank"
@@ -388,20 +329,19 @@ export default function LessonMaterials({ lessonId }: Props) {
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="text-slate-400 hover:text-sky-600 hover:bg-sky-50"
+                  className="text-slate-400 hover:bg-sky-50 hover:text-sky-600"
                   aria-label={`Download ${mat.title}`}
                 >
                   <Download size={15} />
                 </Button>
               </a>
 
-              {/* Delete with AlertDialog */}
               <Button
                 type="button"
                 variant="ghost"
                 size="icon-sm"
                 onClick={() => setDeletingId(mat.id)}
-                className="shrink-0 text-slate-400 hover:text-red-600 hover:bg-red-50"
+                className="shrink-0 text-slate-400 hover:bg-red-50 hover:text-red-600"
                 aria-label={`Delete ${mat.title}`}
               >
                 <Trash2 size={15} />
@@ -418,8 +358,9 @@ export default function LessonMaterials({ lessonId }: Props) {
                     <AlertDialogTitle>Delete Material?</AlertDialogTitle>
                     <AlertDialogDescription>
                       This will permanently delete{" "}
-                      <strong>&ldquo;{mat.title}&rdquo;</strong> and remove
-                      the physical file from storage. This cannot be undone.
+                      <strong>&ldquo;{mat.title}&rdquo;</strong> from
+                      UploadThing and remove it from the lesson. This cannot be
+                      undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -444,6 +385,14 @@ export default function LessonMaterials({ lessonId }: Props) {
           ))}
         </ul>
       )}
+
+      <MaterialPreviewModal
+        material={previewMaterial}
+        open={previewMaterial !== null}
+        onOpenChange={(open) => {
+          if (!open) setPreviewMaterial(null);
+        }}
+      />
     </div>
   );
 }
