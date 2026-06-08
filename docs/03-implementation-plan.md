@@ -346,21 +346,21 @@
 
 ### 6A — Cloud Storage Migration
 
-- [ ] **[Next.js]** Install UploadThing packages (`npm install uploadthing @uploadthing/react`).
-- [ ] **[Next.js API]** Setup UploadThing backend: Create file router at `app/api/uploadthing/core.ts` and the main route handler at `app/api/uploadthing/route.ts` to allow direct-to-cloud uploads.
-- [ ] **[Next.js]** Update Teacher UI: Replace the custom file upload form with UploadThing's `<UploadDropzone>` component in the material management page.
-- [ ] **[Next.js]** Update DB state: Inside the `<UploadDropzone>`'s `onClientUploadComplete` callback, take the returned cloud URL (`res[0].url`) and trigger your API to save it to `Material.fileUrl` in the database.
-- [ ] **[Next.js API]** Update the `DELETE /api/materials/[materialId]` route to call `utapi.deleteFiles(fileKey)` to remove the file from the cloud instead of `fs.unlink`.
-- [ ] **[Prisma]** Update `Material.fileUrl` semantics — this field now stores the UploadThing URL instead of a local `/uploads/...` path. Update any frontend components that reference local paths.
-- [ ] **[Next.js]** Add UploadThing environment variables to `.env` (`UPLOADTHING_SECRET` and `UPLOADTHING_APP_ID`).
+- [x] **[Next.js]** Install UploadThing packages (`npm install uploadthing @uploadthing/react`).
+- [x] **[Next.js API]** Setup UploadThing backend: Create file router at `app/api/uploadthing/core.ts` and the main route handler at `app/api/uploadthing/route.ts` to allow direct-to-cloud uploads.
+- [x] **[Next.js]** Update Teacher UI: Replace the custom file upload form with UploadThing's `<UploadDropzone>` component in the material management page.
+- [x] **[Next.js]** Update DB state: Inside the `<UploadDropzone>`'s `onClientUploadComplete` callback, take the returned cloud URL (`res[0].url`) and trigger your API to save it to `Material.fileUrl` in the database.
+- [x] **[Next.js API]** Update the `DELETE /api/materials/[materialId]` route to call `utapi.deleteFiles(fileKey)` to remove the file from the cloud instead of `fs.unlink`.
+- [x] **[Prisma]** Update `Material.fileUrl` semantics — this field now stores the UploadThing URL instead of a local `/uploads/...` path. Update any frontend components that reference local paths.
+- [x] **[Next.js]** Add UploadThing environment variables to `.env`
 
 ### 6B — Inline PDF & Video Viewers
 
-- [ ] **[Next.js]** Build `<PdfViewer>` component (`components/viewers/PdfViewer.tsx`) — Use the browser-native `<iframe src={url} className="w-full h-200 rounded-xl border border-slate-200" />`. **Strictly avoid `react-pdf`** to prevent SSR/Webpack worker configuration hell.
-- [ ] **[Next.js]** Build `<VideoPlayer>` component (`components/viewers/VideoPlayer.tsx`) — `"use client"` component using HTML5 `<video>` element with controls, playback speed selector, and fullscreen support; accepts cloud-hosted video URL as `src` prop
-- [ ] **[Next.js]** Integrate viewers into the Lesson View page (`app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx`) — render `<PdfViewer>` for `MaterialType.PDF` and `<VideoPlayer>` for `MaterialType.VIDEO` inline, alongside the existing download button
-- [ ] **[Next.js]** Add a "Preview" action button on material list items that opens the viewer in a Shadcn `<Dialog>` modal for quick viewing without navigating away
-- [ ] **[Next.js]** Handle unsupported file types gracefully — for `MaterialType.OTHER` / `MaterialType.LINK`, show only the download button with a file-type icon
+- [x] **[Next.js]** Build `<PdfViewer>` component (`components/viewers/PdfViewer.tsx`) — Use the browser-native `<iframe src={url} className="w-full h-200 rounded-xl border border-slate-200" />`. **Strictly avoid `react-pdf`** to prevent SSR/Webpack worker configuration hell.
+- [x] **[Next.js]** Build `<VideoPlayer>` component (`components/viewers/VideoPlayer.tsx`) — `"use client"` component using HTML5 `<video>` element with controls, playback speed selector, and fullscreen support; accepts cloud-hosted video URL as `src` prop
+- [x] **[Next.js]** Integrate viewers into the Lesson View page (`app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx`) — render `<PdfViewer>` for `MaterialType.PDF` and `<VideoPlayer>` for `MaterialType.VIDEO` inline, alongside the existing download button
+- [x] **[Next.js]** Add a "Preview" action button on material list items that opens the viewer in a Shadcn `<Dialog>` modal for quick viewing without navigating away
+- [x] **[Next.js]** Handle unsupported file types gracefully — for `MaterialType.OTHER` / `MaterialType.LINK`, show only the download button with a file-type icon
 
 ### 6C — Smoke Test Deployment (Vercel + Managed Postgres)
 
