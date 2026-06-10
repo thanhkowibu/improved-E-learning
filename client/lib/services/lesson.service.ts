@@ -65,6 +65,7 @@ export async function getLessonsByModule(moduleId: string) {
     select: {
       id: true,
       title: true,
+      lessonType: true,
       orderIndex: true,
       moduleId: true,
       createdAt: true,
@@ -132,6 +133,7 @@ export async function createLesson(moduleId: string, data: LessonCreateInput) {
       id: true,
       title: true,
       content: true,
+      lessonType: true,
       orderIndex: true,
       moduleId: true,
       createdAt: true,
@@ -162,6 +164,7 @@ export async function updateLesson(
       id: true,
       title: true,
       content: true,
+      lessonType: true,
       orderIndex: true,
       moduleId: true,
       createdAt: true,

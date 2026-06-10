@@ -1,0 +1,214 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
+
+export interface QuizOptionData {
+  id: string;
+  optionText: string;
+  isCorrect?: boolean;
+  orderIndex?: number;
+}
+
+export interface QuizQuestionData {
+  id: string;
+  questionText: string;
+  explanation?: string | null;
+  points: number;
+  orderIndex?: number;
+  options: QuizOptionData[];
+}
+
+export interface QuizData {
+  id: string;
+  lessonId: string;
+  dueDate?: string | Date | null;
+  maxAttempts: number;
+  passingScore: number;
+  questions: QuizQuestionData[];
+}
+
+export interface QuizAttemptAnswerData {
+  id: string;
+  questionId: string;
+  optionId: string;
+  question?: QuizQuestionData;
+  option?: QuizOptionData;
+}
+
+export interface QuizAttemptData {
+  id: string;
+  quizId: string;
+  score: number;
+  totalPoints: number;
+  startedAt?: string | Date | null;
+  submittedAt?: string | Date | null;
+  answers: QuizAttemptAnswerData[];
+}
+
+interface QuizResultProps {
+  attempt: QuizAttemptData;
+  quiz: QuizData;
+}
+
+function formatPercent(score: number, totalPoints: number) {
+  if (totalPoints <= 0) return 0;
+  return Math.round((score / totalPoints) * 100);
+}
+
+function sortQuestions(questions: QuizQuestionData[]) {
+  return questions
+    .slice()
+    .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+}
+
+function sortOptions(options: QuizOptionData[]) {
+  return options
+    .slice()
+    .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+}
+
+export function QuizResult({ attempt, quiz }: QuizResultProps) {
+  const percent = formatPercent(attempt.score, attempt.totalPoints);
+  const passed =
+    attempt.totalPoints > 0 && attempt.score / attempt.totalPoints >= quiz.passingScore;
+  const answersByQuestionId = new Map(
+    attempt.answers.map((answer) => [answer.questionId, answer]),
+  );
+  const questions = sortQuestions(
+    quiz.questions.map((question) => {
+      const gradedQuestion = answersByQuestionId.get(question.id)?.question;
+      return gradedQuestion ?? question;
+    }),
+  );
+
+  return (
+    <Card className="overflow-hidden border-slate-200 bg-white shadow-sm">
+      <CardHeader className="border-b border-slate-100 bg-slate-50/70">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-slate-500">Quiz Result</p>
+            <CardTitle className="mt-1 text-3xl font-extrabold text-slate-900">
+              {attempt.score}/{attempt.totalPoints} - {percent}%
+            </CardTitle>
+          </div>
+          <Badge
+            variant="outline"
+            className={cn(
+              "w-fit rounded-full px-3 py-1 text-sm font-semibold",
+              passed
+                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                : "border-red-200 bg-red-50 text-red-700",
+            )}
+          >
+            {passed ? "Pass" : "Fail"}
+          </Badge>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-5 p-5">
+        {questions.map((question, questionIndex) => {
+          const answer = answersByQuestionId.get(question.id);
+          const options = sortOptions(question.options);
+          const correctOption = options.find((option) => option.isCorrect);
+          const selectedOption = options.find(
+            (option) => option.id === answer?.optionId,
+          );
+          const selectedWasCorrect =
+            selectedOption?.isCorrect === true ||
+            answer?.option?.isCorrect === true ||
+            (Boolean(correctOption) && selectedOption?.id === correctOption?.id);
+
+          return (
+            <section
+              key={question.id}
+              className="rounded-xl border border-slate-200 bg-white p-4"
+            >
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {questionIndex + 1}. {question.questionText}
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {question.points} point{question.points === 1 ? "" : "s"}
+                  </p>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "w-fit rounded-full",
+                    selectedWasCorrect
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      : "border-red-200 bg-red-50 text-red-700",
+                  )}
+                >
+                  {selectedWasCorrect ? "Correct" : "Incorrect"}
+                </Badge>
+              </div>
+
+              <div className="space-y-2">
+                {options.map((option) => {
+                  const isSelected = option.id === selectedOption?.id;
+                  const isCorrect = option.isCorrect === true;
+
+                  return (
+                    <div
+                      key={option.id}
+                      className={cn(
+                        "rounded-lg border px-3 py-2 text-sm transition-colors",
+                        isCorrect &&
+                          "border-emerald-200 bg-emerald-50 text-emerald-800",
+                        isSelected &&
+                          !isCorrect &&
+                          "border-red-200 bg-red-50 text-red-800",
+                        !isSelected &&
+                          !isCorrect &&
+                          "border-slate-200 bg-slate-50/60 text-slate-700",
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <span>{option.optionText}</span>
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          {isSelected && (
+                            <Badge variant="outline" className="bg-white/70">
+                              Your answer
+                            </Badge>
+                          )}
+                          {isCorrect && (
+                            <Badge
+                              variant="outline"
+                              className="border-emerald-200 bg-white/70 text-emerald-700"
+                            >
+                              Correct
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {!selectedWasCorrect && correctOption && (
+                <p className="mt-3 text-sm text-slate-600">
+                  Correct answer:{" "}
+                  <span className="font-semibold text-emerald-700">
+                    {correctOption.optionText}
+                  </span>
+                </p>
+              )}
+
+              {question.explanation && (
+                <Alert className="mt-4 border-slate-200 bg-slate-50">
+                  <AlertDescription>{question.explanation}</AlertDescription>
+                </Alert>
+              )}
+            </section>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+}

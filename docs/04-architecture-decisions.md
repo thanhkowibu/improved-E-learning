@@ -668,3 +668,45 @@ The UploadThing route accepts PDF, video, and image uploads. Upload access is li
 ### Rationale
 
 UploadThing provides a typed Next.js App Router integration, direct-to-cloud uploads, and route-level middleware hooks that fit the existing authorization model. This lets the application migrate away from local `public/uploads` storage while keeping file upload policy close to the API boundary.
+
+---
+
+## ADR-013 · Quiz Engine Data Model
+
+**Date:** 2026-06-09
+**Phase:** 7A (Prisma Schema Updates for Quizzes)
+**Status:** Adopted
+
+### Context
+
+The LMS needs first-class quiz lessons in addition to lecture lessons. Quizzes require durable storage for quiz settings, ordered questions, selectable options, student attempts, and submitted answers while remaining tied to the existing lesson and enrollment model.
+
+### Decision
+
+Add a `LessonType` enum with `LECTURE` and `QUIZ`, plus a backward-compatible `Lesson.lessonType` field defaulting to `LECTURE`. Model each quiz as an optional one-to-one extension of `Lesson` through `Quiz.lessonId @unique`, with child tables for `QuizQuestion`, `QuizOption`, `QuizAttempt`, and `QuizAnswer`.
+
+Student attempts relate back to `User` through a dedicated `StudentQuizAttempts` relation. Quiz records cascade from their owning lesson, and nested quiz data cascades from its parent quiz, question, option, or attempt as appropriate.
+
+### Rationale
+
+Keeping quizzes as a one-to-one lesson extension preserves the existing course/module/lesson hierarchy and avoids creating a parallel curriculum tree. The `lessonType` discriminator lets existing lecture lessons continue unchanged while future API and UI layers can branch cleanly between markdown content and quiz-taking workflows.
+
+---
+
+## ADR-014 · Gemini Structured Quiz Generation
+
+**Date:** 2026-06-10
+**Phase:** 7E (AI-Powered Quiz Generation)
+**Status:** Adopted
+
+### Context
+
+Teachers need a faster way to draft quiz questions from existing lesson markdown and uploaded course materials. The app already uses the Google Gemini File API for grounded course chat, so quiz generation should reuse that backend integration instead of introducing a separate AI client or persistence path.
+
+### Decision
+
+Implement quiz generation through the existing `@google/genai` service layer using `gemini-3.1-flash-lite`, `responseMimeType: "application/json"`, and a strict array-of-question `responseSchema`. The generation API returns validated question JSON only; it does not create or update quiz records. Teachers review and edit generated questions in `<QuizBuilder>` before saving through the existing quiz CRUD endpoint.
+
+### Rationale
+
+Structured JSON output plus Zod validation keeps generated data compatible with the existing quiz schema and prevents malformed AI output from entering the database. Keeping generation as a draft-only operation preserves teacher control and avoids corrupting quizzes that may already have student attempts.

@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { Loader2, FileText, BookOpen } from "lucide-react";
+import { LessonType } from "@prisma/client";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useApi } from "@/hooks/useApi";
 import LessonMaterials from "./LessonMaterials";
 
@@ -62,6 +64,7 @@ export interface Lesson {
   id: string;
   title: string;
   content?: string | null;
+  lessonType?: LessonType;
   orderIndex: number;
   moduleId: string;
 }
@@ -69,6 +72,7 @@ export interface Lesson {
 interface FormValues {
   title: string;
   content: string;
+  lessonType: LessonType;
 }
 
 interface Props {
@@ -100,7 +104,11 @@ export default function LessonEditorDialog({
     setValue,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: { title: "", content: "" },
+    defaultValues: {
+      title: "",
+      content: "",
+      lessonType: LessonType.LECTURE,
+    },
   });
 
   // Sync form values whenever the dialog opens. The module list deliberately
@@ -109,7 +117,11 @@ export default function LessonEditorDialog({
     if (!open) return;
 
     if (!lesson) {
-      reset({ title: "", content: "" });
+      reset({
+        title: "",
+        content: "",
+        lessonType: LessonType.LECTURE,
+      });
       setActiveTab("content");
       return;
     }
@@ -120,6 +132,7 @@ export default function LessonEditorDialog({
       const nextValues = {
         title: nextLesson.title,
         content: nextLesson.content ?? "",
+        lessonType: nextLesson.lessonType ?? LessonType.LECTURE,
       };
 
       reset(nextValues);
@@ -129,6 +142,11 @@ export default function LessonEditorDialog({
         shouldValidate: false,
       });
       setValue("content", nextValues.content, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+      setValue("lessonType", nextValues.lessonType, {
         shouldDirty: false,
         shouldTouch: false,
         shouldValidate: false,
@@ -169,6 +187,7 @@ export default function LessonEditorDialog({
     const res = await api.patch<Lesson>(`/api/lessons/${lesson.id}`, {
       title: values.title.trim(),
       content: values.content || null,
+      lessonType: values.lessonType,
     });
 
     if (res.success && res.data) {
@@ -236,6 +255,44 @@ export default function LessonEditorDialog({
               </div>
 
               {/* Markdown content — SSR-safe via next/dynamic */}
+              <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                <Label>Lesson Type</Label>
+                <Controller
+                  name="lessonType"
+                  control={control}
+                  render={({ field }) => (
+                    <RadioGroup
+                      value={field.value}
+                      onValueChange={(value) => field.onChange(value as LessonType)}
+                      className="grid gap-2 sm:grid-cols-2"
+                    >
+                      <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-sky-200 hover:bg-sky-50/40">
+                        <RadioGroupItem value={LessonType.LECTURE} className="mt-0.5" />
+                        <span>
+                          <span className="block text-sm font-semibold text-slate-800">
+                            Lecture
+                          </span>
+                          <span className="block text-xs text-slate-500">
+                            Markdown lesson content with materials.
+                          </span>
+                        </span>
+                      </label>
+                      <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-sky-200 hover:bg-sky-50/40">
+                        <RadioGroupItem value={LessonType.QUIZ} className="mt-0.5" />
+                        <span>
+                          <span className="block text-sm font-semibold text-slate-800">
+                            Quiz
+                          </span>
+                          <span className="block text-xs text-slate-500">
+                            Add questions, options, attempts, and scoring.
+                          </span>
+                        </span>
+                      </label>
+                    </RadioGroup>
+                  )}
+                />
+              </div>
+
               <div className="space-y-1.5">
                 <Label>Lesson Content (Markdown)</Label>
                 {/*

@@ -31,11 +31,25 @@ import {
   Circle,
   Sparkles,
   Eye,
+  ClipboardList,
+  History,
+  RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +63,12 @@ import { PdfViewer } from "@/components/viewers/PdfViewer";
 import { VideoPlayer } from "@/components/viewers/VideoPlayer";
 import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/useApi";
+import { QuizTaker } from "@/components/quiz/QuizTaker";
+import {
+  QuizResult,
+  type QuizAttemptData,
+  type QuizData,
+} from "@/components/quiz/QuizResult";
 import ReactMarkdown from "react-markdown";
 
 // ─── Dynamic import — SSR safe ────────────────────────────────────────────────
@@ -79,6 +99,7 @@ interface LessonDetail {
   id: string;
   title: string;
   content: string | null;
+  lessonType: "LECTURE" | "QUIZ";
   orderIndex: number;
   moduleId: string;
   materials: MaterialItem[];
@@ -233,6 +254,284 @@ function MarkCompleteButton({
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
+
+type QuizViewState = "HISTORY" | "TAKING" | "REVIEWING";
+
+function formatAttemptDate(value?: string | Date | null) {
+  if (!value) return "Not submitted";
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function getAttemptPercent(attempt: QuizAttemptData) {
+  if (attempt.totalPoints <= 0) return 0;
+  return Math.round((attempt.score / attempt.totalPoints) * 100);
+}
+
+function QuizSection({ lessonId }: { lessonId: string }) {
+  const api = useApi();
+  const [quiz, setQuiz] = useState<QuizData | null>(null);
+  const [attempts, setAttempts] = useState<QuizAttemptData[]>([]);
+  const [view, setView] = useState<QuizViewState>("HISTORY");
+  const [reviewAttempt, setReviewAttempt] = useState<QuizAttemptData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadQuizState = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    setView("HISTORY");
+    setReviewAttempt(null);
+
+    const quizRes = await api.get<QuizData>(`/api/lessons/${lessonId}/quiz`);
+    if (!quizRes.success || !quizRes.data) {
+      const message = quizRes.error ?? quizRes.message ?? "";
+      if (message.toLowerCase().includes("not found")) {
+        setQuiz(null);
+      } else {
+        setError(message || "Failed to load quiz.");
+      }
+      setAttempts([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setQuiz(quizRes.data);
+
+    const attemptsRes = await api.get<QuizAttemptData[]>(
+      `/api/lessons/${lessonId}/quiz/attempts`,
+    );
+    if (attemptsRes.success && attemptsRes.data) {
+      setAttempts(attemptsRes.data);
+    } else {
+      setError(
+        attemptsRes.error ??
+          attemptsRes.message ??
+          "Failed to load quiz attempt history.",
+      );
+      setAttempts([]);
+    }
+
+    setIsLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lessonId]);
+
+  useEffect(() => {
+    void loadQuizState();
+  }, [loadQuizState]);
+
+  if (isLoading) {
+    return (
+      <Card className="mb-12 border-slate-200">
+        <CardContent className="flex items-center justify-center gap-2 py-10 text-sm text-slate-500">
+          <Loader2 size={16} className="animate-spin text-sky-500" />
+          Loading quiz...
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive" className="mb-12">
+        <AlertCircle />
+        <AlertTitle>Quiz unavailable</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!quiz) {
+    return (
+      <Card className="mb-12 border-dashed border-slate-200 bg-slate-50/60">
+        <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+          <ClipboardList size={28} className="text-slate-300" />
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">Quiz coming soon.</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              The instructor has not published questions for this quiz yet.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const dueDate = quiz.dueDate ? new Date(quiz.dueDate) : null;
+  const isClosed = dueDate ? dueDate.getTime() < Date.now() : false;
+  const remainingAttempts = Math.max(quiz.maxAttempts - attempts.length, 0);
+  const canTakeQuiz = !isClosed && remainingAttempts > 0;
+
+  function handleAttemptComplete(attempt: QuizAttemptData) {
+    setAttempts((current) => [attempt, ...current]);
+    setReviewAttempt(attempt);
+    setView("REVIEWING");
+  }
+
+  return (
+    <section className="mb-12 space-y-5">
+      <div className="flex flex-col gap-3 border-t border-slate-100 pt-8 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="flex items-center gap-2 text-xl font-extrabold text-slate-900">
+            <ClipboardList size={20} className="text-sky-500" />
+            Quiz
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {quiz.questions.length} question{quiz.questions.length === 1 ? "" : "s"} ·{" "}
+            {quiz.maxAttempts} attempt{quiz.maxAttempts === 1 ? "" : "s"} allowed
+            {dueDate ? ` · due ${formatAttemptDate(dueDate)}` : ""}
+          </p>
+        </div>
+        {view !== "HISTORY" && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setView("HISTORY");
+              setReviewAttempt(null);
+            }}
+            className="gap-2 rounded-lg border-slate-200 text-slate-600 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
+          >
+            <History size={15} />
+            Attempt History
+          </Button>
+        )}
+      </div>
+
+      {isClosed && (
+        <Alert className="border-amber-200 bg-amber-50 text-amber-900">
+          <AlertCircle />
+          <AlertTitle>Quiz closed.</AlertTitle>
+          <AlertDescription>
+            The due date has passed. You can still review submitted attempts.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {view === "TAKING" && (
+        <QuizTaker
+          lessonId={lessonId}
+          quiz={quiz}
+          remainingAttempts={remainingAttempts}
+          onComplete={handleAttemptComplete}
+        />
+      )}
+
+      {view === "REVIEWING" && reviewAttempt && (
+        <QuizResult attempt={reviewAttempt} quiz={quiz} />
+      )}
+
+      {view === "HISTORY" && (
+        <Card className="border-slate-200 bg-white shadow-sm">
+          <CardHeader className="border-b border-slate-100 bg-slate-50/70">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <History size={16} className="text-slate-500" />
+                  Attempt History
+                </CardTitle>
+                <p className="mt-1 text-sm text-slate-500">
+                  {remainingAttempts > 0
+                    ? `${remainingAttempts} attempt${
+                        remainingAttempts === 1 ? "" : "s"
+                      } remaining.`
+                    : "No attempts remaining."}
+                </p>
+              </div>
+              <Button
+                type="button"
+                disabled={!canTakeQuiz}
+                onClick={() => setView("TAKING")}
+                className="gap-2 bg-sky-500 text-white hover:bg-sky-600"
+              >
+                <RotateCcw size={15} />
+                Take Quiz
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {attempts.length === 0 ? (
+              <div className="flex flex-col items-center gap-2 py-10 text-center">
+                <ClipboardList size={24} className="text-slate-300" />
+                <p className="text-sm font-medium text-slate-700">
+                  No attempts submitted yet.
+                </p>
+                {!canTakeQuiz && (
+                  <p className="text-sm text-slate-500">
+                    {isClosed ? "Quiz closed." : "No attempts remaining."}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Attempt</TableHead>
+                    <TableHead>Submitted</TableHead>
+                    <TableHead>Score</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {attempts.map((attempt, index) => {
+                    const percent = getAttemptPercent(attempt);
+                    const passed =
+                      attempt.totalPoints > 0 &&
+                      attempt.score / attempt.totalPoints >= quiz.passingScore;
+
+                    return (
+                      <TableRow key={attempt.id}>
+                        <TableCell className="font-medium">
+                          Attempt {attempts.length - index}
+                        </TableCell>
+                        <TableCell>{formatAttemptDate(attempt.submittedAt)}</TableCell>
+                        <TableCell>
+                          {attempt.score}/{attempt.totalPoints} ({percent}%)
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "rounded-full",
+                              passed
+                                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                                : "border-red-200 bg-red-50 text-red-700",
+                            )}
+                          >
+                            {passed ? "Pass" : "Fail"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setReviewAttempt(attempt);
+                              setView("REVIEWING");
+                            }}
+                            className="rounded-lg text-sky-600 hover:bg-sky-50 hover:text-sky-700"
+                          >
+                            Review
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </section>
+  );
+}
 
 export default function LessonViewPage() {
   const params = useParams();
@@ -542,6 +841,8 @@ export default function LessonViewPage() {
         </div>
 
         {/* ══ MATERIALS ════════════════════════════════════════════════════════ */}
+        {lesson.lessonType === "QUIZ" && <QuizSection lessonId={lesson.id} />}
+
         <div className="mt-12 mb-12 flex flex-col items-start justify-between gap-4 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-6 sm:flex-row sm:items-center">
           <div>
             <h2 className="text-base font-bold text-slate-900">

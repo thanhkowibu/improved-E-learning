@@ -36,6 +36,11 @@ enum MaterialType {
   OTHER
 }
 
+enum LessonType {
+  LECTURE
+  QUIZ
+}
+
 // ===========================================================
 // Models
 // ===========================================================
@@ -56,6 +61,7 @@ model User {
   enrollments    Enrollment[]     @relation("StudentEnrollments")
   chatThreads    ChatThread[]     @relation("StudentChatThreads")
   lessonProgress LessonProgress[] @relation("StudentLessonProgress")
+  quizAttempts   QuizAttempt[]    @relation("StudentQuizAttempts")
 
   @@index([email])
   @@index([role])
@@ -102,18 +108,20 @@ model Module {
 }
 
 model Lesson {
-  id         String   @id @default(uuid())
+  id         String     @id @default(uuid())
   moduleId   String
   title      String
   content    String?
-  orderIndex Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  lessonType LessonType @default(LECTURE)
+  orderIndex Int        @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   // Relations
   module    Module           @relation("ModuleLessons", fields: [moduleId], references: [id], onDelete: Cascade)
   materials Material[]       @relation("LessonMaterials")
   progress  LessonProgress[] @relation("LessonProgress")
+  quiz      Quiz?
 
   @@index([moduleId])
   @@map("lessons")
@@ -202,4 +210,89 @@ model LessonProgress {
   @@index([studentId])
   @@index([lessonId])
   @@map("lesson_progress")
+}
+
+model Quiz {
+  id           String    @id @default(uuid())
+  lessonId     String    @unique
+  dueDate      DateTime?
+  maxAttempts  Int       @default(1)
+  passingScore Float     @default(0.5)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  lesson    Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id           String   @id @default(uuid())
+  quizId       String
+  questionText String
+  explanation  String?
+  orderIndex   Int      @default(0)
+  points       Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  options QuizOption[]
+  answers QuizAnswer[]
+
+  @@index([quizId])
+  @@map("quiz_questions")
+}
+
+model QuizOption {
+  id         String  @id @default(uuid())
+  questionId String
+  optionText String
+  isCorrect  Boolean @default(false)
+  orderIndex Int     @default(0)
+
+  // Relations
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers  QuizAnswer[]
+
+  @@index([questionId])
+  @@map("quiz_options")
+}
+
+model QuizAttempt {
+  id          String    @id @default(uuid())
+  quizId      String
+  studentId   String
+  score       Float?
+  totalPoints Int?
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+
+  // Relations
+  quiz    Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student User         @relation("StudentQuizAttempts", fields: [studentId], references: [id], onDelete: Cascade)
+  answers QuizAnswer[]
+
+  @@index([quizId])
+  @@index([studentId])
+  @@map("quiz_attempts")
+}
+
+model QuizAnswer {
+  id         String @id @default(uuid())
+  attemptId  String
+  questionId String
+  optionId   String
+
+  // Relations
+  attempt  QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  option   QuizOption   @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+  @@map("quiz_answers")
 }

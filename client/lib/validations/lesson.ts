@@ -11,6 +11,7 @@
  */
 
 import { z } from "zod";
+import { LessonType } from "@prisma/client";
 
 // ─── Create ───────────────────────────────────────────────────────────────────
 
@@ -27,6 +28,10 @@ export const lessonCreateSchema = z
       .max(100_000, "Content must be at most 100,000 characters.")
       .optional()
       .nullable(),
+
+    lessonType: z
+      .enum(LessonType, { error: "lessonType must be LECTURE or QUIZ." })
+      .optional(),
   })
   .strict();
 
@@ -53,6 +58,10 @@ export const lessonUpdateSchema = z
       .number({ error: "orderIndex must be a number." })
       .int("orderIndex must be an integer.")
       .min(0, "orderIndex must be non-negative.")
+      .optional(),
+
+    lessonType: z
+      .enum(LessonType, { error: "lessonType must be LECTURE or QUIZ." })
       .optional(),
   })
   .strict();

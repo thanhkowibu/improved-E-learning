@@ -364,16 +364,16 @@
 
 ### 6C — Smoke Test Deployment (Vercel + Managed Postgres)
 
-- [ ] **[Vercel]** Create a Vercel project and link to the Git repository
-- [ ] **[Database]** Provision a managed PostgreSQL instance — **Neon** (recommended: generous free tier, serverless Postgres) or **Supabase**
-- [ ] **[Prisma]** Update `DATABASE_URL` for the managed Postgres connection string (with `?sslmode=require` and connection pooler URL if using Neon)
-- [ ] **[Prisma]** Run `npx prisma migrate deploy` against the managed database to apply all existing migrations
-- [ ] **[Prisma]** Add `prisma generate` to the Vercel build command: set Build Command to `npx prisma generate && next build`
-- [ ] **[Vercel]** Configure all production environment variables in Vercel dashboard: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY`, `NEXT_PUBLIC_APP_URL`, and cloud storage credentials
-- [ ] **[Next.js]** Verify `next.config.ts` has any necessary `serverExternalPackages` config for Prisma (e.g., `serverExternalPackages: ["@prisma/client"]` if needed)
-- [ ] **[Smoke Test]** Deploy to Vercel and manually verify the full happy path: register → login → create course → add module/lesson → upload a PDF (cloud) → view PDF inline → enable AI → chat with AI tutor → enroll as student → study lesson → download material
-- [ ] **[Smoke Test]** Verify Gemini API connectivity from the Vercel serverless environment (file upload + chat response)
-- [ ] **[Smoke Test]** Document any issues found and fix critical blockers before proceeding to Phase 7
+- [x] **[Vercel]** Create a Vercel project and link to the Git repository
+- [x] **[Database]** Provision a managed PostgreSQL instance — **Neon** (recommended: generous free tier, serverless Postgres) or **Supabase**
+- [x] **[Prisma]** Update `DATABASE_URL` for the managed Postgres connection string (with `?sslmode=require` and connection pooler URL if using Neon)
+- [x] **[Prisma]** Run `npx prisma migrate deploy` against the managed database to apply all existing migrations
+- [x] **[Prisma]** Add `prisma generate` to the Vercel build command: set Build Command to `npx prisma generate && next build`
+- [x] **[Vercel]** Configure all production environment variables in Vercel dashboard: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY`, `NEXT_PUBLIC_APP_URL`, and cloud storage credentials
+- [x] **[Next.js]** Verify `next.config.ts` has any necessary `serverExternalPackages` config for Prisma (e.g., `serverExternalPackages: ["@prisma/client"]` if needed)
+- [x] **[Smoke Test]** Deploy to Vercel and manually verify the full happy path: register → login → create course → add module/lesson → upload a PDF (cloud) → view PDF inline → enable AI → chat with AI tutor → enroll as student → study lesson → download material
+- [x] **[Smoke Test]** Verify Gemini API connectivity from the Vercel serverless environment (file upload + chat response)
+- [x] **[Smoke Test]** Document any issues found and fix critical blockers before proceeding to Phase 7
 
 ---
 
@@ -383,9 +383,9 @@
 
 ### 7A — Prisma Schema Updates for Quizzes
 
-- [ ] **[Prisma]** Add `LessonType` enum: `LECTURE`, `QUIZ`
-- [ ] **[Prisma]** Add `lessonType` field to `Lesson` model: `lessonType LessonType @default(LECTURE)` — backward-compatible, all existing lessons default to `LECTURE`
-- [ ] **[Prisma]** Create `Quiz` model:
+- [x] **[Prisma]** Add `LessonType` enum: `LECTURE`, `QUIZ`
+- [x] **[Prisma]** Add `lessonType` field to `Lesson` model: `lessonType LessonType @default(LECTURE)` — backward-compatible, all existing lessons default to `LECTURE`
+- [x] **[Prisma]** Create `Quiz` model:
 
   ```prisma
   model Quiz {
@@ -405,7 +405,7 @@
   }
   ```
 
-- [ ] **[Prisma]** Create `QuizQuestion` model:
+- [x] **[Prisma]** Create `QuizQuestion` model:
 
   ```prisma
   model QuizQuestion {
@@ -427,7 +427,7 @@
   }
   ```
 
-- [ ] **[Prisma]** Create `QuizOption` model:
+- [x] **[Prisma]** Create `QuizOption` model:
 
   ```prisma
   model QuizOption {
@@ -445,7 +445,7 @@
   }
   ```
 
-- [ ] **[Prisma]** Create `QuizAttempt` model:
+- [x] **[Prisma]** Create `QuizAttempt` model:
 
   ```prisma
   model QuizAttempt {
@@ -467,7 +467,7 @@
   }
   ```
 
-- [ ] **[Prisma]** Create `QuizAnswer` model:
+- [x] **[Prisma]** Create `QuizAnswer` model:
 
   ```prisma
   model QuizAnswer {
@@ -485,73 +485,70 @@
   }
   ```
 
-- [ ] **[Prisma]** Add `quizAttempts QuizAttempt[]` relation to the `User` model
-- [ ] **[Prisma]** Add `quiz Quiz?` relation to the `Lesson` model (1:1 optional)
-- [ ] **[Prisma]** Run migration: `npx prisma migrate dev --name add-quiz-engine`
-- [ ] **[Prisma]** Deploy migration to managed Postgres: `npx prisma migrate deploy`
+- [x] **[Prisma]** Add `quizAttempts QuizAttempt[]` relation to the `User` model
+- [x] **[Prisma]** Add `quiz Quiz?` relation to the `Lesson` model (1:1 optional)
 
 ### 7B — Quiz CRUD API
 
-- [ ] **[Next.js API]** Create Zod validation schemas (`lib/validations/quiz.ts`):
+- [x] **[Next.js API]** Create Zod validation schemas (`lib/validations/quiz.ts`):
   - `quizCreateSchema` — validates `dueDate?`, `maxAttempts`, `timeLimitMin?`, `passingScore`, and nested `questions[]` array with `questionText`, `explanation?`, `points`, and `options[]` with `optionText` and `isCorrect`
   - `quizUpdateSchema` — partial version for updates
   - `quizSubmitSchema` — validates `answers[]` array with `{ questionId, optionId }`
-- [ ] **[Next.js API]** Create quiz service module (`lib/services/quiz.service.ts`):
+- [x] **[Next.js API]** Create quiz service module (`lib/services/quiz.service.ts`):
   - `createQuiz(lessonId, data)` — creates quiz with nested questions and options using Prisma nested `create`
   - `getQuizByLessonId(lessonId)` — fetches quiz with questions and options via Prisma `include`. **CRITICAL: If request is from a STUDENT, map over the options and remove the `isCorrect` field before returning JSON.**
   - `updateQuiz(quizId, data)` — upserts questions/options (delete-and-recreate strategy for simplicity). **MVP Rule: If `attempts > 0`, block updating questions/options to prevent orphaned records.**
   - `deleteQuiz(quizId)` — cascade deletes via Prisma
   - `submitAttempt(quizId, studentId, answers)` — creates `QuizAttempt` + `QuizAnswer` records, calculates score
   - `getAttempts(quizId, studentId)` — fetches student's past attempts with answers
-- [ ] **[Next.js API]** Implement `POST /api/lessons/[lessonId]/quiz` route handler — TEACHER/ADMIN, creates quiz with questions + options; validates lesson is `QUIZ` type
-- [ ] **[Next.js API]** Implement `GET /api/lessons/[lessonId]/quiz` route handler — owner/enrolled students; returns quiz structure (for students: excludes `isCorrect` until after submission)
-- [ ] **[Next.js API]** Implement `PATCH /api/lessons/[lessonId]/quiz` route handler — TEACHER/ADMIN, updates quiz settings and questions
-- [ ] **[Next.js API]** Implement `DELETE /api/lessons/[lessonId]/quiz` route handler — TEACHER/ADMIN, deletes quiz
-- [ ] **[Next.js API]** Implement `POST /api/lessons/[lessonId]/quiz/submit` route handler — STUDENT, submits answers; validates: enrollment, max attempts not exceeded, due date not passed; calculates and stores score
-- [ ] **[Next.js API]** Implement `GET /api/lessons/[lessonId]/quiz/attempts` route handler — STUDENT (own attempts) or TEACHER (all attempts for grading overview); returns attempts with scores
+- [x] **[Next.js API]** Implement `POST /api/lessons/[lessonId]/quiz` route handler — TEACHER/ADMIN, creates quiz with questions + options; validates lesson is `QUIZ` type
+- [x] **[Next.js API]** Implement `GET /api/lessons/[lessonId]/quiz` route handler — owner/enrolled students; returns quiz structure (for students: excludes `isCorrect` until after submission)
+- [x] **[Next.js API]** Implement `PATCH /api/lessons/[lessonId]/quiz` route handler — TEACHER/ADMIN, updates quiz settings and questions
+- [x] **[Next.js API]** Implement `DELETE /api/lessons/[lessonId]/quiz` route handler — TEACHER/ADMIN, deletes quiz
+- [x] **[Next.js API]** Implement `POST /api/lessons/[lessonId]/quiz/submit` route handler — STUDENT, submits answers; validates: enrollment, max attempts not exceeded, due date not passed; calculates and stores score
+- [x] **[Next.js API]** Implement `GET /api/lessons/[lessonId]/quiz/attempts` route handler — STUDENT (own attempts) or TEACHER (all attempts for grading overview); returns attempts with scores
 
 ### 7C — Teacher Quiz Builder UI
 
-- [ ] **[Next.js]** Update lesson creation/edit form to include `lessonType` selector (`LECTURE` / `QUIZ` radio group or `<Select>`)
-- [ ] **[Next.js]** Build `<QuizBuilder>` component (`components/quiz/QuizBuilder.tsx`) — `"use client"` dynamic form with:
+- [x] **[Next.js]** Update lesson creation/edit form to include `lessonType` selector (`LECTURE` / `QUIZ` radio group or `<Select>`)
+- [x] **[Next.js]** Build `<QuizBuilder>` component (`components/quiz/QuizBuilder.tsx`) — `"use client"` dynamic form with:
   - Quiz settings section: due date picker (Shadcn `<DatePicker>`), max attempts input, optional time limit, passing score percentage (Skip time limit for MVP).
   - Dynamic question list: add/remove/reorder questions with drag-and-drop (reuse `@dnd-kit/core`)
   - Per-question: text input for question, optional explanation textarea, points input
   - Per-question option list: add/remove options (min 2, max 6), text input for each option, radio/checkbox to mark correct answer(s)
   - Form validation with Zod before submission
-- [ ] **[Next.js]** Integrate `<QuizBuilder>` into the lesson edit page — show the quiz builder panel below the lesson content editor when `lessonType === "QUIZ"`
-- [ ] **[Next.js]** Build quiz preview mode — teacher can preview the quiz as a student would see it before publishing
-- [ ] **[Next.js]** Handle edit mode: pre-populate `<QuizBuilder>` with existing quiz data when editing a `QUIZ` lesson
+- [x] **[Next.js]** Integrate `<QuizBuilder>` as a sheet opened by an icon shown beside edit icon in lesson item when `lessonType === "QUIZ"`
+- [x] **[Next.js]** Build quiz preview mode — teacher can preview the quiz as a student would see it before publishing
+- [x] **[Next.js]** Handle edit mode: pre-populate `<QuizBuilder>` with existing quiz data when editing a `QUIZ` lesson
 
 ### 7D — Student Quiz Taking UI
 
-- [ ] **[Next.js]** Build `<QuizTaker>` component (`components/quiz/QuizTaker.tsx`) — `"use client"` component that renders the quiz-taking interface:
+- [x] **[Next.js]** Build `<QuizTaker>` component (`components/quiz/QuizTaker.tsx`) — `"use client"` component that renders the quiz-taking interface:
   - Displays quiz title, number of questions, and remaining attempts
   - Renders each question with its options as radio buttons (single-select)
   - Shows progress indicator (e.g., "Question 3 of 10")
-  - Optional countdown timer if `timeLimitMin` is set
   - Submit button with confirmation dialog ("Are you sure? You cannot change your answers after submission.")
-- [ ] **[Next.js]** Build `<QuizResult>` component (`components/quiz/QuizResult.tsx`) — renders after submission or when reviewing a past attempt:
+- [x] **[Next.js]** Build `<QuizResult>` component (`components/quiz/QuizResult.tsx`) — renders after submission or when reviewing a past attempt:
   - Shows score (e.g., "8/10 — 80%") with pass/fail indicator based on `passingScore`
   - Per-question breakdown: student's selected answer, correct answer highlighted, explanation text displayed
   - Color-coded: green for correct, red for incorrect
-- [ ] **[Next.js]** Integrate quiz UI into the Lesson View page — when a lesson is `QUIZ` type, render `<QuizTaker>` instead of the markdown content viewer; after submission, render `<QuizResult>`
-- [ ] **[Next.js]** Show attempt history — list of past attempts with scores and "Review" button to view `<QuizResult>` for each attempt
-- [ ] **[Next.js]** Handle edge cases: due date passed (show "Quiz closed" message), max attempts reached (show "No attempts remaining"), quiz not yet created by teacher (show "Quiz coming soon")
+- [x] **[Next.js]** Integrate quiz UI into the Lesson View page — when a lesson is `QUIZ` type, render `<QuizTaker>` below the markdown content viewer; after submission, render `<QuizResult>`
+- [x] **[Next.js]** Show attempt history — list of past attempts with scores and "Review" button to view `<QuizResult>` for each attempt
+- [x] **[Next.js]** Handle edge cases: due date passed (show "Quiz closed" message), max attempts reached (show "No attempts remaining"), quiz not yet created by teacher (show "Quiz coming soon")
 
 ### 7E — AI-Powered Quiz Generation (Magic AI Button)
 
-- [ ] **[Next.js API]** Create a Gemini prompt template (`lib/gemini/prompts.ts`) for quiz generation — instruct Gemini to read the lesson content (text + attached PDFs) and output a JSON array of questions with options, correct answers, and explanations; specify the exact JSON schema in the prompt for reliable structured output
-- [ ] **[Next.js API]** Implement `POST /api/lessons/[lessonId]/quiz/generate` route handler:
+- [x] **[Next.js API]** Create a Gemini prompt template (`lib/gemini/prompts.ts`) for quiz generation — instruct Gemini to read the lesson content (text + attached PDFs) and output a JSON array of questions with options, correct answers, and explanations; specify the exact JSON schema in the prompt for reliable structured output
+- [x] **[Next.js API]** Implement `POST /api/lessons/[lessonId]/quiz/generate` route handler:
   1. Verify TEACHER/ADMIN ownership of the lesson's course
   2. Load the lesson's `content` (markdown text) and associated material `geminiFileUri` references via Prisma
   3. Call Gemini `generateContent` with the quiz-generation system prompt + lesson content + file references. **CRITICAL: Use `responseMimeType: "application/json"` and provide a strict `responseSchema` (Array of questions with options) to guarantee valid JSON output.**
   4. Parse the JSON response, validate structure with Zod
   5. Return the generated questions as a structured JSON response (does NOT auto-save — the teacher reviews first)
-- [ ] **[Next.js API]** Add optional parameters: `numberOfQuestions` (default 5)
-- [ ] **[Next.js]** Add "✨ Generate with AI" button in the `<QuizBuilder>` component — calls the generate endpoint, then populates the quiz form fields with the AI-generated questions; teacher can review, edit, add/remove questions before saving
-- [ ] **[Next.js]** Show loading state with a shimmer animation while Gemini generates questions
-- [ ] **[Next.js]** Handle errors: course AI not enabled, no materials uploaded, Gemini rate limit, malformed response (fallback: show error toast and let teacher create manually)
+- [x] **[Next.js API]** Add optional parameters: `numberOfQuestions` (default 5)
+- [x] **[Next.js]** Add "✨ Generate with AI" button in the `<QuizBuilder>` component — calls the generate endpoint, then populates the quiz form fields with the AI-generated questions; teacher can review, edit, add/remove questions before saving
+- [x] **[Next.js]** Show loading state with a shimmer animation while Gemini generates questions
+- [x] **[Next.js]** Handle errors: course AI not enabled, no materials uploaded, Gemini rate limit, malformed response (fallback: show error toast and let teacher create manually)
 
 ---
 

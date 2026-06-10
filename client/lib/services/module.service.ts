@@ -47,6 +47,7 @@ export async function getModulesByCourse(courseId: string) {
         select: {
           id: true,
           title: true,
+          lessonType: true,
           orderIndex: true,
           moduleId: true,
         },
@@ -74,6 +75,7 @@ export async function getModuleById(moduleId: string, courseId: string) {
         select: {
           id: true,
           title: true,
+          lessonType: true,
           orderIndex: true,
           createdAt: true,
           updatedAt: true,
