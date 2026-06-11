@@ -1,8 +1,14 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { Loader2, Sparkles } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useApi } from "@/hooks/useApi";
 import { cn } from "@/lib/utils";
 
 export interface QuizOptionData {
@@ -53,6 +59,16 @@ interface QuizResultProps {
   quiz: QuizData;
 }
 
+interface AIExplanationState {
+  loading: boolean;
+  text?: string;
+  visible: boolean;
+}
+
+interface AIExplanationResponse {
+  explanation: string;
+}
+
 function formatPercent(score: number, totalPoints: number) {
   if (totalPoints <= 0) return 0;
   return Math.round((score / totalPoints) * 100);
@@ -70,7 +86,79 @@ function sortOptions(options: QuizOptionData[]) {
     .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
 }
 
+function getAIExplanationCacheKey(attemptId: string, quizId: string) {
+  return `learnai:quiz-ai-explanations:${quizId}:${attemptId}`;
+}
+
+function loadAIExplanationCache(
+  cacheKey: string,
+): Record<string, AIExplanationState> {
+  if (typeof window === "undefined") return {};
+
+  try {
+    const raw = window.sessionStorage.getItem(cacheKey);
+    if (!raw) return {};
+
+    const parsed = JSON.parse(raw) as Record<string, { text?: unknown }>;
+    return Object.fromEntries(
+      Object.entries(parsed).flatMap(([questionId, value]) => {
+        if (typeof value?.text !== "string" || !value.text) {
+          return [];
+        }
+
+        return [
+          [
+            questionId,
+            {
+              loading: false,
+              text: value.text,
+              visible: false,
+            } satisfies AIExplanationState,
+          ],
+        ];
+      }),
+    );
+  } catch (error) {
+    console.error("Failed to read quiz AI explanation cache.", {
+      cacheKey,
+      error,
+    });
+    return {};
+  }
+}
+
+function saveAIExplanationCache(
+  cacheKey: string,
+  aiData: Record<string, AIExplanationState>,
+) {
+  if (typeof window === "undefined") return;
+
+  try {
+    const cachePayload = Object.fromEntries(
+      Object.entries(aiData).flatMap(([questionId, value]) => {
+        if (!value.text) return [];
+        return [[questionId, { text: value.text }]];
+      }),
+    );
+
+    window.sessionStorage.setItem(cacheKey, JSON.stringify(cachePayload));
+  } catch (error) {
+    console.error("Failed to save quiz AI explanation cache.", {
+      cacheKey,
+      error,
+    });
+  }
+}
+
 export function QuizResult({ attempt, quiz }: QuizResultProps) {
+  const api = useApi();
+  const aiCacheKey = useMemo(
+    () => getAIExplanationCacheKey(attempt.id, quiz.id),
+    [attempt.id, quiz.id],
+  );
+  const [aiData, setAiData] = useState<Record<string, AIExplanationState>>(() =>
+    loadAIExplanationCache(aiCacheKey),
+  );
   const percent = formatPercent(attempt.score, attempt.totalPoints);
   const passed =
     attempt.totalPoints > 0 && attempt.score / attempt.totalPoints >= quiz.passingScore;
@@ -83,6 +171,80 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
       return gradedQuestion ?? question;
     }),
   );
+
+  useEffect(() => {
+    setAiData(loadAIExplanationCache(aiCacheKey));
+  }, [aiCacheKey]);
+
+  useEffect(() => {
+    saveAIExplanationCache(aiCacheKey, aiData);
+  }, [aiCacheKey, aiData]);
+
+  async function handleExplainQuestion({
+    question,
+    options,
+    correctOption,
+    studentOption,
+  }: {
+    question: QuizQuestionData;
+    options: QuizOptionData[];
+    correctOption: QuizOptionData | undefined;
+    studentOption: QuizOptionData | undefined;
+  }) {
+    const current = aiData[question.id];
+
+    if (current?.text) {
+      setAiData((previous) => ({
+        ...previous,
+        [question.id]: {
+          ...current,
+          visible: !current.visible,
+        },
+      }));
+      return;
+    }
+
+    setAiData((previous) => ({
+      ...previous,
+      [question.id]: {
+        loading: true,
+        visible: true,
+      },
+    }));
+
+    const res = await api.post<AIExplanationResponse>("/api/quiz/explain", {
+      questionText: question.questionText,
+      options: options.map((option) => option.optionText),
+      correctOption: correctOption?.optionText ?? "Correct option unavailable",
+      studentOption: studentOption?.optionText ?? "No answer selected",
+    });
+
+    const explanation = res.data?.explanation;
+
+    if (res.success && explanation) {
+      setAiData((previous) => ({
+        ...previous,
+        [question.id]: {
+          loading: false,
+          text: explanation,
+          visible: true,
+        },
+      }));
+    } else {
+      toast.error(
+        res.error ??
+          res.message ??
+          "Failed to generate an explanation. Please try again.",
+      );
+      setAiData((previous) => ({
+        ...previous,
+        [question.id]: {
+          loading: false,
+          visible: false,
+        },
+      }));
+    }
+  }
 
   return (
     <Card className="overflow-hidden border-slate-200 bg-white shadow-sm">
@@ -120,6 +282,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
             selectedOption?.isCorrect === true ||
             answer?.option?.isCorrect === true ||
             (Boolean(correctOption) && selectedOption?.id === correctOption?.id);
+          const explanationState = aiData[question.id];
 
           return (
             <section
@@ -205,6 +368,42 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
                   <AlertDescription>{question.explanation}</AlertDescription>
                 </Alert>
               )}
+
+              <div className="mt-4 border-t border-slate-100 pt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={explanationState?.loading}
+                  onClick={() =>
+                    void handleExplainQuestion({
+                      question,
+                      options,
+                      correctOption,
+                      studentOption: selectedOption,
+                    })
+                  }
+                  className="gap-1.5 rounded-lg text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
+                >
+                  {explanationState?.loading ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={14} />
+                  )}
+                  Ask AI Tutor to Explain
+                </Button>
+
+                {explanationState?.visible && explanationState.text && (
+                  <Alert className="mt-3 border-indigo-200 bg-indigo-50/70 text-slate-800">
+                    <Sparkles className="size-4 text-indigo-500" />
+                    <AlertDescription>
+                      <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1">
+                        <ReactMarkdown>{explanationState.text}</ReactMarkdown>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
             </section>
           );
         })}

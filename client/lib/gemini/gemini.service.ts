@@ -18,6 +18,13 @@ interface ChatHistoryItem {
   text: string;
 }
 
+interface QuizExplanationInput {
+  questionText: string;
+  options: string[];
+  correctOption: string;
+  studentOption: string;
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -324,8 +331,99 @@ class GeminiService {
       throw error;
     }
   }
+
+  async generateQuizExplanation({
+    questionText,
+    options,
+    correctOption,
+    studentOption,
+  }: QuizExplanationInput): Promise<string> {
+    const systemInstruction = `You are a friendly, encouraging AI tutor. A student just took a quiz and is reviewing their results. They want clarification on a specific question. Their selected answer was: ${studentOption}. The correct answer is: ${correctOption}. Based on the question text and options provided, write a short, clear, and easy-to-understand explanation (max 3-4 sentences). If their answer was wrong, explain why the correct answer is right and gently point out the misconception. If their answer was right, validate their choice and briefly reinforce the concept. CRITICAL RULE: You MUST write your explanation in the exact same language as the provided question text and options. Do not use English if the question is in another language. Format your output in clean Markdown.`;
+
+    const contents: Content[] = [
+      {
+        role: "user",
+        parts: [
+          {
+            text: [
+              `Question: ${questionText}`,
+              "Options:",
+              ...options.map((option, index) => `${index + 1}. ${option}`),
+            ].join("\n"),
+          },
+        ],
+      },
+    ];
+
+    const generate = async () =>
+      ai.models.generateContent({
+        model: DEFAULT_MODEL,
+        contents,
+        config: {
+          systemInstruction,
+        },
+      });
+
+    try {
+      let response: Awaited<ReturnType<typeof generate>>;
+
+      try {
+        response = await generate();
+      } catch (error) {
+        if (!isRateLimitError(error)) {
+          throw error;
+        }
+
+        console.error("Gemini quiz explanation rate limit hit. Retrying once after delay.", {
+          delayMs: RATE_LIMIT_RETRY_DELAY_MS,
+          error,
+        });
+        await sleep(RATE_LIMIT_RETRY_DELAY_MS);
+        response = await generate();
+      }
+
+      const candidate = response.candidates?.[0];
+
+      console.log("Gemini quiz explanation usage metadata.", {
+        promptTokenCount: response.usageMetadata?.promptTokenCount,
+        candidatesTokenCount: response.usageMetadata?.candidatesTokenCount,
+        totalTokenCount: response.usageMetadata?.totalTokenCount,
+      });
+
+      console.log("Gemini quiz explanation response metadata.", {
+        finishReason: candidate?.finishReason,
+        finishMessage: candidate?.finishMessage,
+        safetyRatings: candidate?.safetyRatings,
+        promptFeedback: response.promptFeedback,
+      });
+
+      if (response.promptFeedback?.blockReason) {
+        throw new Error(
+          response.promptFeedback.blockReasonMessage ??
+            `Gemini blocked quiz explanation. Block reason: ${response.promptFeedback.blockReason}.`
+        );
+      }
+
+      const responseText = response.text;
+      if (!responseText) {
+        throw new Error(
+          candidate?.finishMessage ??
+            `Gemini returned no explanation text. Finish reason: ${candidate?.finishReason ?? "unknown"}.`
+        );
+      }
+
+      return responseText;
+    } catch (error) {
+      console.error("Failed to generate Gemini quiz explanation.", {
+        questionText,
+        optionCount: options.length,
+        error,
+      });
+      throw error;
+    }
+  }
 }
 
 export const geminiService = new GeminiService();
 export { GeminiService };
-export type { ChatHistoryItem };
+export type { ChatHistoryItem, QuizExplanationInput };
