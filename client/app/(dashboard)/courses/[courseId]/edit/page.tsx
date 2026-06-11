@@ -32,6 +32,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
 import { useCourseDetail } from "@/hooks/useCourseDetail";
@@ -40,7 +41,7 @@ import CourseForm, {
   type CourseFormHandle,
 } from "@/components/CourseForm";
 import CurriculumEditor from "@/components/curriculum/CurriculumEditor";
-import { AITutorSettings } from "@/components/course/AITutorSettings";
+import { MaterialsTable } from "@/components/materials/MaterialsTable";
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -71,17 +72,14 @@ export default function EditCoursePage() {
   const [isDeleting, setIsDeleting] = useState(false);
   // Ref to access CourseForm's imperative reset() handle
   const formRef = useRef<CourseFormHandle>(null);
-  const aiAttachments = useMemo(
+  const lessonOptions = useMemo(
     () =>
       course?.modules.flatMap((module) =>
-        module.lessons.flatMap((lesson) =>
-          lesson.materials.map((material) => ({
-            id: material.id,
-            name: material.title,
-            url: material.fileUrl,
-            geminiFileUri: material.geminiFileUri,
-          })),
-        ),
+        module.lessons.map((lesson) => ({
+          id: lesson.id,
+          title: lesson.title,
+          moduleTitle: module.title,
+        })),
       ) ?? [],
     [course],
   );
@@ -160,7 +158,7 @@ export default function EditCoursePage() {
   async function handleDelete() {
     if (
       !confirm(
-        `⚠️ Delete "${course?.title}"?\n\nThis will permanently remove the course, all its modules, lessons, and materials. This action cannot be undone.`
+        `⚠️ Delete "${course?.title}"?\n\nThis will permanently remove the course, all its modules, lessons, and materials. This action cannot be undone.`,
       )
     )
       return;
@@ -269,7 +267,9 @@ export default function EditCoursePage() {
         <div className="space-y-4">
           {/* Quick info */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-            <h3 className="text-sm font-semibold text-slate-700 mb-3">Course Info</h3>
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">
+              Course Info
+            </h3>
             <div className="space-y-2 text-xs text-slate-500">
               <div className="flex justify-between">
                 <span>Modules</span>
@@ -300,12 +300,14 @@ export default function EditCoursePage() {
           <div className="bg-white rounded-2xl border border-red-200 shadow-sm p-5">
             <div className="flex items-center gap-2 mb-3">
               <AlertTriangle size={15} className="text-red-500" />
-              <h3 className="text-sm font-semibold text-red-700">Danger Zone</h3>
+              <h3 className="text-sm font-semibold text-red-700">
+                Danger Zone
+              </h3>
             </div>
             <Separator className="mb-4" />
             <p className="text-xs text-slate-500 mb-4">
-              Permanently delete this course along with all its modules, lessons, and
-              uploaded materials. This cannot be undone.
+              Permanently delete this course along with all its modules,
+              lessons, and uploaded materials. This cannot be undone.
             </p>
             <Button
               id="delete-course-btn"
@@ -327,16 +329,23 @@ export default function EditCoursePage() {
       </div>
 
       {/* ── Curriculum Editor (full width, below the form/sidebar grid) ── */}
-      <div className="mt-8">
-        <AITutorSettings
-          courseId={courseId}
-          isAIEnabled={course.aiEnabled}
-          attachments={aiAttachments}
-        />
-      </div>
-
-      <div className="mt-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
-        <CurriculumEditor courseId={courseId} />
+      <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <Tabs defaultValue="curriculum" className="space-y-6">
+          <TabsList variant="line" className="font-bold">
+            <TabsTrigger value="curriculum" className="px-3">
+              Curriculum
+            </TabsTrigger>
+            <TabsTrigger value="materials" className="px-3">
+              Materials
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="curriculum" className="mt-0">
+            <CurriculumEditor courseId={courseId} />
+          </TabsContent>
+          <TabsContent value="materials" className="mt-0">
+            <MaterialsTable courseId={courseId} lessons={lessonOptions} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

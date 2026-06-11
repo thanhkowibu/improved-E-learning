@@ -33,6 +33,36 @@ export async function getMaterialsByLesson(lessonId: string) {
   });
 }
 
+/**
+ * Returns every material in a course with the parent lesson/module location.
+ */
+export async function getMaterialsByCourse(courseId: string) {
+  return prisma.material.findMany({
+    where: {
+      lesson: {
+        module: {
+          courseId,
+        },
+      },
+    },
+    include: {
+      lesson: {
+        select: {
+          id: true,
+          title: true,
+          module: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: [{ createdAt: "desc" }],
+  });
+}
+
 // ─── getMaterialById ──────────────────────────────────────────────────────────
 
 /**

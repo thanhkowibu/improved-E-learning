@@ -41,12 +41,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { toast } from "sonner";
-import {
-  Plus,
-  Loader2,
-  BookOpen,
-  AlertCircle,
-} from "lucide-react";
+import { Plus, Loader2, BookOpen, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useApi } from "@/hooks/useApi";
 import ModuleItem, { type Module } from "./ModuleItem";
@@ -84,7 +79,7 @@ export default function CurriculumEditor({ courseId }: Props) {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   // ── Fetch modules ─────────────────────────────────────────────────────────
@@ -143,17 +138,23 @@ export default function CurriculumEditor({ courseId }: Props) {
     if (oldIndex === -1 || newIndex === -1) return;
 
     const originalModules = [...modules];
-    const reordered = arrayMove(modules, oldIndex, newIndex).map((m, index) => ({
-      ...m,
-      orderIndex: index,
-    }));
+    const reordered = arrayMove(modules, oldIndex, newIndex).map(
+      (m, index) => ({
+        ...m,
+        orderIndex: index,
+      }),
+    );
     setModules(reordered); // optimistic update
 
     const orderedIds = reordered.map((m) => m.id);
     // PUT /api/courses/:courseId/modules — bulk reorder endpoint
-    const res = await api.put(`/api/courses/${courseId}/modules`, { orderedIds });
+    const res = await api.put(`/api/courses/${courseId}/modules`, {
+      orderedIds,
+    });
     if (!res.success) {
-      toast.error((res as { error?: string }).error ?? "Failed to reorder modules.");
+      toast.error(
+        (res as { error?: string }).error ?? "Failed to reorder modules.",
+      );
       setModules(originalModules); // revert
     }
   }
@@ -166,13 +167,13 @@ export default function CurriculumEditor({ courseId }: Props) {
 
   function handleModuleUpdated(updated: Module) {
     setModules((prev) =>
-      prev.map((m) => (m.id === updated.id ? { ...m, ...updated } : m))
+      prev.map((m) => (m.id === updated.id ? { ...m, ...updated } : m)),
     );
   }
 
   function handleLessonsUpdated(moduleId: string, lessons: Lesson[]) {
     setModules((prev) =>
-      prev.map((m) => (m.id === moduleId ? { ...m, lessons } : m))
+      prev.map((m) => (m.id === moduleId ? { ...m, lessons } : m)),
     );
   }
 
@@ -188,20 +189,22 @@ export default function CurriculumEditor({ courseId }: Props) {
           ? {
               ...m,
               lessons: m.lessons.map((l) =>
-                l.id === updated.id ? updated : l
+                l.id === updated.id ? updated : l,
               ),
             }
-          : m
-      )
+          : m,
+      ),
     );
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
 
-  const sortedModules = [...modules].sort((a, b) => a.orderIndex - b.orderIndex);
+  const sortedModules = [...modules].sort(
+    (a, b) => a.orderIndex - b.orderIndex,
+  );
 
   return (
-    <div className="mt-8 pt-8 border-t border-slate-200">
+    <div className="pt-8">
       {/* Section header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2.5">
@@ -209,7 +212,9 @@ export default function CurriculumEditor({ courseId }: Props) {
             <BookOpen size={16} className="text-sky-500" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-slate-900">Curriculum</h2>
+            <h2 className="text-base font-semibold text-slate-900">
+              Curriculum
+            </h2>
             <p className="text-xs text-slate-500 mt-0.5">
               Drag modules to reorder · Use arrows to reorder lessons
             </p>
@@ -253,7 +258,9 @@ export default function CurriculumEditor({ courseId }: Props) {
         <div className="rounded-xl border-2 border-dashed border-slate-200 py-10 flex flex-col items-center gap-2 text-slate-400">
           <BookOpen size={28} className="text-slate-300" />
           <p className="text-sm font-medium">No modules yet</p>
-          <p className="text-xs">Add your first module to start building the curriculum.</p>
+          <p className="text-xs">
+            Add your first module to start building the curriculum.
+          </p>
         </div>
       )}
 
@@ -327,7 +334,10 @@ export default function CurriculumEditor({ courseId }: Props) {
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => { setIsAddingModule(false); setNewModuleTitle(""); }}
+              onClick={() => {
+                setIsAddingModule(false);
+                setNewModuleTitle("");
+              }}
               disabled={isCreatingModule}
               className="h-8 text-slate-500 shrink-0"
             >

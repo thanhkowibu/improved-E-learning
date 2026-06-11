@@ -556,31 +556,36 @@
 
 > Final presentation prep: centralized material management, theming, internationalization, responsive polish, and production deployment.
 
-### 8A — Centralized Material Management (Teacher)
+### 8A — Centralized & Unified Material Dashboard (Teacher)
 
-- [ ] **[Next.js API]** Implement `GET /api/courses/[courseId]/materials` route handler — TEACHER/ADMIN, returns all materials across all lessons in the course with their parent lesson and module titles via Prisma `include` (join through `Material → Lesson → Module`)
-- [ ] **[Next.js]** Build `<MaterialsTable>` component (`components/materials/MaterialsTable.tsx`) — `"use client"` data table using Shadcn `<Table>` displaying: file name, type badge (`PDF`/`VIDEO`/`OTHER`), file size, parent lesson title, parent module title, Gemini sync status, upload date, and action buttons (download, delete, preview)
-- [ ] **[Next.js]** Integrate `<MaterialsTable>` as a new tab in the course edit page (`app/(dashboard)/courses/[courseId]/edit/page.tsx`) — add a "Materials" tab alongside the existing curriculum editor tab
-- [ ] **[Next.js]** Show total storage usage summary (sum of `fileSizeBytes`) at the top of the materials table
+- [x] **[Next.js API]** Implement `GET /api/courses/[courseId]/materials` route handler — TEACHER/ADMIN, returns all materials across all lessons in the course, including fields for filename, size, type, upload date, and **Gemini Sync State (`geminiFileName`, `geminiFileUri`)** via Prisma `include` (join through `Material → Lesson → Module`).
+- [x] **[Next.js API]** Implement `POST /api/courses/[courseId]/materials/[materialId]/resync` route handler — TEACHER/ADMIN. **CRITICAL 48H EXPIRATION FIX:** This endpoint re-downloads the original file stream (from UploadThing), uploads it to the Google Gemini File API to get a brand new File ID/URI, and **STRICTLY updates the `Material` record in Prisma with the new `geminiFileName` and `geminiFileUri`** to completely prevent the 403 Permission Denied error.
+- [x] **[Next.js]** Build `<MaterialsTable>` component (`components/materials/MaterialsTable.tsx`) — `"use client"` unified data table using Shadcn `<Table>` displaying:
+  - File name, Type badge (`PDF`/`VIDEO`/`OTHER`), and File size (formatted in MB/KB)
+  - Location hierarchy (e.g., "Module 1 > Lesson 3")
+  - **Gemini Sync Status Indicator** (Visual badge: "Synced" with green dot if valid, "Expired / Not Synced" with gray/amber dot if `updatedAt` is older than 48 hours)
+  - **Action Column:** Buttons to Download, Delete, and **"✨ Re-Sync to AI"** (calls the new re-sync endpoint and refreshes the table state).
+- [x] **[Next.js]** Integrate `<MaterialsTable>` as a new dedicated tab called **"Materials"** in the Course Edit page (`app/(dashboard)/courses/[courseId]/edit/page.tsx`) to replace the old `<AITutorSettings>` component.
+- [x] **[Next.js]** Clean up legacy UI: Remove the old, basic sync list `<AITutorSettings>` from the "AI Tutor Configuration" section to avoid duplication, and direct teachers to use this new centralized dashboard instead.
+- [x] **[Next.js]** Show storage summary metrics at the top of the Materials tab (Total files count, and sum of `fileSizeBytes` converted to a clean MB layout).
+- [x] **[Next.js]** Add a "✨ Upload Material" button at the top of `<MaterialsTable>`:
+  - Clicking it opens a Shadcn `<Dialog>` containing `<UploadDropzone>` like in `<LessonMaterials>` component and a Shadcn `<Select>` dropdown to choose the target Lesson (fetched from the course layout context).
+  - On submission, reuse the existing `POST /api/lessons/[lessonId]/materials` endpoint to attach the file, then automatically refresh the dashboard table state.
 
 ### 8B — Theme System (Light/Dark Mode) - Optional MVP Bonus
 
-- [ ] **[Next.js]** Install `next-themes` (`npm install next-themes`) for theme management
-- [ ] **[Next.js]** Wrap the app with `<ThemeProvider>` in `app/layout.tsx` — configure `attribute="class"`, `defaultTheme="system"`, `enableSystem=true`
-- [ ] **[Tailwind]** Define dark-mode CSS variables in `app/globals.css` — extend the existing Shadcn CSS variable system with a `[data-theme="dark"]` or `.dark` class that overrides color tokens (background, foreground, card, popover, primary, muted, accent, border, etc.)
-- [ ] **[Next.js]** Build a `<ThemeToggle>` component (`components/layout/ThemeToggle.tsx`) — toggle button or dropdown (`<DropdownMenu>`) with Light / Dark / System options using Shadcn `<Button>` + Lucide icons (`Sun`, `Moon`, `Monitor`)
-- [ ] **[Next.js]** Place `<ThemeToggle>` in the top Navbar alongside the user avatar dropdown
+- [ ] **[Next.js]** Install `next-themes` and wrap the app with `<ThemeProvider>` in `app/layout.tsx`.
+- [ ] **[Next.js]** Build a simple `<ThemeToggle>` component (Sun/Moon icon) and place it in the top Navbar.
 - [ ] **[Testing]** Do a quick manual test. If some hardcoded colors break in Dark Mode, leave them as-is or fix only the most critical layout issues.
 
-### 8C — Internationalization (EN/VN)
+### 8C — Vietnamese Localization (Hardcoded)
 
-- [ ] **[Next.js]** Install `next-intl` (`npm install next-intl`) for i18n — lightweight, App Router compatible
-- [ ] **[Next.js]** Create locale message files: `messages/en.json` and `messages/vi.json` — organize by namespace (e.g., `common`, `auth`, `courses`, `dashboard`, `chat`, `quiz`)
-- [ ] **[Next.js]** Configure `next-intl` provider in `app/layout.tsx` (or a dedicated `i18n.ts` config) — detect locale from `localStorage` preference (no URL-based routing needed for MVP)
-- [ ] **[Next.js]** Build a `<LanguageToggle>` component (`components/layout/LanguageToggle.tsx`) — dropdown or segmented control with `EN` / `VN` flags/labels
-- [ ] **[Next.js]** Place `<LanguageToggle>` in the Navbar alongside the theme toggle
-- [ ] **[Next.js]** Replace hardcoded UI strings in key pages with `useTranslations()` calls — prioritize: auth pages, navbar, sidebar, dashboard, course catalog, lesson view, chat interface, quiz UI
-- [ ] **[Next.js]** Translate all user-facing static strings to Vietnamese in `messages/vi.json`
+> The project is for HUST students, so the default UI must be 100% in Vietnamese. To save time, bypass complex i18n libraries and hardcode translations directly into the UI components.
+
+- [ ] **[Next.js]** Audit shared layout components (Navbar, Sidebar, Footer) and translate UI strings to natural Vietnamese for a LMS app (e.g., "Dashboard" -> "Bảng điều khiển", "Courses" -> "Khóa học").
+- [ ] **[Next.js]** Audit Student UI flows: Translate action buttons and states (e.g., "Enroll" -> "Đăng ký học", "Submit" -> "Nộp bài", "Review" -> "Xem lại").
+- [ ] **[Next.js]** Audit Teacher UI flows (Dashboard): Translate table headers, form labels, and toast notifications (e.g., "Success!" -> "Thành công!").
+- [ ] **[Next.js]** Update the localization settings for any third-party UI components (e.g., Shadcn `<DatePicker>`, Calendar, or Data Table pagination) to use the Vietnamese locale (`vi`).
 
 ### 8D — Responsive Design Pass
 

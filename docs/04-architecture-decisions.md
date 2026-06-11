@@ -710,3 +710,25 @@ Implement quiz generation through the existing `@google/genai` service layer usi
 ### Rationale
 
 Structured JSON output plus Zod validation keeps generated data compatible with the existing quiz schema and prevents malformed AI output from entering the database. Keeping generation as a draft-only operation preserves teacher control and avoids corrupting quizzes that may already have student attempts.
+
+---
+
+## ADR-015 · Centralized Material Dashboard and Gemini Re-Sync
+
+**Date:** 2026-06-11
+**Phase:** 8A (Centralized & Unified Material Dashboard)
+**Status:** Adopted
+
+### Context
+
+Gemini File API references can become unusable after the service-side retention window, which causes downstream AI features such as quiz generation to fail with permission errors. Teachers also need one course-level place to see every uploaded material and its AI sync status instead of checking each lesson individually.
+
+### Decision
+
+Add a course-level materials API and a centralized `<MaterialsTable>` in the course edit page. Each material displays its lesson/module location, storage usage, and a Gemini sync freshness indicator based on the stored `geminiFileName`, `geminiFileUri`, and `updatedAt`.
+
+Add a per-material re-sync route that downloads the original UploadThing file URL, uploads a fresh copy to Gemini, waits for the file to become active, and overwrites the material's `geminiFileName` and `geminiFileUri` in Prisma.
+
+### Rationale
+
+Keeping the original UploadThing URL as the durable source of truth lets the app regenerate short-lived Gemini File API references without requiring the teacher to re-upload the file manually. Updating the existing `Material` row preserves all lesson relationships while making future AI operations use the fresh Gemini identifiers.
