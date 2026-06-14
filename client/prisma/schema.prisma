@@ -46,15 +46,20 @@ enum LessonType {
 // ===========================================================
 
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
-  hashedPassword String
-  fullName       String
-  role           UserRole @default(STUDENT)
-  avatarUrl      String?
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id               String   @id @default(uuid())
+  email            String   @unique
+  hashedPassword   String
+  fullName         String
+  role             UserRole @default(STUDENT)
+  avatarUrl        String?
+  phoneNumber      String?
+  gender           String?
+  birthYear        Int?
+  highestEducation String?
+  bio              String?  @db.Text
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relations
   courses        Course[]         @relation("TeacherCourses")

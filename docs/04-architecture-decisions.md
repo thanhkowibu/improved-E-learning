@@ -732,3 +732,25 @@ Add a per-material re-sync route that downloads the original UploadThing file UR
 ### Rationale
 
 Keeping the original UploadThing URL as the durable source of truth lets the app regenerate short-lived Gemini File API references without requiring the teacher to re-upload the file manually. Updating the existing `Material` row preserves all lesson relationships while making future AI operations use the fresh Gemini identifiers.
+
+---
+
+## ADR-016 · User Profile Settings and Public Profiles
+
+**Date:** 2026-06-14
+**Phase:** Post-8C (Vietnamese User Account Experience)
+**Status:** Adopted
+
+### Context
+
+Users need a dedicated place to manage personal profile details and change their password. The platform also needs a safe public profile page that can show learner or teacher identity, biography, and completed course certificates without exposing private fields.
+
+### Decision
+
+Extend `User` with optional profile fields: `phoneNumber`, `gender`, `birthYear`, `highestEducation`, and `bio`. Keep password changes on the existing self-service `PATCH /api/users/[userId]` endpoint, guarded so only the session owner can update their own profile or password.
+
+Add `GET /api/users/[userId]/public` for authenticated public profile reads. This endpoint returns only non-sensitive fields and derives completed courses from enrollment/course lesson progress.
+
+### Rationale
+
+Keeping settings updates on the existing user endpoint avoids a parallel account API while still enforcing strict self-only authorization for sensitive changes. A separate public profile endpoint makes the privacy boundary explicit and prevents accidental exposure of email, phone number, or password-related data.

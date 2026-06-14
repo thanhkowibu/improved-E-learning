@@ -65,6 +65,12 @@ const ROLE_BADGE: Record<string, string> = {
   STUDENT: "bg-sky-100 text-sky-700 hover:bg-sky-100",
 };
 
+const ROLE_LABELS: Record<UserItem["role"], string> = {
+  ADMIN: "Quản trị viên",
+  TEACHER: "Giảng viên",
+  STUDENT: "Sinh viên",
+};
+
 // ─── Avatar initials ──────────────────────────────────────────────────────────
 
 function UserAvatar({ name, isActive }: { name: string; isActive: boolean }) {
@@ -79,8 +85,8 @@ function UserAvatar({ name, isActive }: { name: string; isActive: boolean }) {
     <div
       className={`h-9 w-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 transition-opacity ${
         isActive
-          ? "bg-gradient-to-br from-sky-400 to-sky-600"
-          : "bg-gradient-to-br from-slate-300 to-slate-400 opacity-60"
+          ? "bg-linear-to-br from-sky-400 to-sky-600"
+          : "bg-linear-to-br from-slate-300 to-slate-400 opacity-60"
       }`}
     >
       {initials}
@@ -138,17 +144,17 @@ export default function AdminUsersPage() {
     setError(null);
     api
       .get<{ items: UserItem[]; total: number }>(
-        `/api/users?page=${pg}&limit=${PAGE_SIZE}`
+        `/api/users?page=${pg}&limit=${PAGE_SIZE}`,
       )
       .then((res) => {
         if (res.success && res.data) {
           setUsers(res.data.items);
           setTotal(res.data.total);
         } else {
-          setError(res.error ?? "Failed to load users.");
+          setError(res.error ?? "Không thể tải danh sách người dùng.");
         }
       })
-      .catch(() => setError("An unexpected error occurred."))
+      .catch(() => setError("Đã xảy ra lỗi không mong muốn."))
       .finally(() => setLoading(false));
   };
 
@@ -165,7 +171,7 @@ export default function AdminUsersPage() {
       (u) =>
         u.fullName.toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q) ||
-        u.role.toLowerCase().includes(q)
+        u.role.toLowerCase().includes(q),
     );
   }, [users, search]);
 
@@ -178,21 +184,21 @@ export default function AdminUsersPage() {
     // Optimistic update
     setUsers((prev) =>
       prev.map((u) =>
-        u.id === targetUser.id ? { ...u, isActive: newStatus } : u
-      )
+        u.id === targetUser.id ? { ...u, isActive: newStatus } : u,
+      ),
     );
 
     const res = await api.patch<UserItem>(
       `/api/users/${targetUser.id}/status`,
-      { isActive: newStatus }
+      { isActive: newStatus },
     );
 
     if (!res.success) {
       // Revert on failure
       setUsers((prev) =>
         prev.map((u) =>
-          u.id === targetUser.id ? { ...u, isActive: !newStatus } : u
-        )
+          u.id === targetUser.id ? { ...u, isActive: !newStatus } : u,
+        ),
       );
     }
     setTogglingId(null);
@@ -222,7 +228,7 @@ export default function AdminUsersPage() {
                 className="gap-1.5 text-slate-500 hover:text-slate-700 -ml-2"
               >
                 <ArrowLeft size={14} />
-                Dashboard
+                Bảng điều khiển
               </Button>
             </Link>
           </div>
@@ -234,7 +240,7 @@ export default function AdminUsersPage() {
             className="gap-1.5 text-slate-600"
           >
             <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
-            Refresh
+            Làm mới
           </Button>
         </div>
 
@@ -244,11 +250,10 @@ export default function AdminUsersPage() {
           </div>
           <div>
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              User Management
+              Quản lý người dùng
             </h1>
             <p className="text-slate-500 text-sm">
-              {total.toLocaleString()} registered user
-              {total !== 1 ? "s" : ""} on the platform
+              {total.toLocaleString()} người dùng đã đăng ký trên hệ thống
             </p>
           </div>
         </div>
@@ -257,25 +262,25 @@ export default function AdminUsersPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             {
-              label: "Total Users",
+              label: "Tổng người dùng",
               value: total,
               colorClass: "text-violet-600",
               bgClass: "bg-violet-50",
             },
             {
-              label: "Active",
+              label: "Đang hoạt động",
               value: users.filter((u) => u.isActive).length,
               colorClass: "text-emerald-600",
               bgClass: "bg-emerald-50",
             },
             {
-              label: "Inactive",
+              label: "Tạm khóa",
               value: users.filter((u) => !u.isActive).length,
               colorClass: "text-red-500",
               bgClass: "bg-red-50",
             },
             {
-              label: "On This Page",
+              label: "Trong trang này",
               value: filtered.length,
               colorClass: "text-sky-600",
               bgClass: "bg-sky-50",
@@ -289,7 +294,9 @@ export default function AdminUsersPage() {
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
                   {label}
                 </p>
-                <p className={`mt-1 text-2xl font-extrabold ${colorClass} tabular-nums`}>
+                <p
+                  className={`mt-1 text-2xl font-extrabold ${colorClass} tabular-nums`}
+                >
                   {value}
                 </p>
               </CardContent>
@@ -304,7 +311,7 @@ export default function AdminUsersPage() {
             className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
           />
           <Input
-            placeholder="Search by name, email, or role…"
+            placeholder="Tìm theo tên, email hoặc vai trò..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10 bg-white border-slate-200 rounded-xl h-10 focus-visible:ring-sky-500"
@@ -322,7 +329,7 @@ export default function AdminUsersPage() {
               onClick={() => fetchUsers(page)}
               className="border-red-300 text-red-600 hover:bg-red-50"
             >
-              Retry
+              Thử lại
             </Button>
           </div>
         )}
@@ -332,7 +339,7 @@ export default function AdminUsersPage() {
           <CardHeader className="px-6 py-4 border-b border-slate-100">
             <CardTitle className="text-sm font-semibold text-slate-900 flex items-center gap-2">
               <ShieldCheck size={16} className="text-violet-500" />
-              Users — Page {page} of {totalPages || 1}
+              Người dùng - Trang {page} / {totalPages || 1}
             </CardTitle>
           </CardHeader>
 
@@ -344,7 +351,9 @@ export default function AdminUsersPage() {
                 <Users size={24} className="text-slate-300" />
               </div>
               <p className="text-slate-500 text-sm">
-                {search ? `No users match "${search}"` : "No users found."}
+                {search
+                  ? `Không có người dùng khớp với "${search}"`
+                  : "Chưa có người dùng."}
               </p>
             </div>
           ) : (
@@ -352,19 +361,19 @@ export default function AdminUsersPage() {
               <TableHeader>
                 <TableRow className="bg-slate-50/80">
                   <TableHead className="pl-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                    User
+                    Người dùng
                   </TableHead>
                   <TableHead className="py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                    Role
+                    Vai trò
                   </TableHead>
                   <TableHead className="py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                    Status
+                    Trạng thái
                   </TableHead>
                   <TableHead className="py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                    Joined
+                    Ngày tham gia
                   </TableHead>
                   <TableHead className="pr-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                    Action
+                    Thao tác
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -383,7 +392,7 @@ export default function AdminUsersPage() {
                             {u.fullName}
                             {u.id === user.id && (
                               <span className="ml-1.5 text-[10px] text-sky-500 font-normal">
-                                (you)
+                                (bạn)
                               </span>
                             )}
                           </p>
@@ -399,7 +408,7 @@ export default function AdminUsersPage() {
                       <Badge
                         className={`text-[11px] font-semibold ${ROLE_BADGE[u.role] ?? ""}`}
                       >
-                        {u.role}
+                        {ROLE_LABELS[u.role]}
                       </Badge>
                     </TableCell>
 
@@ -412,13 +421,13 @@ export default function AdminUsersPage() {
                             : "bg-red-100 text-red-600 hover:bg-red-100 text-[11px] font-semibold"
                         }
                       >
-                        {u.isActive ? "Active" : "Inactive"}
+                        {u.isActive ? "Đang hoạt động" : "Tạm khóa"}
                       </Badge>
                     </TableCell>
 
                     {/* Joined date */}
                     <TableCell className="py-3 text-xs text-slate-400">
-                      {new Date(u.createdAt).toLocaleDateString("en-US", {
+                      {new Date(u.createdAt).toLocaleDateString("vi-VN", {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
@@ -429,7 +438,7 @@ export default function AdminUsersPage() {
                     <TableCell className="pr-6 py-3 text-right">
                       {u.id === user.id ? (
                         <span className="text-xs text-slate-300 italic">
-                          Cannot edit self
+                          Không thể chỉnh sửa chính mình
                         </span>
                       ) : (
                         <Button
@@ -448,12 +457,12 @@ export default function AdminUsersPage() {
                           ) : u.isActive ? (
                             <>
                               <UserX size={12} />
-                              Deactivate
+                              Tạm khóa
                             </>
                           ) : (
                             <>
                               <UserCheck size={12} />
-                              Reactivate
+                              Mở khóa
                             </>
                           )}
                         </Button>
@@ -469,8 +478,9 @@ export default function AdminUsersPage() {
           {!loading && totalPages > 1 && (
             <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
               <p className="text-xs text-slate-400">
-                Showing {(page - 1) * PAGE_SIZE + 1}–
-                {Math.min(page * PAGE_SIZE, total)} of {total} users
+                Hiển thị {(page - 1) * PAGE_SIZE + 1}-
+                {Math.min(page * PAGE_SIZE, total)} trong tổng số {total} người
+                dùng
               </p>
               <div className="flex items-center gap-2">
                 <Button

@@ -582,10 +582,10 @@
 
 > The project is for HUST students, so the default UI must be 100% in Vietnamese. To save time, bypass complex i18n libraries and hardcode translations directly into the UI components.
 
-- [ ] **[Next.js]** Audit shared layout components (Navbar, Sidebar, Footer) and translate UI strings to natural Vietnamese for a LMS app (e.g., "Dashboard" -> "Bảng điều khiển", "Courses" -> "Khóa học").
-- [ ] **[Next.js]** Audit Student UI flows: Translate action buttons and states (e.g., "Enroll" -> "Đăng ký học", "Submit" -> "Nộp bài", "Review" -> "Xem lại").
-- [ ] **[Next.js]** Audit Teacher UI flows (Dashboard): Translate table headers, form labels, and toast notifications (e.g., "Success!" -> "Thành công!").
-- [ ] **[Next.js]** Update the localization settings for any third-party UI components (e.g., Shadcn `<DatePicker>`, Calendar, or Data Table pagination) to use the Vietnamese locale (`vi`).
+- [x] **[Next.js]** Audit shared layout components (Navbar, Sidebar, Footer) and translate UI strings to natural Vietnamese for a LMS app (e.g., "Dashboard" -> "Bảng điều khiển", "Courses" -> "Khóa học").
+- [x] **[Next.js]** Audit Student UI flows: Translate action buttons and states (e.g., "Enroll" -> "Đăng ký học", "Submit" -> "Nộp bài", "Review" -> "Xem lại").
+- [x] **[Next.js]** Audit Teacher UI flows (Dashboard): Translate table headers, form labels, and toast notifications (e.g., "Success!" -> "Thành công!").
+- [x] **[Next.js]** Update the localization settings for any third-party UI components (e.g., Shadcn `<DatePicker>`, Calendar, or Data Table pagination) to use the Vietnamese locale (`vi`).
 
 ### 8D — Responsive Design Pass
 

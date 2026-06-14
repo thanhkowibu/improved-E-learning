@@ -49,9 +49,9 @@ export function QuizTaker({
   onComplete,
 }: QuizTakerProps) {
   const api = useApi();
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>(
-    {},
-  );
+  const [selectedAnswers, setSelectedAnswers] = useState<
+    Record<string, string>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
@@ -59,16 +59,18 @@ export function QuizTaker({
   const answeredCount = Object.keys(selectedAnswers).length;
   const isComplete = answeredCount === questions.length;
   const progressValue =
-    questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0;
+    questions.length > 0
+      ? Math.round((answeredCount / questions.length) * 100)
+      : 0;
 
   async function submitQuiz() {
     if (!isComplete) {
-      toast.error("Please answer every question before submitting.");
+      toast.error("Vui lòng trả lời tất cả câu hỏi trước khi nộp bài.");
       return;
     }
 
     setIsSubmitting(true);
-    const toastId = toast.loading("Submitting quiz...");
+    const toastId = toast.loading("Đang nộp bài...");
     const answers = questions.map((question) => ({
       questionId: question.id,
       optionId: selectedAnswers[question.id],
@@ -80,11 +82,11 @@ export function QuizTaker({
     );
 
     if (res.success && res.data) {
-      toast.success("Quiz submitted.", { id: toastId });
+      toast.success("Đã nộp Quiz.", { id: toastId });
       setIsConfirmOpen(false);
       onComplete(res.data);
     } else {
-      toast.error(res.error ?? res.message ?? "Failed to submit quiz.", {
+      toast.error(res.error ?? res.message ?? "Không thể nộp Quiz.", {
         id: toastId,
       });
     }
@@ -100,10 +102,10 @@ export function QuizTaker({
             <div>
               <p className="text-sm font-medium text-slate-500">Quiz</p>
               <CardTitle className="mt-1 text-2xl font-extrabold text-slate-900">
-                Lesson Quiz
+                Quiz của bài học
               </CardTitle>
               <p className="mt-2 text-sm text-slate-500">
-                {questions.length} question{questions.length === 1 ? "" : "s"}
+                {questions.length} câu hỏi
               </p>
             </div>
             {remainingAttempts !== undefined && (
@@ -111,14 +113,14 @@ export function QuizTaker({
                 variant="outline"
                 className="w-fit rounded-full border-sky-200 bg-sky-50 px-3 py-1 text-sky-700"
               >
-                {remainingAttempts} attempt{remainingAttempts === 1 ? "" : "s"} remaining
+                Còn {remainingAttempts} lượt làm bài
               </Badge>
             )}
           </div>
           <div className="mt-4 space-y-2">
             <div className="flex items-center justify-between text-xs text-slate-500">
               <span>
-                {answeredCount} of {questions.length} answered
+                Đã trả lời {answeredCount}/{questions.length}
               </span>
               <span>{progressValue}%</span>
             </div>
@@ -135,11 +137,11 @@ export function QuizTaker({
                     {questionIndex + 1}. {question.questionText}
                   </CardTitle>
                   <Badge variant="secondary" className="w-fit rounded-md">
-                    {question.points} pt
+                    {question.points} điểm
                   </Badge>
                 </div>
                 <p className="text-xs text-slate-500">
-                  Question {questionIndex + 1} of {questions.length}
+                  Câu {questionIndex + 1}/{questions.length}
                 </p>
               </CardHeader>
               <CardContent>
@@ -154,7 +156,8 @@ export function QuizTaker({
                   className="gap-2"
                 >
                   {sortOptions(question.options).map((option) => {
-                    const isSelected = selectedAnswers[question.id] === option.id;
+                    const isSelected =
+                      selectedAnswers[question.id] === option.id;
 
                     return (
                       <Label
@@ -188,7 +191,7 @@ export function QuizTaker({
               ) : (
                 <Send size={15} />
               )}
-              Submit Quiz
+              Nộp bài
             </Button>
           </div>
         </CardContent>
@@ -197,13 +200,13 @@ export function QuizTaker({
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Bạn chắc chắn muốn nộp bài?</AlertDialogTitle>
             <AlertDialogDescription>
-              You cannot change your answers after submission.
+              Bạn sẽ không thể thay đổi câu trả lời sau khi nộp bài.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isSubmitting}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               disabled={isSubmitting}
               onClick={(event) => {
@@ -213,7 +216,7 @@ export function QuizTaker({
               className="gap-2 bg-sky-500 text-white hover:bg-sky-600"
             >
               {isSubmitting && <Loader2 size={14} className="animate-spin" />}
-              Submit
+              Nộp bài
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

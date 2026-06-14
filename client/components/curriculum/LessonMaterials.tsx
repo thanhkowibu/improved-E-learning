@@ -114,10 +114,10 @@ export default function LessonMaterials({ lessonId }: Props) {
       if (res.ok && json?.success && json.data) {
         setMaterials(json.data);
       } else {
-        setLoadError(json?.message ?? "Failed to load materials.");
+        setLoadError(json?.message ?? "Không thể tải tài liệu.");
       }
     } catch {
-      setLoadError("Failed to load materials.");
+      setLoadError("Không thể tải tài liệu.");
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +131,7 @@ export default function LessonMaterials({ lessonId }: Props) {
     const fileUrl = uploaded.url ?? uploaded.ufsUrl;
     if (!fileUrl) {
       toast.error(
-        "Upload completed, but UploadThing did not return a file URL.",
+        "Tải lên hoàn tất nhưng UploadThing không trả về URL tệp.",
       );
       return;
     }
@@ -160,17 +160,17 @@ export default function LessonMaterials({ lessonId }: Props) {
 
       if (!res.ok || !json?.success || !json.data) {
         toast.error(
-          json?.message ?? "Upload saved to cloud, but database sync failed.",
+          json?.message ?? "Đã lưu lên cloud nhưng không thể đồng bộ cơ sở dữ liệu.",
         );
         return;
       }
 
       setMaterials((prev) => [...prev, json.data as Material]);
-      toast.success(`"${uploaded.name}" uploaded successfully.`);
+      toast.success(`Đã tải lên "${uploaded.name}".`);
       router.refresh();
       window.dispatchEvent(new CustomEvent("course-materials-changed"));
     } catch {
-      toast.error("Upload saved to cloud, but database sync failed.");
+      toast.error("Đã lưu lên cloud nhưng không thể đồng bộ cơ sở dữ liệu.");
     } finally {
       setIsSavingUpload(false);
     }
@@ -197,7 +197,7 @@ export default function LessonMaterials({ lessonId }: Props) {
         const json = (await res.json().catch(() => null)) as {
           message?: string;
         } | null;
-        toast.error(json?.message ?? "Failed to delete material.", {
+        toast.error(json?.message ?? "Không thể xóa tài liệu.", {
           id: toastId,
         });
       }
@@ -226,7 +226,7 @@ export default function LessonMaterials({ lessonId }: Props) {
             });
           }}
           onUploadError={(error) => {
-            toast.error(error.message || "Upload failed.");
+            toast.error(error.message || "Tải lên thất bại.");
           }}
           appearance={{
             container:
@@ -241,7 +241,7 @@ export default function LessonMaterials({ lessonId }: Props) {
           }}
           content={{
             allowedContent:
-              "PDF, video, and image files are stored in UploadThing.",
+              "Tệp PDF, video và hình ảnh sẽ được lưu trên UploadThing.",
           }}
         />
         {isSavingUpload && (
@@ -277,7 +277,7 @@ export default function LessonMaterials({ lessonId }: Props) {
         </div>
       ) : materials.length === 0 ? (
         <p className="py-4 text-center text-xs text-slate-400">
-          No materials attached yet. Upload your first file above.
+          Chưa có tài liệu đính kèm. Hãy tải tệp đầu tiên ở phía trên.
         </p>
       ) : (
         <ul className="space-y-2">
@@ -314,7 +314,7 @@ export default function LessonMaterials({ lessonId }: Props) {
                 size="icon-sm"
                 onClick={() => setPreviewMaterial(mat)}
                 className="shrink-0 text-slate-400 hover:bg-sky-50 hover:text-sky-600"
-                aria-label={`Preview ${mat.title}`}
+                aria-label={`Xem trước ${mat.title}`}
               >
                 <Eye size={15} />
               </Button>
@@ -330,7 +330,7 @@ export default function LessonMaterials({ lessonId }: Props) {
                   variant="ghost"
                   size="icon-sm"
                   className="text-slate-400 hover:bg-sky-50 hover:text-sky-600"
-                  aria-label={`Download ${mat.title}`}
+                  aria-label={`Tải xuống ${mat.title}`}
                 >
                   <Download size={15} />
                 </Button>
@@ -342,7 +342,7 @@ export default function LessonMaterials({ lessonId }: Props) {
                 size="icon-sm"
                 onClick={() => setDeletingId(mat.id)}
                 className="shrink-0 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                aria-label={`Delete ${mat.title}`}
+                aria-label={`Xóa ${mat.title}`}
               >
                 <Trash2 size={15} />
               </Button>
@@ -355,17 +355,16 @@ export default function LessonMaterials({ lessonId }: Props) {
               >
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Material?</AlertDialogTitle>
+                    <AlertDialogTitle>Xóa tài liệu?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete{" "}
-                      <strong>&ldquo;{mat.title}&rdquo;</strong> from
-                      UploadThing and remove it from the lesson. This cannot be
-                      undone.
+                      Thao tác này sẽ xóa vĩnh viễn{" "}
+                      <strong>&ldquo;{mat.title}&rdquo;</strong> khỏi
+                      UploadThing và gỡ khỏi bài học. Không thể hoàn tác.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel disabled={isDeleting}>
-                      Cancel
+                      Hủy
                     </AlertDialogCancel>
                     <AlertDialogAction
                       variant="destructive"
@@ -376,7 +375,7 @@ export default function LessonMaterials({ lessonId }: Props) {
                       {isDeleting && (
                         <Loader2 size={13} className="animate-spin" />
                       )}
-                      Delete
+                      Xóa
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

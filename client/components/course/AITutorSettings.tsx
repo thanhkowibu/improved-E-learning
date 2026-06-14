@@ -88,16 +88,14 @@ export function AITutorSettings({
       };
 
       if (!response.ok || !body.success) {
-        throw new Error(body.message ?? "Failed to sync AI Tutor materials.");
+        throw new Error(body.message ?? "Không thể đồng bộ tài liệu cho Trợ giảng AI.");
       }
 
       const uploadedCount = body.data?.uploadedCount ?? 0;
       toast.success(
         uploadedCount > 0
-          ? `AI Tutor synced ${uploadedCount} new material${
-              uploadedCount === 1 ? "" : "s"
-            }.`
-          : "AI Tutor materials are already synced.",
+          ? `Trợ giảng AI đã đồng bộ ${uploadedCount} tài liệu mới.`
+          : "Tài liệu cho Trợ giảng AI đã được đồng bộ.",
         { id: toastId },
       );
       setDisplayIsAIEnabled(true);
@@ -113,7 +111,7 @@ export function AITutorSettings({
       toast.error(
         error instanceof Error
           ? error.message
-          : "Failed to sync AI Tutor materials.",
+          : "Không thể đồng bộ tài liệu cho Trợ giảng AI.",
         { id: toastId },
       );
     } finally {
@@ -130,25 +128,25 @@ export function AITutorSettings({
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
                 <Sparkles size={16} />
               </span>
-              AI Tutor Configuration
+              Cấu hình Trợ giảng AI
               {status === "active" && (
                 <Badge className="bg-emerald-100 text-emerald-700">
-                  Active
+                  Đang hoạt động
                 </Badge>
               )}
               {status === "out-of-sync" && (
                 <Badge className="bg-amber-100 text-amber-700">
-                  Out of Sync
+                  Cần đồng bộ
                 </Badge>
               )}
               {status === "disabled" && (
                 <Badge variant="secondary" className="text-slate-600">
-                  Disabled
+                  Đã tắt
                 </Badge>
               )}
             </CardTitle>
             <CardDescription>
-              Manage Gemini File API sync for materials used by the AI Tutor.
+              Quản lý đồng bộ Gemini File API cho tài liệu dùng bởi Trợ giảng AI.
             </CardDescription>
           </div>
           <div className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-500">
@@ -164,8 +162,8 @@ export function AITutorSettings({
           <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-8 text-center">
             <FileText className="mx-auto mb-3 h-8 w-8 text-slate-300" />
             <p className="mx-auto max-w-lg text-sm text-slate-500">
-              No course materials uploaded yet. Add lessons and attachments to
-              sync with the AI Tutor.
+              Chưa có tài liệu khóa học. Hãy thêm bài học và tài liệu đính kèm
+              để đồng bộ với Trợ giảng AI.
             </p>
           </div>
         ) : (
@@ -204,11 +202,11 @@ export function AITutorSettings({
                     >
                       {isSynced ? (
                         <>
-                          Synced <CheckCircle2 size={12} />
+                          Đã đồng bộ <CheckCircle2 size={12} />
                         </>
                       ) : (
                         <>
-                          Not Synced <XCircle size={12} />
+                          Chưa đồng bộ <XCircle size={12} />
                         </>
                       )}
                     </Badge>
@@ -222,8 +220,8 @@ export function AITutorSettings({
 
       <CardFooter className="flex flex-col items-stretch gap-3 bg-indigo-50/30 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-slate-500">
-          Sync uploads unsynced materials to Gemini and enables the AI Tutor for
-          this course.
+          Đồng bộ các tài liệu chưa xử lý lên Gemini và bật Trợ giảng AI cho
+          khóa học này.
         </p>
         <Button
           type="button"
@@ -236,7 +234,7 @@ export function AITutorSettings({
           ) : (
             <RefreshCw size={16} />
           )}
-          Re-sync Materials
+          Đồng bộ lại tài liệu
         </Button>
       </CardFooter>
     </Card>

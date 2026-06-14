@@ -93,7 +93,7 @@ function CourseRow({ course }: { course: CourseItem }) {
   return (
     <div className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50/60 transition-colors group">
       {/* Thumbnail */}
-      <div className="h-11 w-16 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="h-11 w-16 rounded-xl bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center shrink-0 overflow-hidden">
         {course.thumbnailUrl ? (
           <img
             src={course.thumbnailUrl}
@@ -118,17 +118,17 @@ function CourseRow({ course }: { course: CourseItem }) {
                 : "bg-slate-100 text-slate-500 hover:bg-slate-100 text-[10px] font-semibold shrink-0"
             }
           >
-            {course.isPublished ? "Published" : "Draft"}
+            {course.isPublished ? "Đã xuất bản" : "Bản nháp"}
           </Badge>
         </div>
         <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
           <span className="flex items-center gap-1">
             <Users size={11} />
-            {course._count.enrollments} students
+            {course._count.enrollments} sinh viên
           </span>
           <span className="flex items-center gap-1">
             <Layers size={11} />
-            {course._count.modules} modules
+            {course._count.modules} học phần
           </span>
         </div>
       </div>
@@ -136,12 +136,19 @@ function CourseRow({ course }: { course: CourseItem }) {
       {/* Actions — visible on hover */}
       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
         <Link href={`/courses/${course.id}`}>
-          <Button variant="ghost" size="sm" className="h-8 px-2.5 text-slate-500 hover:text-slate-700">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2.5 text-slate-500 hover:text-slate-700"
+          >
             <Eye size={14} />
           </Button>
         </Link>
         <Link href={`/courses/${course.id}/edit`}>
-          <Button size="sm" className="h-8 px-3 bg-sky-500 hover:bg-sky-600 text-white gap-1.5">
+          <Button
+            size="sm"
+            className="h-8 px-3 bg-sky-500 hover:bg-sky-600 text-white gap-1.5"
+          >
             <Pencil size={12} />
             Edit
           </Button>
@@ -158,7 +165,9 @@ function DashboardSkeleton() {
     <div className="space-y-8">
       <Skeleton className="h-20 w-full rounded-2xl" />
       <div className="grid grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-24 rounded-2xl" />
+        ))}
       </div>
       <Skeleton className="h-64 rounded-2xl" />
     </div>
@@ -184,7 +193,10 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
 
   const published = courses.filter((c) => c.isPublished);
   const drafts = courses.filter((c) => !c.isPublished);
-  const totalStudents = courses.reduce((acc, c) => acc + c._count.enrollments, 0);
+  const totalStudents = courses.reduce(
+    (acc, c) => acc + c._count.enrollments,
+    0,
+  );
   const firstName = fullName.split(" ")[0];
 
   return (
@@ -201,13 +213,13 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
                   Hello, {firstName} 👨‍🏫
                 </h2>
                 <p className="text-slate-500 text-sm mt-1">
-                  Manage your courses and track student progress.
+                  Quản lý khóa học và theo dõi tiến độ học tập của sinh viên.
                 </p>
               </div>
               <Link href="/courses/new">
                 <Button className="bg-sky-500 hover:bg-sky-600 text-white gap-2 shadow-sm font-semibold">
                   <PlusCircle size={16} />
-                  Create Course
+                  Tạo khóa học
                 </Button>
               </Link>
             </div>
@@ -215,28 +227,28 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
             {/* ── Stat cards ── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <StatCard
-                title="Published Courses"
+                title="Khóa học đã xuất bản"
                 value={published.length}
                 icon={CheckCircle2}
                 colorClass="text-sky-600"
                 bgClass="bg-sky-50"
-                label="Live & accessible"
+                label="Đang mở cho sinh viên"
               />
               <StatCard
-                title="Total Students"
+                title="Tổng sinh viên"
                 value={totalStudents}
                 icon={Users}
                 colorClass="text-violet-600"
                 bgClass="bg-violet-50"
-                label="Across all courses"
+                label="Trên toàn bộ khóa học"
               />
               <StatCard
-                title="Draft Courses"
+                title="Khóa học nháp"
                 value={drafts.length}
                 icon={BookOpen}
                 colorClass="text-amber-600"
                 bgClass="bg-amber-50"
-                label="Unpublished"
+                label="Chưa xuất bản"
               />
             </div>
 
@@ -246,7 +258,7 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                     <Layers size={16} className="text-sky-500" />
-                    My Courses
+                    Khóa học của tôi
                   </CardTitle>
                   <Link href="/my-courses">
                     <Button
@@ -254,7 +266,7 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
                       size="sm"
                       className="text-sky-600 gap-1 hover:text-sky-700 hover:bg-sky-50 text-xs"
                     >
-                      Manage all <ArrowRight size={13} />
+                      Quản lý tất cả <ArrowRight size={13} />
                     </Button>
                   </Link>
                 </div>
@@ -267,10 +279,10 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
                   </div>
                   <div>
                     <p className="font-semibold text-slate-700">
-                      No courses yet
+                      Chưa có khóa học
                     </p>
                     <p className="text-slate-400 text-sm mt-0.5">
-                      Create your first course to get started.
+                      Tạo khóa học đầu tiên để bắt đầu.
                     </p>
                   </div>
                   <Link href="/courses/new">
@@ -279,7 +291,7 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
                       className="bg-sky-500 hover:bg-sky-600 text-white gap-1.5"
                     >
                       <PlusCircle size={14} />
-                      New Course
+                      Khóa học mới
                     </Button>
                   </Link>
                 </CardContent>
@@ -294,20 +306,18 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
 
             {/* ── Analytics CTA ── */}
             {courses.length > 0 && (
-              <Card className="border border-sky-200 bg-gradient-to-br from-sky-50 to-white shadow-sm">
+              <Card className="border border-sky-200 bg-linear-to-br from-sky-50 to-white shadow-sm">
                 <CardContent className="p-5 flex items-center gap-4">
                   <div className="h-12 w-12 rounded-2xl bg-sky-100 flex items-center justify-center shrink-0">
                     <BarChart3 size={22} className="text-sky-600" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-slate-900">
-                      {totalStudents} student{totalStudents !== 1 ? "s" : ""}{" "}
-                      enrolled across your courses
+                      {totalStudents} sinh viên đã đăng ký các khóa học của bạn
                     </p>
                     <p className="text-slate-500 text-sm mt-0.5 flex items-center gap-1.5">
                       <TrendingUp size={12} className="text-emerald-500" />
-                      {published.length} published ·{" "}
-                      {drafts.length} in draft
+                      {published.length} đã xuất bản · {drafts.length} bản nháp
                     </p>
                   </div>
                 </CardContent>

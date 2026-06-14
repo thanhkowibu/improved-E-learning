@@ -10,9 +10,9 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LearnAI — Smart LMS",
+  title: "LearnAI — LMS thông minh",
   description:
-    "A minimalist Learning Management System with an AI Tutor powered by Google Gemini.",
+    "Hệ thống quản lý học tập tối giản với trợ giảng AI dùng Google Gemini.",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="vi" className={cn("font-sans", geist.variable)}>
       <body className={`${inter.className} antialiased min-h-screen bg-white`}>
         <AuthProvider>{children}</AuthProvider>
         <Toaster position="top-center" richColors theme="light" />

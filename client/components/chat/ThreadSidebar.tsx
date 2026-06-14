@@ -35,10 +35,10 @@ function formatThreadTime(value: string | Date): string {
   const date = value instanceof Date ? value : new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "Recent chat";
+    return "Cuộc trò chuyện gần đây";
   }
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat("vi-VN", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -65,7 +65,7 @@ export function ThreadSidebar({
           onClick={onCreateNew}
         >
           <Plus className="size-4 text-blue-600" />
-          New Chat
+          Cuộc trò chuyện mới
         </Button>
       </div>
 
@@ -100,7 +100,7 @@ export function ThreadSidebar({
                   variant="ghost"
                   size="icon-sm"
                   className="mr-1 shrink-0 text-muted-foreground opacity-70 hover:bg-red-50 hover:text-red-600 group-hover/thread:opacity-100"
-                  aria-label="Delete chat"
+                  aria-label="Xóa cuộc trò chuyện"
                   onClick={() => setPendingDeleteId(thread.id)}
                 >
                   <Trash2 className="size-3.5" />
@@ -114,14 +114,14 @@ export function ThreadSidebar({
                 >
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Chat?</AlertDialogTitle>
+                      <AlertDialogTitle>Xóa cuộc trò chuyện?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to delete this chat? This will
-                        permanently remove the conversation history.
+                        Bạn có chắc muốn xóa cuộc trò chuyện này? Toàn bộ lịch
+                        sử trao đổi sẽ bị xóa vĩnh viễn.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>Hủy</AlertDialogCancel>
                       <AlertDialogAction
                         variant="destructive"
                         onClick={() => {
@@ -129,7 +129,7 @@ export function ThreadSidebar({
                           setPendingDeleteId(null);
                         }}
                       >
-                        Delete
+                        Xóa
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

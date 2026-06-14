@@ -26,7 +26,13 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePathname } from "next/navigation";
-import { Bell, ChevronDown, GraduationCap, LogOut, Settings } from "lucide-react";
+import {
+  Bell,
+  ChevronDown,
+  GraduationCap,
+  LogOut,
+  Settings,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -38,36 +44,38 @@ interface NavItem {
 
 // ─── Role nav maps ────────────────────────────────────────────────────────────
 
-const GUEST_NAV: NavItem[] = [
-  { href: "/courses", label: "Courses" },
-];
+const GUEST_NAV: NavItem[] = [{ href: "/courses", label: "Khóa học" }];
 
 const STUDENT_NAV: NavItem[] = [
-  { href: "/courses", label: "Courses" },
-  { href: "/my-courses", label: "My Learning" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/courses", label: "Khóa học" },
+  { href: "/my-courses", label: "Lớp học của tôi" },
+  { href: "/dashboard", label: "Bảng điều khiển" },
 ];
 
 const TEACHER_NAV: NavItem[] = [
-  { href: "/courses", label: "Courses" },
-  { href: "/my-courses", label: "Manage" },
-  { href: "/courses/new", label: "Create Course" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/courses", label: "Khóa học" },
+  { href: "/my-courses", label: "Quản lý" },
+  { href: "/courses/new", label: "Tạo khóa học" },
+  { href: "/dashboard", label: "Bảng điều khiển" },
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/courses", label: "Courses" },
-  { href: "/admin/analytics", label: "Analytics" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/admin/users", label: "Người dùng" },
+  { href: "/admin/courses", label: "Khóa học" },
+  { href: "/admin/analytics", label: "Thống kê" },
+  { href: "/dashboard", label: "Bảng điều khiển" },
 ];
 
 function getNav(role?: string): NavItem[] {
   switch (role) {
-    case "TEACHER": return TEACHER_NAV;
-    case "ADMIN": return ADMIN_NAV;
-    case "STUDENT": return STUDENT_NAV;
-    default: return GUEST_NAV;
+    case "TEACHER":
+      return TEACHER_NAV;
+    case "ADMIN":
+      return ADMIN_NAV;
+    case "STUDENT":
+      return STUDENT_NAV;
+    default:
+      return GUEST_NAV;
   }
 }
 
@@ -102,15 +110,13 @@ function NavLink({ item }: { item: NavItem }) {
       href={item.href}
       className={cn(
         "relative px-1 py-1 text-sm font-semibold transition-colors duration-150",
-        active
-          ? "text-sky-600"
-          : "text-slate-600 hover:text-slate-900"
+        active ? "text-sky-600" : "text-slate-600 hover:text-slate-900",
       )}
     >
       {item.label}
       {/* Active underline */}
       {active && (
-        <span className="absolute -bottom-[1px] left-0 right-0 h-0.5 rounded-full bg-sky-500" />
+        <span className="absolute -bottom-px left-0 right-0 h-0.5 rounded-full bg-sky-500" />
       )}
     </Link>
   );
@@ -126,7 +132,10 @@ export default function Navbar() {
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     }
@@ -138,12 +147,8 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm">
       <div className="container mx-auto px-6 md:px-12 lg:px-24 max-w-7xl">
         <div className="flex h-16 items-center gap-8">
-
           {/* ── Logo ── */}
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 shrink-0 group"
-          >
+          <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
             <div className="h-8 w-8 rounded-lg bg-sky-500 flex items-center justify-center shadow-sm group-hover:bg-sky-600 transition-colors">
               <GraduationCap size={18} className="text-white" />
             </div>
@@ -153,7 +158,10 @@ export default function Navbar() {
           </Link>
 
           {/* ── Nav links (desktop) ── */}
-          <nav className="hidden md:flex items-center gap-6 flex-1" aria-label="Main navigation">
+          <nav
+            className="hidden md:flex items-center gap-6 flex-1"
+            aria-label="Main navigation"
+          >
             {navItems.map((item) => (
               <NavLink key={item.href} item={item} />
             ))}
@@ -168,7 +176,7 @@ export default function Navbar() {
                 {/* Notification bell */}
                 <button
                   className="relative h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
-                  aria-label="Notifications"
+                  aria-label="Thông báo"
                 >
                   <Bell size={18} />
                   <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-sky-500 ring-2 ring-white" />
@@ -184,7 +192,7 @@ export default function Navbar() {
                     aria-expanded={dropdownOpen}
                   >
                     {/* Avatar */}
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
+                    <div className="h-8 w-8 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
                       {getInitials(user.fullName)}
                     </div>
                     {/* Name + role */}
@@ -195,7 +203,7 @@ export default function Navbar() {
                       <p
                         className={cn(
                           "text-[10px] font-medium mt-0.5 px-1.5 rounded-sm inline-block",
-                          ROLE_STYLES[user.role]
+                          ROLE_STYLES[user.role],
                         )}
                       >
                         {user.role}
@@ -205,7 +213,7 @@ export default function Navbar() {
                       size={14}
                       className={cn(
                         "text-slate-400 transition-transform duration-200",
-                        dropdownOpen && "rotate-180"
+                        dropdownOpen && "rotate-180",
                       )}
                     />
                   </button>
@@ -215,12 +223,16 @@ export default function Navbar() {
                     <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200/80 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                       {/* User info */}
                       <div className="px-4 py-3.5 border-b border-slate-100 bg-slate-50">
-                        <p className="text-sm font-bold text-slate-900 truncate">{user.fullName}</p>
-                        <p className="text-xs text-slate-500 truncate mt-0.5">{user.email}</p>
+                        <p className="text-sm font-bold text-slate-900 truncate">
+                          {user.fullName}
+                        </p>
+                        <p className="text-xs text-slate-500 truncate mt-0.5">
+                          {user.email}
+                        </p>
                         <span
                           className={cn(
                             "mt-1.5 inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full",
-                            ROLE_STYLES[user.role]
+                            ROLE_STYLES[user.role],
                           )}
                         >
                           {user.role}
@@ -235,9 +247,12 @@ export default function Navbar() {
                           className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                         >
                           <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                            <GraduationCap size={14} className="text-slate-500" />
+                            <GraduationCap
+                              size={14}
+                              className="text-slate-500"
+                            />
                           </div>
-                          Dashboard
+                          Bảng điều khiển
                         </Link>
                         <Link
                           href="/settings"
@@ -247,7 +262,7 @@ export default function Navbar() {
                           <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
                             <Settings size={14} className="text-slate-500" />
                           </div>
-                          Profile & Settings
+                          Hồ sơ & cài đặt
                         </Link>
                       </div>
 
@@ -255,13 +270,16 @@ export default function Navbar() {
                       <div className="border-t border-slate-100 py-1.5">
                         <button
                           id="navbar-logout-btn"
-                          onClick={() => { setDropdownOpen(false); logout(); }}
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            logout();
+                          }}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                         >
                           <div className="h-7 w-7 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
                             <LogOut size={14} className="text-red-500" />
                           </div>
-                          Sign out
+                          Đăng xuất
                         </button>
                       </div>
                     </div>
@@ -276,14 +294,14 @@ export default function Navbar() {
                   href="/login"
                   className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-semibold text-sky-600 border border-sky-300 rounded-xl hover:bg-sky-50 transition-colors"
                 >
-                  Log in
+                  Đăng nhập
                 </Link>
                 <Link
                   id="navbar-register-btn"
                   href="/register"
                   className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-sky-500 rounded-xl hover:bg-sky-600 active:bg-sky-700 transition-colors shadow-sm"
                 >
-                  Get Started
+                  Bắt đầu
                 </Link>
               </>
             )}

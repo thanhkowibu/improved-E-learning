@@ -19,7 +19,7 @@ export default function AuthLayout({
       <div className="hidden lg:flex lg:w-[45%] xl:w-1/2 flex-col justify-between bg-sky-500 text-white p-12 relative overflow-hidden">
         {/* Background decorative circles */}
         <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-400 opacity-40" />
-        <div className="absolute -bottom-32 -right-32 h-[28rem] w-[28rem] rounded-full bg-sky-600 opacity-30" />
+        <div className="absolute -bottom-32 -right-32 h-112 w-md rounded-full bg-sky-600 opacity-30" />
 
         {/* Logo */}
         <div className="relative z-10 flex items-center gap-3">
@@ -38,18 +38,20 @@ export default function AuthLayout({
         {/* Center copy */}
         <div className="relative z-10 space-y-6">
           <h1 className="text-4xl font-extrabold leading-tight">
-            Knowledge is your<br />greatest asset.
+            Tri thức là tài sản
+            <br />
+            lớn nhất của bạn.
           </h1>
           <p className="text-sky-100 text-lg leading-relaxed max-w-sm">
-            Access expert-led courses and an AI tutor that answers your questions
-            based directly on your course materials — anytime, anywhere.
+            Đồng hành cùng các khóa học chất lượng và trợ giảng AI trả lời câu
+            hỏi dựa vào chính tài liệu khóa học, mọi lúc mọi nơi.
           </p>
           {/* Stats row */}
           <div className="flex gap-8 pt-4">
             {[
-              { value: "100+", label: "Courses" },
-              { value: "5k+", label: "Students" },
-              { value: "AI", label: "Tutor" },
+              { value: "100+", label: "Khóa học" },
+              { value: "5k+", label: "Sinh viên" },
+              { value: "AI", label: "Trợ giảng" },
             ].map((stat) => (
               <div key={stat.label}>
                 <p className="text-3xl font-bold">{stat.value}</p>
@@ -61,7 +63,7 @@ export default function AuthLayout({
 
         {/* Footer note */}
         <p className="relative z-10 text-sky-200 text-sm">
-          © {new Date().getFullYear()} LearnAI Platform. All rights reserved.
+          © {new Date().getFullYear()} LearnAI. All rights reserved.
         </p>
       </div>
 
@@ -82,15 +84,17 @@ export default function AuthLayout({
         </div>
 
         <div className="w-full max-w-md">
-          <Suspense fallback={
-            <div className="flex flex-col items-center justify-center p-8 gap-3">
-              <div className="relative">
-                <div className="h-10 w-10 rounded-full border-4 border-slate-100" />
-                <div className="absolute inset-0 h-10 w-10 rounded-full border-4 border-sky-500 border-t-transparent animate-spin" />
+          <Suspense
+            fallback={
+              <div className="flex flex-col items-center justify-center p-8 gap-3">
+                <div className="relative">
+                  <div className="h-10 w-10 rounded-full border-4 border-slate-100" />
+                  <div className="absolute inset-0 h-10 w-10 rounded-full border-4 border-sky-500 border-t-transparent animate-spin" />
+                </div>
+                <p className="text-xs text-slate-400">Đang tải biểu mẫu...</p>
               </div>
-              <p className="text-xs text-slate-400">Loading form…</p>
-            </div>
-          }>
+            }
+          >
             {children}
           </Suspense>
         </div>

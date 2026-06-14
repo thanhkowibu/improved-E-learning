@@ -94,7 +94,9 @@ function Field({
       </div>
       {children}
       {hint && !error && <p className="text-xs text-slate-400 pl-1">{hint}</p>}
-      {error && <p className="text-xs text-red-500 font-medium pl-1">{error}</p>}
+      {error && (
+        <p className="text-xs text-red-500 font-medium pl-1">{error}</p>
+      )}
     </div>
   );
 }
@@ -156,33 +158,37 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-7" noValidate>
         {/* ── Title ── */}
         <Field
-          label="Course Title"
+          label="Tên khóa học"
           icon={BookOpen}
-          hint="Make it clear and descriptive. e.g. 'Introduction to Machine Learning'"
+          hint="Đặt tên rõ ràng, dễ hiểu. Ví dụ: 'Nhập môn học máy'"
           error={errors.title?.message}
         >
           <Input
             id="course-title"
-            placeholder="e.g. Introduction to Machine Learning"
-            className={`rounded-xl h-11 border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-sky-400 ${errors.title ? "border-red-300 focus-visible:ring-red-400" : ""
-              }`}
+            placeholder="Ví dụ: Nhập môn học máy"
+            className={`rounded-xl h-11 border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-sky-400 ${
+              errors.title ? "border-red-300 focus-visible:ring-red-400" : ""
+            }`}
             {...register("title")}
           />
         </Field>
 
         {/* ── Description ── */}
         <Field
-          label="Description"
+          label="Mô tả"
           icon={FileText}
-          hint="Describe what students will learn. Markdown is supported in lesson content."
+          hint="Mô tả những gì sinh viên sẽ học. Nội dung bài học có hỗ trợ Markdown."
           error={errors.description?.message}
         >
           <Textarea
             id="course-description"
-            placeholder="What will students learn? What are the prerequisites?"
+            placeholder="Sinh viên sẽ học gì? Cần kiến thức nền nào?"
             rows={5}
-            className={`rounded-xl border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-sky-400 resize-y min-h-[120px] ${errors.description ? "border-red-300 focus-visible:ring-red-400" : ""
-              }`}
+            className={`rounded-xl border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-sky-400 resize-y min-h-30 ${
+              errors.description
+                ? "border-red-300 focus-visible:ring-red-400"
+                : ""
+            }`}
             {...register("description")}
           />
         </Field>
@@ -191,15 +197,18 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
         <Field
           label="Thumbnail URL"
           icon={Image}
-          hint="Paste a direct image URL (https://…). Leave blank for a default gradient."
+          hint="Dán URL hình ảnh trực tiếp (https://…). Để trống sẽ có gradient mặc định."
           error={errors.thumbnailUrl?.message}
         >
           <Input
             id="course-thumbnail"
             type="url"
             placeholder="https://example.com/thumbnail.jpg"
-            className={`rounded-xl h-11 border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-sky-400 ${errors.thumbnailUrl ? "border-red-300 focus-visible:ring-red-400" : ""
-              }`}
+            className={`rounded-xl h-11 border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-sky-400 ${
+              errors.thumbnailUrl
+                ? "border-red-300 focus-visible:ring-red-400"
+                : ""
+            }`}
             {...register("thumbnailUrl")}
           />
         </Field>
@@ -210,7 +219,7 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
         {mode === "edit" && (
           <div className="space-y-4">
             <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-              Visibility
+              Hiển thị
             </p>
 
             {/* isPublished */}
@@ -218,10 +227,12 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
               <div className="flex items-start gap-3">
                 <Globe size={18} className="text-sky-500 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Publish Course</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    Xuất bản khóa học
+                  </p>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Published courses are visible to all students. Unpublished courses are
-                    drafts.
+                    Khóa học đã xuất bản sẽ hiển thị với sinh viên. Khóa học
+                    chưa xuất bản được lưu dưới dạng <br /> bản nháp.
                   </p>
                 </div>
               </div>
@@ -239,16 +250,17 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
               />
             </div>
 
-
             {/* aiEnabled */}
 
             <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50">
               <div className="flex items-start gap-3">
                 <span className="text-lg leading-none mt-0.5">🤖</span>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">AI Assistant</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    Trợ giảng AI
+                  </p>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Enable an AI-powered Q&A assistant for enrolled students.
+                    Bật tính năng trợ lý hỏi đáp AI cho sinh viên đã đăng ký.
                   </p>
                 </div>
               </div>
@@ -277,15 +289,13 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
             className="bg-sky-500 hover:bg-sky-600 text-white rounded-xl px-8 py-2.5 font-semibold gap-2 shadow-sm transition-all"
           >
             {isSubmitting && <Loader2 size={16} className="animate-spin" />}
-            {mode === "create" ? "Create Course" : "Save Changes"}
+            {mode === "create" ? "Tạo khóa học" : "Lưu thay đổi"}
           </Button>
-          {isSubmitting && (
-            <p className="text-sm text-slate-500">Saving…</p>
-          )}
+          {isSubmitting && <p className="text-sm text-slate-500">Saving…</p>}
         </div>
       </form>
     );
-  }
+  },
 );
 
 export default CourseForm;

@@ -53,6 +53,16 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { QuizBuilder } from "@/components/quiz/QuizBuilder";
 import { useApi } from "@/hooks/useApi";
 import type { Lesson } from "./LessonEditorDialog";
@@ -109,6 +119,12 @@ export default function ModuleItem({
   const [editTitle, setEditTitle] = useState(module.title);
   const [isSavingTitle, setIsSavingTitle] = useState(false);
   const [isDeletingModule, setIsDeletingModule] = useState(false);
+  const [isDeleteModuleDialogOpen, setIsDeleteModuleDialogOpen] =
+    useState(false);
+  const [lessonPendingDelete, setLessonPendingDelete] = useState<Lesson | null>(
+    null,
+  );
+  const [deletingLessonId, setDeletingLessonId] = useState<string | null>(null);
   const [isAddingLesson, setIsAddingLesson] = useState(false);
   const [newLessonTitle, setNewLessonTitle] = useState("");
   const [newLessonType, setNewLessonType] = useState<LessonType>(
@@ -128,16 +144,16 @@ export default function ModuleItem({
       return;
     }
     setIsSavingTitle(true);
-    const toastId = toast.loading("Updating module…");
+    const toastId = toast.loading("Đang cập nhật…");
     const res = await api.patch<Module>(
       `/api/courses/${courseId}/modules/${module.id}`,
       { title: trimmed },
     );
     if (res.success && res.data) {
-      toast.success("Module updated.", { id: toastId });
+      toast.success("Đã cập nhật học phần.", { id: toastId });
       onModuleUpdated({ ...module, title: trimmed });
     } else {
-      toast.error(res.error ?? "Failed to update module.", { id: toastId });
+      toast.error(res.error ?? "Không thể cập nhật học phần.", { id: toastId });
       setEditTitle(module.title); // revert
     }
     setIsSavingTitle(false);
@@ -152,20 +168,16 @@ export default function ModuleItem({
   // ── Module delete ─────────────────────────────────────────────────────────
 
   async function deleteModule() {
-    if (
-      !confirm(
-        `Delete module "${module.title}" and all its lessons? This cannot be undone.`,
-      )
-    )
-      return;
     setIsDeletingModule(true);
-    const toastId = toast.loading("Deleting module…");
+    const toastId = toast.loading("Đang xóa học phần...");
     const res = await api.del(`/api/courses/${courseId}/modules/${module.id}`);
+
     if (res.success) {
-      toast.success("Module deleted.", { id: toastId });
+      toast.success("Đã xóa học phần.", { id: toastId });
+      setIsDeleteModuleDialogOpen(false);
       onModuleDeleted(module.id);
     } else {
-      toast.error(res.error ?? "Failed to delete module.", { id: toastId });
+      toast.error(res.error ?? "Không thể xóa học phần.", { id: toastId });
       setIsDeletingModule(false);
     }
   }
@@ -176,19 +188,19 @@ export default function ModuleItem({
     const trimmed = newLessonTitle.trim();
     if (isCreatingLesson || !trimmed) return;
     setIsCreatingLesson(true);
-    const toastId = toast.loading("Adding lesson…");
+    const toastId = toast.loading("Đang thêm…");
     const res = await api.post<Lesson>(`/api/modules/${module.id}/lessons`, {
       title: trimmed,
       lessonType: newLessonType,
     });
     if (res.success && res.data) {
-      toast.success("Lesson added.", { id: toastId });
+      toast.success("Đã thêm bài học.", { id: toastId });
       onLessonsUpdated(module.id, [...module.lessons, res.data]);
       setNewLessonTitle("");
       setNewLessonType(LessonType.LECTURE);
       setIsAddingLesson(false);
     } else {
-      toast.error(res.error ?? "Failed to add lesson.", { id: toastId });
+      toast.error(res.error ?? "Không thể thêm bài học.", { id: toastId });
     }
     setIsCreatingLesson(false);
   }
@@ -201,19 +213,22 @@ export default function ModuleItem({
   // ── Delete lesson ─────────────────────────────────────────────────────────
 
   async function deleteLesson(lesson: Lesson) {
-    if (!confirm(`Delete lesson "${lesson.title}"? This cannot be undone.`))
-      return;
-    const toastId = toast.loading("Deleting lesson…");
+    setDeletingLessonId(lesson.id);
+    const toastId = toast.loading("Đang xóa bài học...");
     const res = await api.del(`/api/lessons/${lesson.id}`);
+
     if (res.success) {
-      toast.success("Lesson deleted.", { id: toastId });
+      toast.success("Đã xóa bài học.", { id: toastId });
+      setLessonPendingDelete(null);
       onLessonsUpdated(
         module.id,
         module.lessons.filter((l) => l.id !== lesson.id),
       );
     } else {
-      toast.error(res.error ?? "Failed to delete lesson.", { id: toastId });
+      toast.error(res.error ?? "Không thể xóa bài học.", { id: toastId });
     }
+
+    setDeletingLessonId(null);
   }
 
   // ── Move lesson Up/Down ───────────────────────────────────────────────────
@@ -244,7 +259,7 @@ export default function ModuleItem({
       orderedIds,
     });
     if (!res.success) {
-      toast.error(res.error ?? "Failed to reorder lessons.");
+      toast.error(res.error ?? "Không thể sắp xếp lại bài học.");
       // Revert
       onLessonsUpdated(module.id, lessons);
     }
@@ -267,7 +282,7 @@ export default function ModuleItem({
             <button
               type="button"
               className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 transition-colors p-0.5 shrink-0 touch-none"
-              aria-label="Drag to reorder module"
+              aria-label="Kéo để sắp xếp học phần"
               {...attributes}
               {...listeners}
             >
@@ -295,7 +310,7 @@ export default function ModuleItem({
                     onClick={saveTitle}
                     disabled={isSavingTitle}
                     className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                    aria-label="Save module title"
+                    aria-label="Lưu tên học phần"
                   >
                     {isSavingTitle ? (
                       <Loader2 size={14} className="animate-spin" />
@@ -309,7 +324,7 @@ export default function ModuleItem({
                     size="icon-sm"
                     onClick={cancelTitleEdit}
                     className="text-slate-500 hover:text-slate-700"
-                    aria-label="Cancel edit"
+                    aria-label="Hủy chỉnh sửa"
                   >
                     <X size={14} />
                   </Button>
@@ -323,8 +338,7 @@ export default function ModuleItem({
                     variant="secondary"
                     className="text-xs font-normal shrink-0"
                   >
-                    {sortedLessons.length} lesson
-                    {sortedLessons.length !== 1 ? "s" : ""}
+                    {sortedLessons.length} bài học
                   </Badge>
                 </div>
               )}
@@ -342,7 +356,7 @@ export default function ModuleItem({
                     setIsEditingTitle(true);
                   }}
                   className="text-slate-400 hover:text-sky-600 hover:bg-sky-50"
-                  aria-label="Edit module title"
+                  aria-label="Chỉnh sửa tên học phần"
                 >
                   <Pencil size={14} />
                 </Button>
@@ -350,10 +364,10 @@ export default function ModuleItem({
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  onClick={deleteModule}
+                  onClick={() => setIsDeleteModuleDialogOpen(true)}
                   disabled={isDeletingModule}
                   className="text-slate-400 hover:text-red-600 hover:bg-red-50"
-                  aria-label="Delete module"
+                  aria-label="Xóa học phần"
                 >
                   {isDeletingModule ? (
                     <Loader2 size={14} className="animate-spin" />
@@ -370,7 +384,9 @@ export default function ModuleItem({
             {sortedLessons.length === 0 ? (
               <div className="py-6 flex flex-col items-center gap-1.5 text-slate-400">
                 <BookOpen size={20} className="text-slate-300" />
-                <p className="text-xs">No lessons yet. Add one below.</p>
+                <p className="text-xs">
+                  Chưa có bài học. Thêm bài học bên dưới.
+                </p>
               </div>
             ) : (
               <ul className="divide-y divide-slate-100">
@@ -399,7 +415,7 @@ export default function ModuleItem({
                         onClick={() => moveLesson(idx, "up")}
                         disabled={idx === 0 || movingLessonId === lesson.id}
                         className="text-slate-400 hover:text-slate-700 disabled:opacity-30"
-                        aria-label="Move lesson up"
+                        aria-label="Đưa bài học lên"
                       >
                         <ChevronUp size={14} />
                       </Button>
@@ -414,7 +430,7 @@ export default function ModuleItem({
                           movingLessonId === lesson.id
                         }
                         className="text-slate-400 hover:text-slate-700 disabled:opacity-30"
-                        aria-label="Move lesson down"
+                        aria-label="Đưa bài học xuống"
                       >
                         <ChevronDown size={14} />
                       </Button>
@@ -425,7 +441,7 @@ export default function ModuleItem({
                         size="icon-sm"
                         onClick={() => onEditLesson(lesson)}
                         className="text-slate-400 hover:text-sky-600 hover:bg-sky-50"
-                        aria-label="Edit lesson content"
+                        aria-label="Chỉnh sửa nội dung bài học"
                       >
                         <Pencil size={14} />
                       </Button>
@@ -436,7 +452,7 @@ export default function ModuleItem({
                           size="sm"
                           onClick={() => setQuizLesson(lesson)}
                           className="h-7 gap-1.5 rounded-lg px-2 text-xs text-slate-500 hover:bg-sky-50 hover:text-sky-600"
-                          aria-label={`Manage quiz for ${lesson.title}`}
+                          aria-label={`Quản lý quiz cho ${lesson.title}`}
                         >
                           <ListTodo size={13} />
                         </Button>
@@ -446,11 +462,16 @@ export default function ModuleItem({
                         type="button"
                         variant="ghost"
                         size="icon-sm"
-                        onClick={() => deleteLesson(lesson)}
+                        onClick={() => setLessonPendingDelete(lesson)}
+                        disabled={deletingLessonId === lesson.id}
                         className="text-slate-400 hover:text-red-600 hover:bg-red-50"
-                        aria-label="Delete lesson"
+                        aria-label="Xóa bài học"
                       >
-                        <Trash2 size={14} />
+                        {deletingLessonId === lesson.id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={14} />
+                        )}
                       </Button>
                     </div>
                   </li>
@@ -468,7 +489,7 @@ export default function ModuleItem({
                       value={newLessonTitle}
                       onChange={(e) => setNewLessonTitle(e.target.value)}
                       disabled={isCreatingLesson}
-                      placeholder="Lesson title…"
+                      placeholder="Tên bài học…"
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
@@ -493,7 +514,7 @@ export default function ModuleItem({
                       ) : (
                         <Check size={12} />
                       )}
-                      {isCreatingLesson ? "Adding..." : "Add"}
+                      {isCreatingLesson ? "Đang thêm..." : "Thêm"}
                     </Button>
                     <Button
                       type="button"
@@ -519,7 +540,7 @@ export default function ModuleItem({
                   >
                     <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 hover:border-sky-200 hover:bg-sky-50">
                       <RadioGroupItem value={LessonType.LECTURE} />
-                      Lecture
+                      Bài giảng
                     </label>
                     <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 hover:border-sky-200 hover:bg-sky-50">
                       <RadioGroupItem value={LessonType.QUIZ} />
@@ -534,7 +555,7 @@ export default function ModuleItem({
                   className="w-full flex items-center gap-2 text-xs text-slate-500 hover:text-sky-600 transition-colors py-0.5"
                 >
                   <Plus size={14} />
-                  Add Lesson
+                  Thêm bài học
                 </button>
               )}
             </div>
@@ -553,9 +574,9 @@ export default function ModuleItem({
           className="flex w-[90vw]! max-w-4xl! flex-col gap-0 p-0 sm:w-[90vw]!"
         >
           <SheetHeader className="border-b border-slate-100 px-6 py-5 text-left">
-            <SheetTitle>Manage Quiz</SheetTitle>
+            <SheetTitle>Quản lý quiz</SheetTitle>
             <SheetDescription className="truncate">
-              {quizLesson?.title ?? "Configure quiz questions and settings."}
+              {quizLesson?.title ?? "Cấu hình câu hỏi và thiết lập quiz."}
             </SheetDescription>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto bg-slate-50/40 p-6">
@@ -563,6 +584,80 @@ export default function ModuleItem({
           </div>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog
+        open={isDeleteModuleDialogOpen}
+        onOpenChange={(open) => {
+          if (!isDeletingModule) setIsDeleteModuleDialogOpen(open);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa học phần?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Thao tác này sẽ xóa học phần "{module.title}" và toàn bộ bài học
+              bên trong. Không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingModule}>
+              Hủy
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={isDeletingModule}
+              onClick={(event) => {
+                event.preventDefault();
+                void deleteModule();
+              }}
+              className="gap-2"
+            >
+              {isDeletingModule && (
+                <Loader2 size={14} className="animate-spin" />
+              )}
+              Xóa học phần
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={lessonPendingDelete !== null}
+        onOpenChange={(open) => {
+          if (!open && !deletingLessonId) setLessonPendingDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa bài học?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Thao tác này sẽ xóa bài học "{lessonPendingDelete?.title}" và các
+              tài liệu liên quan. Không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingLessonId !== null}>
+              Hủy
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={
+                deletingLessonId !== null || lessonPendingDelete === null
+              }
+              onClick={(event) => {
+                event.preventDefault();
+                if (lessonPendingDelete) void deleteLesson(lessonPendingDelete);
+              }}
+              className="gap-2"
+            >
+              {deletingLessonId !== null && (
+                <Loader2 size={14} className="animate-spin" />
+              )}
+              Xóa bài học
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

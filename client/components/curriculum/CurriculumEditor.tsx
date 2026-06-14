@@ -91,7 +91,7 @@ export default function CurriculumEditor({ courseId }: Props) {
     if (res.success && res.data) {
       setModules(res.data);
     } else {
-      setLoadError(res.error ?? "Failed to load curriculum.");
+      setLoadError(res.error ?? "Không thể tải chương trình học.");
     }
     setIsLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,12 +112,12 @@ export default function CurriculumEditor({ courseId }: Props) {
       title: trimmed,
     });
     if (res.success && res.data) {
-      toast.success("Module created.", { id: toastId });
+      toast.success("Đã tạo học phần.", { id: toastId });
       setModules((prev) => [...prev, { ...res.data!, lessons: [] }]);
       setNewModuleTitle("");
       setIsAddingModule(false);
     } else {
-      toast.error(res.error ?? "Failed to create module.", { id: toastId });
+      toast.error(res.error ?? "Không thể tạo học phần.", { id: toastId });
     }
     setIsCreatingModule(false);
   }
@@ -153,7 +153,7 @@ export default function CurriculumEditor({ courseId }: Props) {
     });
     if (!res.success) {
       toast.error(
-        (res as { error?: string }).error ?? "Failed to reorder modules.",
+        (res as { error?: string }).error ?? "Không thể sắp xếp lại học phần.",
       );
       setModules(originalModules); // revert
     }
@@ -213,16 +213,17 @@ export default function CurriculumEditor({ courseId }: Props) {
           </div>
           <div>
             <h2 className="text-base font-semibold text-slate-900">
-              Curriculum
+              Chương trình học
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Drag modules to reorder · Use arrows to reorder lessons
+              Kéo thả để sắp xếp lại thứ tự học phần · Sử dụng mũi tên để sắp
+              xếp lại thứ tự bài học
             </p>
           </div>
         </div>
         {/* Module count badge */}
         <span className="text-xs text-slate-400 font-medium tabular-nums">
-          {sortedModules.length} module{sortedModules.length !== 1 ? "s" : ""}
+          {sortedModules.length} học phần
         </span>
       </div>
 
@@ -248,7 +249,7 @@ export default function CurriculumEditor({ courseId }: Props) {
             onClick={loadModules}
             className="ml-auto text-xs underline hover:no-underline shrink-0"
           >
-            Retry
+            Thử lại
           </button>
         </div>
       )}
@@ -257,10 +258,8 @@ export default function CurriculumEditor({ courseId }: Props) {
       {!isLoading && !loadError && sortedModules.length === 0 && (
         <div className="rounded-xl border-2 border-dashed border-slate-200 py-10 flex flex-col items-center gap-2 text-slate-400">
           <BookOpen size={28} className="text-slate-300" />
-          <p className="text-sm font-medium">No modules yet</p>
-          <p className="text-xs">
-            Add your first module to start building the curriculum.
-          </p>
+          <p className="text-sm font-medium">Chưa có học phần nào</p>
+          <p className="text-xs">Thêm học phần đầu tiên để bắt đầu.</p>
         </div>
       )}
 
@@ -328,7 +327,7 @@ export default function CurriculumEditor({ courseId }: Props) {
               ) : (
                 <Plus size={12} />
               )}
-              {isCreatingModule ? "Adding..." : "Add Module"}
+              {isCreatingModule ? "Đang thêm..." : "Thêm học phần"}
             </Button>
             <Button
               type="button"
@@ -341,7 +340,7 @@ export default function CurriculumEditor({ courseId }: Props) {
               disabled={isCreatingModule}
               className="h-8 text-slate-500 shrink-0"
             >
-              Cancel
+              Hủy
             </Button>
           </form>
         ) : (
@@ -352,7 +351,7 @@ export default function CurriculumEditor({ courseId }: Props) {
             className="w-full border-dashed border-slate-300 text-slate-600 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50 gap-2 rounded-xl h-10"
           >
             <Plus size={15} />
-            Add Module
+            Thêm học phần
           </Button>
         )}
       </div>

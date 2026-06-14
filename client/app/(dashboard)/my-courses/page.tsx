@@ -27,24 +27,24 @@ function usePageMeta(role?: string) {
   switch (role) {
     case "TEACHER":
       return {
-        title: "My Courses",
-        subtitle: "Manage the courses you teach.",
+        title: "Khóa học của tôi",
+        subtitle: "Quản lý các khóa học bạn đang giảng dạy.",
         showCreate: true,
-        emptyMsg: "You haven't created any courses yet.",
+        emptyMsg: "Bạn chưa tạo khóa học nào.",
       };
     case "ADMIN":
       return {
-        title: "All Courses",
-        subtitle: "Platform-wide course management.",
+        title: "Tất cả khóa học",
+        subtitle: "Quản lý toàn bộ khóa học trên hệ thống.",
         showCreate: true,
-        emptyMsg: "No courses on the platform yet.",
+        emptyMsg: "Chưa có khóa học nào trên hệ thống.",
       };
     default:
       return {
-        title: "My Learning",
-        subtitle: "Continue where you left off.",
+        title: "Lớp học của tôi",
+        subtitle: "Tiếp tục từ nơi bạn đã dừng lại.",
         showCreate: false,
-        emptyMsg: "You're not enrolled in any courses yet.",
+        emptyMsg: "Bạn chưa đăng ký khóa học nào.",
       };
   }
 }
@@ -93,7 +93,7 @@ export default function MyCoursesPage() {
               className="bg-sky-500 hover:bg-sky-600 text-white rounded-xl gap-2 font-semibold shadow-sm"
             >
               <PlusCircle size={16} />
-              Create Course
+              Tạo khóa học
             </Button>
           </Link>
         )}
@@ -102,7 +102,7 @@ export default function MyCoursesPage() {
       {/* ── Count ── */}
       {!isLoading && !error && courses.length > 0 && (
         <p className="mb-5 text-sm text-slate-500">
-          {courses.length} course{courses.length !== 1 ? "s" : ""}
+          {courses.length} khóa học
         </p>
       )}
 
@@ -116,7 +116,7 @@ export default function MyCoursesPage() {
             <AlertCircle size={28} className="text-red-400" />
           </div>
           <div>
-            <p className="font-semibold text-slate-800">Something went wrong</p>
+            <p className="font-semibold text-slate-800">Đã xảy ra lỗi</p>
             <p className="text-sm text-slate-500 mt-1">{error}</p>
           </div>
           <Button
@@ -124,7 +124,7 @@ export default function MyCoursesPage() {
             onClick={refetch}
             className="rounded-xl border-sky-300 text-sky-600 hover:bg-sky-50"
           >
-            Try again
+            Thử lại
           </Button>
         </div>
       )}
@@ -139,21 +139,21 @@ export default function MyCoursesPage() {
             <p className="font-semibold text-slate-800">{meta.emptyMsg}</p>
             {user?.role === "STUDENT" && (
               <p className="text-sm text-slate-500 mt-1">
-                Browse the catalog and enroll in a course to get started.
+                Duyệt danh mục và đăng ký một khóa học để bắt đầu.
               </p>
             )}
           </div>
           {user?.role === "STUDENT" ? (
             <Link href="/courses">
               <Button className="bg-sky-500 hover:bg-sky-600 text-white rounded-xl">
-                Browse Courses
+                Duyệt khóa học
               </Button>
             </Link>
           ) : (
             <Link href="/courses/new">
               <Button className="bg-sky-500 hover:bg-sky-600 text-white rounded-xl gap-2">
                 <PlusCircle size={15} />
-                Create your first course
+                Tạo khóa học đầu tiên
               </Button>
             </Link>
           )}

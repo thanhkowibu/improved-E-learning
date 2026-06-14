@@ -161,7 +161,8 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
   );
   const percent = formatPercent(attempt.score, attempt.totalPoints);
   const passed =
-    attempt.totalPoints > 0 && attempt.score / attempt.totalPoints >= quiz.passingScore;
+    attempt.totalPoints > 0 &&
+    attempt.score / attempt.totalPoints >= quiz.passingScore;
   const answersByQuestionId = new Map(
     attempt.answers.map((answer) => [answer.questionId, answer]),
   );
@@ -215,8 +216,8 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
     const res = await api.post<AIExplanationResponse>("/api/quiz/explain", {
       questionText: question.questionText,
       options: options.map((option) => option.optionText),
-      correctOption: correctOption?.optionText ?? "Correct option unavailable",
-      studentOption: studentOption?.optionText ?? "No answer selected",
+      correctOption: correctOption?.optionText ?? "Không có đáp án đúng",
+      studentOption: studentOption?.optionText ?? "Chưa chọn đáp án",
     });
 
     const explanation = res.data?.explanation;
@@ -234,7 +235,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
       toast.error(
         res.error ??
           res.message ??
-          "Failed to generate an explanation. Please try again.",
+          "Không thể tạo giải thích. Vui lòng thử lại.",
       );
       setAiData((previous) => ({
         ...previous,
@@ -251,7 +252,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
       <CardHeader className="border-b border-slate-100 bg-slate-50/70">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-slate-500">Quiz Result</p>
+            <p className="text-sm font-medium text-slate-500">Kết quả Quiz</p>
             <CardTitle className="mt-1 text-3xl font-extrabold text-slate-900">
               {attempt.score}/{attempt.totalPoints} - {percent}%
             </CardTitle>
@@ -265,7 +266,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
                 : "border-red-200 bg-red-50 text-red-700",
             )}
           >
-            {passed ? "Pass" : "Fail"}
+            {passed ? "Đạt" : "Chưa đạt"}
           </Badge>
         </div>
       </CardHeader>
@@ -281,7 +282,8 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
           const selectedWasCorrect =
             selectedOption?.isCorrect === true ||
             answer?.option?.isCorrect === true ||
-            (Boolean(correctOption) && selectedOption?.id === correctOption?.id);
+            (Boolean(correctOption) &&
+              selectedOption?.id === correctOption?.id);
           const explanationState = aiData[question.id];
 
           return (
@@ -295,7 +297,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
                     {questionIndex + 1}. {question.questionText}
                   </h3>
                   <p className="mt-1 text-xs text-slate-500">
-                    {question.points} point{question.points === 1 ? "" : "s"}
+                    {question.points} điểm
                   </p>
                 </div>
                 <Badge
@@ -307,7 +309,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
                       : "border-red-200 bg-red-50 text-red-700",
                   )}
                 >
-                  {selectedWasCorrect ? "Correct" : "Incorrect"}
+                  {selectedWasCorrect ? "Đúng" : "Sai"}
                 </Badge>
               </div>
 
@@ -336,7 +338,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
                         <div className="flex shrink-0 items-center gap-1.5">
                           {isSelected && (
                             <Badge variant="outline" className="bg-white/70">
-                              Your answer
+                              Đáp án của bạn
                             </Badge>
                           )}
                           {isCorrect && (
@@ -344,7 +346,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
                               variant="outline"
                               className="border-emerald-200 bg-white/70 text-emerald-700"
                             >
-                              Correct
+                              Đúng
                             </Badge>
                           )}
                         </div>
@@ -356,7 +358,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
 
               {!selectedWasCorrect && correctOption && (
                 <p className="mt-3 text-sm text-slate-600">
-                  Correct answer:{" "}
+                  Đáp án đúng:{" "}
                   <span className="font-semibold text-emerald-700">
                     {correctOption.optionText}
                   </span>
@@ -390,7 +392,7 @@ export function QuizResult({ attempt, quiz }: QuizResultProps) {
                   ) : (
                     <Sparkles size={14} />
                   )}
-                  Ask AI Tutor to Explain
+                  Hỏi trợ giảng AI giải thích
                 </Button>
 
                 {explanationState?.visible && explanationState.text && (

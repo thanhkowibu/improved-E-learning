@@ -47,9 +47,11 @@ export default function Home() {
           setCourses(res.data.items ?? []);
         }
       })
-      .catch(() => {/* silently ignore on landing page */})
+      .catch(() => {
+        /* silently ignore on landing page */
+      })
       .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -57,25 +59,28 @@ export default function Home() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-sky-600 via-sky-500 to-sky-400 text-white">
+      <section className="relative overflow-hidden bg-linear-to-br from-sky-600 via-sky-500 to-sky-400 text-white">
         <div className="mx-auto px-6 md:px-12 lg:px-24 max-w-7xl py-24 md:py-32">
           <div className="max-w-2xl">
             <p className="text-sky-100 text-sm font-semibold uppercase tracking-widest mb-3">
               The Academic LMS
             </p>
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-              Enlightening Your<br />Digital Future
+              Khai sáng tương lai
+              <br />
+              kỹ thuật số của bạn
             </h1>
             <p className="mt-5 text-sky-100 text-lg leading-relaxed max-w-xl">
-              Access 100+ high-quality courses across technology, design, and sciences.
-              Learn at your own pace with industry-leading instructors.
+              Truy cập hơn 100 khóa học chất lượng cao thuộc các lĩnh vực công
+              nghệ, thiết kế và khoa học. Học theo nhịp độ của bạn cùng đội ngũ
+              giảng viên chất lượng.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/register"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white text-sky-600 font-semibold rounded-xl hover:bg-sky-50 transition-colors shadow-sm"
               >
-                Get Started — It&apos;s Free
+                Bắt đầu ngay hôm nay
                 <ArrowRight size={16} />
               </Link>
               <Link
@@ -83,7 +88,7 @@ export default function Home() {
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white/15 text-white font-semibold rounded-xl hover:bg-white/25 transition-colors border border-white/30"
               >
                 <BookOpen size={16} />
-                Browse Courses
+                Khám phá toàn bộ khóa học
               </Link>
             </div>
           </div>
@@ -92,19 +97,24 @@ export default function Home() {
 
       {/* Featured courses */}
       <section className="mx-auto px-6 md:px-12 lg:px-24 max-w-7xl py-16">
-        <h2 className="text-2xl font-bold text-slate-900 mb-8">Featured Courses</h2>
+        <h2 className="text-2xl font-bold text-slate-900 mb-8">
+          Khóa học nổi bật
+        </h2>
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-48 rounded-2xl bg-slate-100 animate-pulse" />
+              <div
+                key={i}
+                className="h-48 rounded-2xl bg-slate-100 animate-pulse"
+              />
             ))}
           </div>
         ) : courses.length === 0 ? (
           <div className="p-8 bg-sky-50 text-sky-700 rounded-2xl border border-sky-200 text-center">
             <GraduationCap size={32} className="mx-auto mb-3 text-sky-400" />
-            <p className="font-semibold">No courses published yet.</p>
-            <p className="text-sm text-sky-500 mt-1">Check back soon!</p>
+            <p className="font-semibold">Chưa có khóa học nào được xuất bản.</p>
+            <p className="text-sm text-sky-500 mt-1">Vui lòng quay lại sau.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -121,7 +131,9 @@ export default function Home() {
                   {course.title}
                 </h3>
                 {course.description && (
-                  <p className="mt-1.5 text-sm text-slate-500 line-clamp-2">{course.description}</p>
+                  <p className="mt-1.5 text-sm text-slate-500 line-clamp-2">
+                    {course.description}
+                  </p>
                 )}
                 {course.teacher && (
                   <p className="mt-3 text-xs text-slate-400 flex items-center gap-1">
@@ -138,7 +150,7 @@ export default function Home() {
             href="/courses"
             className="inline-flex items-center gap-2 px-6 py-3 bg-sky-500 text-white font-semibold rounded-xl hover:bg-sky-600 transition-colors shadow-sm"
           >
-            View All Courses <ArrowRight size={15} />
+            Xem tất cả khóa học <ArrowRight size={15} />
           </Link>
         </div>
       </section>

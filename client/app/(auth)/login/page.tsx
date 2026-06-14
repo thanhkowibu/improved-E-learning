@@ -30,12 +30,23 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-slate-700">{label}</label>
+      <label className="block text-sm font-medium text-slate-700">
+        {label}
+      </label>
       {children}
       {error && (
         <p className="text-xs text-red-500 flex items-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3.5 w-3.5 shrink-0">
-            <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14Zm0-4a.75.75 0 0 1-.75-.75v-2.5a.75.75 0 0 1 1.5 0v2.5A.75.75 0 0 1 8 11Zm0-5.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z" clipRule="evenodd" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            className="h-3.5 w-3.5 shrink-0"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14Zm0-4a.75.75 0 0 1-.75-.75v-2.5a.75.75 0 0 1 1.5 0v2.5A.75.75 0 0 1 8 11Zm0-5.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"
+              clipRule="evenodd"
+            />
           </svg>
           {error}
         </p>
@@ -71,13 +82,13 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginInput) {
     setServerError(null);
-    const toastId = toast.loading("Signing in…");
+    const toastId = toast.loading("Đang đăng nhập...");
     try {
       await login(data.email, data.password);
-      toast.success("Welcome back!", { id: toastId });
+      toast.success("Chào mừng bạn trở lại!", { id: toastId });
       router.push(nextPath);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Login failed.";
+      const msg = err instanceof Error ? err.message : "Đăng nhập thất bại.";
       setServerError(msg);
       toast.error(msg, { id: toastId });
     }
@@ -87,8 +98,8 @@ export default function LoginPage() {
     <div className="space-y-8">
       {/* Heading */}
       <div className="text-center space-y-1">
-        <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
-        <p className="text-sm text-slate-500">Sign in to continue learning</p>
+        <h1 className="text-2xl font-bold text-slate-900">Chào mừng trở lại</h1>
+        <p className="text-sm text-slate-500">Đăng nhập để tiếp tục học tập</p>
       </div>
 
       {/* Server error banner */}
@@ -97,8 +108,17 @@ export default function LoginPage() {
           role="alert"
           className="flex items-start gap-3 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 shrink-0 text-red-400 mt-0.5">
-            <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm-.75-4.75a.75.75 0 0 0 1.5 0v-2.5a.75.75 0 0 0-1.5 0v2.5Zm.75-7a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" clipRule="evenodd" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-5 w-5 shrink-0 text-red-400 mt-0.5"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm-.75-4.75a.75.75 0 0 0 1.5 0v-2.5a.75.75 0 0 0-1.5 0v2.5Zm.75-7a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"
+              clipRule="evenodd"
+            />
           </svg>
           {serverError}
         </div>
@@ -111,7 +131,7 @@ export default function LoginPage() {
         noValidate
         className="space-y-5"
       >
-        <Field label="Email address" error={errors.email?.message}>
+        <Field label="Địa chỉ email" error={errors.email?.message}>
           <input
             id="login-email"
             type="email"
@@ -122,7 +142,7 @@ export default function LoginPage() {
           />
         </Field>
 
-        <Field label="Password" error={errors.password?.message}>
+        <Field label="Mật khẩu" error={errors.password?.message}>
           <div className="relative">
             <input
               id="login-password"
@@ -136,17 +156,35 @@ export default function LoginPage() {
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
             >
               {showPassword ? (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                  <path fillRule="evenodd" d="M3.28 2.22a.75.75 0 0 0-1.06 1.06l14.5 14.5a.75.75 0 1 0 1.06-1.06l-1.745-1.745a10.029 10.029 0 0 0 3.3-4.38 1.651 1.651 0 0 0 0-1.185A10.004 10.004 0 0 0 9.999 3a9.956 9.956 0 0 0-4.744 1.194L3.28 2.22ZM7.752 6.69l1.092 1.092a2.5 2.5 0 0 1 3.374 3.373l1.091 1.092a4 4 0 0 0-5.557-5.557Z" clipRule="evenodd" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3.28 2.22a.75.75 0 0 0-1.06 1.06l14.5 14.5a.75.75 0 1 0 1.06-1.06l-1.745-1.745a10.029 10.029 0 0 0 3.3-4.38 1.651 1.651 0 0 0 0-1.185A10.004 10.004 0 0 0 9.999 3a9.956 9.956 0 0 0-4.744 1.194L3.28 2.22ZM7.752 6.69l1.092 1.092a2.5 2.5 0 0 1 3.374 3.373l1.091 1.092a4 4 0 0 0-5.557-5.557Z"
+                    clipRule="evenodd"
+                  />
                   <path d="m10.748 13.93 2.523 2.523a9.987 9.987 0 0 1-3.27.547c-4.258 0-7.894-2.66-9.337-6.41a1.651 1.651 0 0 1 0-1.186A10.007 10.007 0 0 1 2.839 6.02L6.07 9.252a4 4 0 0 0 4.678 4.678Z" />
                 </svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-4 w-4"
+                >
                   <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
-                  <path fillRule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41Z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41Z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               )}
             </button>
@@ -161,14 +199,30 @@ export default function LoginPage() {
         >
           {isSubmitting ? (
             <>
-              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              <svg
+                className="animate-spin h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
               </svg>
-              Signing in…
+              Đang đăng nhập...
             </>
           ) : (
-            "Sign in"
+            "Đăng nhập"
           )}
         </button>
       </form>
@@ -177,7 +231,9 @@ export default function LoginPage() {
       <div className="space-y-4">
         <div className="relative flex items-center">
           <div className="flex-1 border-t border-slate-200" />
-          <span className="mx-4 text-xs text-slate-400">Don&apos;t have an account?</span>
+          <span className="mx-4 text-xs text-slate-400">
+            Chưa có tài khoản?
+          </span>
           <div className="flex-1 border-t border-slate-200" />
         </div>
 
@@ -186,7 +242,7 @@ export default function LoginPage() {
           href="/register"
           className="w-full flex items-center justify-center py-2.5 px-4 rounded-lg text-sm font-medium text-sky-600 border border-sky-300 hover:bg-sky-50 transition-colors"
         >
-          Create an account
+          Tạo tài khoản
         </Link>
       </div>
     </div>

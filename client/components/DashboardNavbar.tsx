@@ -37,7 +37,9 @@ interface DashboardNavbarProps {
   title?: string;
 }
 
-export default function DashboardNavbar({ title = "Dashboard" }: DashboardNavbarProps) {
+export default function DashboardNavbar({
+  title = "Bảng điều khiển",
+}: DashboardNavbarProps) {
   const { user, logout, isLoading } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -62,7 +64,7 @@ export default function DashboardNavbar({ title = "Dashboard" }: DashboardNavbar
         {/* Notification bell */}
         <button
           className="relative h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
-          aria-label="Notifications"
+          aria-label="Thông báo"
         >
           <Bell size={18} />
           {/* Unread dot */}
@@ -81,7 +83,7 @@ export default function DashboardNavbar({ title = "Dashboard" }: DashboardNavbar
               aria-haspopup="true"
               aria-expanded={open}
             >
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+              <div className="h-8 w-8 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
                 {getInitials(user.fullName)}
               </div>
               <div className="hidden sm:block text-left">
@@ -91,7 +93,7 @@ export default function DashboardNavbar({ title = "Dashboard" }: DashboardNavbar
                 <p
                   className={cn(
                     "text-[10px] font-medium mt-0.5 px-1 rounded-sm",
-                    ROLE_STYLES[user.role]
+                    ROLE_STYLES[user.role],
                   )}
                 >
                   {user.role}
@@ -101,7 +103,7 @@ export default function DashboardNavbar({ title = "Dashboard" }: DashboardNavbar
                 size={14}
                 className={cn(
                   "text-slate-400 transition-transform duration-200",
-                  open && "rotate-180"
+                  open && "rotate-180",
                 )}
               />
             </button>
@@ -110,8 +112,12 @@ export default function DashboardNavbar({ title = "Dashboard" }: DashboardNavbar
               <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-lg ring-1 ring-slate-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                 {/* User info */}
                 <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
-                  <p className="text-sm font-semibold text-slate-900">{user.fullName}</p>
-                  <p className="text-xs text-slate-500 truncate mt-0.5">{user.email}</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {user.fullName}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate mt-0.5">
+                    {user.email}
+                  </p>
                 </div>
 
                 {/* Links */}
@@ -122,7 +128,7 @@ export default function DashboardNavbar({ title = "Dashboard" }: DashboardNavbar
                     className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     <User size={15} className="text-slate-400" />
-                    Profile settings
+                    Cài đặt hồ sơ
                   </Link>
                 </div>
 
@@ -130,11 +136,14 @@ export default function DashboardNavbar({ title = "Dashboard" }: DashboardNavbar
                 <div className="border-t border-slate-100 py-1">
                   <button
                     id="dashboard-logout-btn"
-                    onClick={() => { setOpen(false); logout(); }}
+                    onClick={() => {
+                      setOpen(false);
+                      logout();
+                    }}
                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                   >
                     <LogOut size={15} />
-                    Sign out
+                    Đăng xuất
                   </button>
                 </div>
               </div>

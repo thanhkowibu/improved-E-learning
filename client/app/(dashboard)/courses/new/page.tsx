@@ -49,10 +49,14 @@ export default function NewCoursePage() {
     const res = await api.post<{ id: string }>("/api/courses", body);
 
     if (res.success && res.data) {
-      toast.success("Course created! Now add modules and lessons.", { id: toastId });
+      toast.success("Đã tạo khóa học! Bây giờ hãy thêm học phần và bài học.", {
+        id: toastId,
+      });
       router.push(`/courses/${res.data.id}/edit`);
     } else {
-      toast.error(res.error ?? "Failed to create course. Please try again.", { id: toastId });
+      toast.error(res.error ?? "Không thể tạo khóa học. Vui lòng thử lại.", {
+        id: toastId,
+      });
       setIsSubmitting(false);
     }
   }
@@ -66,7 +70,7 @@ export default function NewCoursePage() {
           className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors mb-4"
         >
           <ArrowLeft size={14} />
-          Back to My Courses
+          Quay lại khóa học của tôi
         </Link>
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-sky-50 flex items-center justify-center">
@@ -74,10 +78,11 @@ export default function NewCoursePage() {
           </div>
           <div>
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-              Create New Course
+              Tạo khóa học mới
             </h1>
             <p className="text-sm text-slate-500 mt-0.5">
-              Fill in the basics — you can add modules and lessons after saving.
+              Điền thông tin cơ bản — bạn có thể thêm các mô-đun và bài học sau
+              khi lưu.
             </p>
           </div>
         </div>
@@ -95,7 +100,8 @@ export default function NewCoursePage() {
 
         {/* Tip */}
         <p className="mt-4 text-xs text-slate-400 text-center">
-          You&apos;ll be redirected to the course editor to add modules and lessons after creation.
+          Sau khi tạo, bạn sẽ được chuyển hướng đến trình chỉnh sửa khóa học để
+          thêm các mô-đun và bài học.
         </p>
       </div>
     </div>

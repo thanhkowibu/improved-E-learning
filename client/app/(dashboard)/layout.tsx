@@ -51,7 +51,7 @@ export default function DashboardLayout({
           </div>
           <div className="flex items-center gap-2 text-slate-500 text-sm">
             <GraduationCap size={16} className="text-sky-500" />
-            Loading your workspace…
+            Đang tải không gian học tập...
           </div>
         </div>
       </div>

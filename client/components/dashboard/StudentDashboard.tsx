@@ -106,7 +106,7 @@ function LearningCard({ enrollment }: { enrollment: EnrollmentItem }) {
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
           {/* Thumbnail */}
-          <div className="h-14 w-[72px] rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="h-14 w-18 rounded-xl bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center shrink-0 overflow-hidden">
             {enrollment.course.thumbnailUrl ? (
               <img
                 src={enrollment.course.thumbnailUrl}
@@ -127,10 +127,7 @@ function LearningCard({ enrollment }: { enrollment: EnrollmentItem }) {
               by {enrollment.course.teacher.fullName}
             </p>
             <div className="mt-2 flex items-center gap-2">
-              <Progress
-                value={enrollment.progress}
-                className="h-1.5 flex-1"
-              />
+              <Progress value={enrollment.progress} className="h-1.5 flex-1" />
               <span className="text-xs font-semibold text-slate-600 shrink-0 tabular-nums w-9 text-right">
                 {enrollment.progress}%
               </span>
@@ -144,7 +141,7 @@ function LearningCard({ enrollment }: { enrollment: EnrollmentItem }) {
               className="bg-sky-500 hover:bg-sky-600 text-white gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
             >
               <PlayCircle size={13} />
-              {enrollment.progress === 0 ? "Start" : "Continue"}
+              {enrollment.progress === 0 ? "Bắt đầu" : "Tiếp tục"}
             </Button>
           </Link>
         </div>
@@ -209,7 +206,7 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
         ) : (
           <>
             {/* ── Welcome hero ── */}
-            <div className="rounded-2xl bg-gradient-to-br from-sky-500 via-sky-500 to-sky-600 p-6 text-white shadow-lg overflow-hidden relative">
+            <div className="rounded-2xl bg-linear-to-br from-sky-500 via-sky-500 to-sky-600 p-6 text-white shadow-lg overflow-hidden relative">
               {/* Decorative circle */}
               <div className="absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/10" />
               <div className="absolute -right-2 -bottom-6 h-24 w-24 rounded-full bg-white/8" />
@@ -218,17 +215,17 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
                 <div>
                   <p className="text-sky-100 text-sm font-medium flex items-center gap-1.5">
                     <Flame size={13} className="text-amber-300" />
-                    Welcome back
+                    Chào mừng quay lại
                   </p>
                   <h2 className="mt-1 text-2xl md:text-3xl font-bold">
                     {firstName}! 👋
                   </h2>
                   <p className="mt-1.5 text-sky-100 text-sm max-w-sm">
                     {active.length === 0
-                      ? "Start your learning journey — explore courses below."
+                      ? "Bắt đầu hành trình học tập bằng cách khám phá các khóa học bên dưới."
                       : avgProgress >= 75
-                      ? "You're almost there — keep it up! 🚀"
-                      : "Keep up the momentum — you're doing great!"}
+                        ? "Bạn sắp hoàn thành rồi, hãy tiếp tục nhé!"
+                        : "Giữ vững nhịp học, bạn đang làm rất tốt!"}
                   </p>
                 </div>
                 <div className="hidden sm:flex h-20 w-20 rounded-2xl bg-white/15 items-center justify-center shrink-0">
@@ -240,28 +237,28 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
             {/* ── Stat cards ── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <StatCard
-                title="Enrolled Courses"
+                title="Khóa học đã đăng ký"
                 value={active.length}
                 icon={BookMarked}
                 colorClass="text-sky-600"
                 bgClass="bg-sky-50"
-                label="Currently active"
+                label="Đang học"
               />
               <StatCard
-                title="Completed"
+                title="Hoàn thành"
                 value={completed.length}
                 icon={CheckCircle2}
                 colorClass="text-emerald-600"
                 bgClass="bg-emerald-50"
-                label="Certificates earned"
+                label="Chứng chỉ đạt được"
               />
               <StatCard
-                title="Avg. Progress"
+                title="Tiến độ trung bình"
                 value={`${avgProgress}%`}
                 icon={TrendingUp}
                 colorClass="text-violet-600"
                 bgClass="bg-violet-50"
-                label="Across active courses"
+                label="Trên các khóa đang học"
               />
             </div>
 
@@ -270,7 +267,7 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2">
                   <PlayCircle size={16} className="text-sky-500" />
-                  Continue Learning
+                  Tiếp tục học
                 </h3>
                 <Link href="/my-courses">
                   <Button
@@ -278,7 +275,7 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
                     size="sm"
                     className="text-sky-600 gap-1 hover:text-sky-700 hover:bg-sky-50"
                   >
-                    See all <ArrowRight size={14} />
+                    Xem tất cả <ArrowRight size={14} />
                   </Button>
                 </Link>
               </div>
@@ -291,10 +288,10 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
                     </div>
                     <div>
                       <p className="font-semibold text-slate-700">
-                        No active courses yet
+                        Chưa có khóa học đang học
                       </p>
                       <p className="text-slate-400 text-sm mt-0.5">
-                        Enroll in a course to start learning
+                        Đăng ký một khóa học để bắt đầu
                       </p>
                     </div>
                     <Link href="/courses">
@@ -302,7 +299,7 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
                         size="sm"
                         className="bg-sky-500 hover:bg-sky-600 text-white mt-1"
                       >
-                        Browse Courses
+                        Duyệt khóa học
                       </Button>
                     </Link>
                   </CardContent>
@@ -314,12 +311,12 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
                   ))}
                   {active.length > 4 && (
                     <p className="text-center text-xs text-slate-400 pt-1">
-                      +{active.length - 4} more courses in{" "}
+                      +{active.length - 4} khóa học khác trong{" "}
                       <Link
                         href="/my-courses"
                         className="text-sky-500 hover:underline"
                       >
-                        My Learning
+                        Lớp học của tôi
                       </Link>
                     </p>
                   )}
@@ -329,18 +326,17 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
 
             {/* ── Completed courses badge ── */}
             {completed.length > 0 && (
-              <Card className="border border-emerald-200 bg-gradient-to-br from-emerald-50 to-sky-50 shadow-sm">
+              <Card className="border border-emerald-200 bg-linear-to-br from-emerald-50 to-sky-50 shadow-sm">
                 <CardContent className="p-5 flex items-center gap-4">
                   <div className="h-12 w-12 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0">
                     <Award size={24} className="text-emerald-500" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-emerald-800">
-                      🎉 You&apos;ve completed {completed.length} course
-                      {completed.length > 1 ? "s" : ""}!
+                      🎉 Bạn đã hoàn thành {completed.length} khóa học!
                     </p>
                     <p className="text-emerald-600 text-sm mt-0.5">
-                      Outstanding achievement — keep exploring new skills.
+                      Tuyệt vời — hãy tiếp tục trau dồi kỹ năng mới.
                     </p>
                   </div>
                 </CardContent>
@@ -352,16 +348,16 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
               <CardContent className="p-5 flex items-center justify-between gap-4">
                 <div>
                   <p className="text-white font-semibold">
-                    Discover New Courses
+                    Khám phá khóa học mới
                   </p>
                   <p className="text-slate-400 text-sm mt-0.5">
-                    Expand your knowledge today
+                    Mở rộng kiến thức ngay hôm nay
                   </p>
                 </div>
                 <Link href="/courses">
                   <Button className="bg-sky-500 hover:bg-sky-600 text-white gap-1.5 shrink-0">
                     <Layers size={15} />
-                    Browse
+                    Duyệt
                   </Button>
                 </Link>
               </CardContent>

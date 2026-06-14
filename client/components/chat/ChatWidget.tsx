@@ -81,7 +81,7 @@ function ExpandButton({ courseId }: { courseId: string }) {
             </Link>
           }
         />
-        <TooltipContent>Open in full page</TooltipContent>
+        <TooltipContent>Mở toàn trang</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
@@ -128,7 +128,7 @@ export function ChatWidget({
       );
 
       if (!response.success || !response.data) {
-        const message = response.message ?? "Failed to load chat threads.";
+        const message = response.message ?? "Không thể tải danh sách trò chuyện.";
         if (isAiUnavailableMessage(message)) {
           setAiUnavailableMessage(message);
           setThreads([]);
@@ -146,7 +146,7 @@ export function ChatWidget({
       setActiveThreadId((current) => current ?? loadedThreads[0]?.id ?? null);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to load chat threads.",
+        error instanceof Error ? error.message : "Không thể tải danh sách trò chuyện.",
       );
     } finally {
       setIsThreadLoading(false);
@@ -166,7 +166,7 @@ export function ChatWidget({
       );
 
       if (!response.success || !response.data) {
-        throw new Error(response.message ?? "Failed to load chat messages.");
+        throw new Error(response.message ?? "Không thể tải tin nhắn.");
       }
 
       setMessages(response.data.map(toMessageListItem));
@@ -174,7 +174,7 @@ export function ChatWidget({
       toast.error(
         error instanceof Error
           ? error.message
-          : "Failed to load chat messages.",
+          : "Không thể tải tin nhắn.",
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -198,7 +198,7 @@ export function ChatWidget({
       );
 
       if (!response.success || !response.data) {
-        const message = response.message ?? "Failed to create a new chat.";
+        const message = response.message ?? "Không thể tạo cuộc trò chuyện mới.";
         if (isAiUnavailableMessage(message)) {
           setAiUnavailableMessage(message);
           return;
@@ -212,10 +212,10 @@ export function ChatWidget({
       setThreads((current) => [createdThread, ...current]);
       setActiveThreadId(createdThread.id);
       setMessages([]);
-      toast.success("New chat created.");
+      toast.success("Đã tạo cuộc trò chuyện mới.");
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to create a new chat.",
+        error instanceof Error ? error.message : "Không thể tạo cuộc trò chuyện mới.",
       );
     }
   }
@@ -225,7 +225,7 @@ export function ChatWidget({
       const response = await api.del(`/api/chat/threads/${threadId}`);
 
       if (!response.success) {
-        throw new Error(response.message ?? "Failed to delete chat.");
+        throw new Error(response.message ?? "Không thể xóa cuộc trò chuyện.");
       }
 
       const remainingThreads = threads.filter(
@@ -241,10 +241,10 @@ export function ChatWidget({
         }
       }
 
-      toast.success("Chat deleted.");
+      toast.success("Đã xóa cuộc trò chuyện.");
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete chat.",
+        error instanceof Error ? error.message : "Không thể xóa cuộc trò chuyện.",
       );
     }
   }
@@ -261,7 +261,7 @@ export function ChatWidget({
 
         if (!createResponse.success || !createResponse.data) {
           const message =
-            createResponse.message ?? "Failed to create a chat thread.";
+            createResponse.message ?? "Không thể tạo chủ đề trò chuyện.";
           if (isAiUnavailableMessage(message)) {
             setAiUnavailableMessage(message);
             return;
@@ -292,7 +292,7 @@ export function ChatWidget({
       );
 
       if (!response.success || !response.data) {
-        throw new Error(response.message ?? "Failed to send message.");
+        throw new Error(response.message ?? "Không thể gửi tin nhắn.");
       }
 
       const askData = response.data;
@@ -308,7 +308,7 @@ export function ChatWidget({
         current.filter((message) => !message.id.startsWith("optimistic-")),
       );
       toast.error(
-        error instanceof Error ? error.message : "Failed to send message.",
+        error instanceof Error ? error.message : "Không thể gửi tin nhắn.",
       );
     } finally {
       setIsLoading(false);
@@ -330,11 +330,11 @@ export function ChatWidget({
               <Bot className="size-6" />
             </div>
             <h2 className="text-lg font-bold text-slate-900">
-              AI Tutor Not Configured
+              Trợ giảng AI chưa sẵn sàng
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              The instructor has not enabled the AI Tutor or synced materials
-              for this course yet.
+              Giảng viên chưa bật Trợ giảng AI hoặc chưa đồng bộ tài liệu cho
+              khóa học này.
             </p>
           </div>
         </div>

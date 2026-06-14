@@ -44,17 +44,17 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
           onChange={(event) => setText(event.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
-          placeholder="Ask the AI Tutor..."
+          placeholder="Hỏi trợ giảng AI..."
           rows={2}
           className="max-h-40 min-h-12 resize-none"
-          aria-label="Chat message"
+          aria-label="Tin nhắn trò chuyện"
         />
         <Button
           type="button"
           onClick={handleSend}
           disabled={isDisabled}
           size="icon-lg"
-          aria-label="Send message"
+          aria-label="Gửi tin nhắn"
           className="bg-blue-600 text-white hover:bg-blue-700"
         >
           <Send className="size-4" />

@@ -10,15 +10,15 @@ import { type NextRequest } from "next/server";
 import { ZodError } from "zod";
 import { getAuthUser, AuthError } from "@/lib/auth/get-auth-user";
 import { requireRole, UserRole } from "@/lib/auth/require-role";
-import {
-  userSelfUpdateSchema,
-  userAdminUpdateSchema,
-} from "@/lib/validations/user";
+import { userSelfUpdateSchema } from "@/lib/validations/user";
 import {
   getUserById,
+  getUserWithPasswordById,
   updateUser,
+  updateUserPassword,
   deactivateUser,
 } from "@/lib/services/user.service";
+import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import {
   ok,
   badRequest,
@@ -44,14 +44,16 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const isAdmin = caller.role === UserRole.ADMIN;
 
     if (!isSelf && !isAdmin) {
-      return forbidden("You do not have permission to view this user.");
+      return forbidden("Bạn không có quyền xem thông tin người dùng này.");
     }
 
     const user = await getUserById(userId);
     return ok(user);
   } catch (err) {
     if (err instanceof AuthError) {
-      return err.status === 403 ? forbidden(err.message) : unauthorized(err.message);
+      return err.status === 403
+        ? forbidden(err.message)
+        : unauthorized(err.message);
     }
     if (err instanceof Error && err.message.includes("not found")) {
       return notFound(err.message);
@@ -68,47 +70,78 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const { userId } = await context.params;
     const caller = await getAuthUser(request);
 
-    const isSelf = caller.id === userId;
-    const isAdmin = caller.role === UserRole.ADMIN;
-
-    if (!isSelf && !isAdmin) {
-      return forbidden("You do not have permission to update this user.");
+    if (caller.id !== userId) {
+      return forbidden("Bạn chỉ có thể cập nhật tài khoản của chính mình.");
     }
 
     const body = await request.json();
+    const parsed = userSelfUpdateSchema.parse(body);
 
-    // ADMIN gets the wider schema (includes isActive).
-    // Regular users get the narrower self-update schema.
-    const schema = isAdmin ? userAdminUpdateSchema : userSelfUpdateSchema;
-    const parsed = schema.parse(body);
+    const profileUpdates = {
+      fullName: parsed.fullName,
+      avatarUrl: parsed.avatarUrl,
+      phoneNumber: parsed.phoneNumber,
+      gender: parsed.gender,
+      birthYear: parsed.birthYear,
+      highestEducation: parsed.highestEducation,
+      bio: parsed.bio,
+    };
 
-    // Prevent an empty PATCH (no-op).
-    if (Object.keys(parsed).length === 0) {
-      return badRequest("Request body must contain at least one field to update.");
+    const hasProfileUpdates = Object.values(profileUpdates).some(
+      (value) => value !== undefined,
+    );
+    const isChangingPassword = Boolean(
+      parsed.currentPassword && parsed.newPassword,
+    );
+
+    if (!hasProfileUpdates && !isChangingPassword) {
+      return badRequest("Vui lòng cung cấp thông tin cần cập nhật.");
     }
 
-    const updated = await updateUser(userId, parsed);
-    return ok(updated, "User updated successfully.");
+    if (isChangingPassword) {
+      const userWithPassword = await getUserWithPasswordById(userId);
+      const passwordMatches = await verifyPassword(
+        parsed.currentPassword as string,
+        userWithPassword.hashedPassword,
+      );
+
+      if (!passwordMatches) {
+        return badRequest("Mật khẩu hiện tại không chính xác.");
+      }
+    }
+
+    let updated = hasProfileUpdates
+      ? await updateUser(userId, profileUpdates)
+      : await getUserById(userId);
+
+    if (isChangingPassword) {
+      const hashedPassword = await hashPassword(parsed.newPassword as string);
+      updated = await updateUserPassword(userId, hashedPassword);
+    }
+
+    return ok(updated, "Cập nhật tài khoản thành công.");
   } catch (err) {
     if (err instanceof AuthError) {
-      return err.status === 403 ? forbidden(err.message) : unauthorized(err.message);
+      return err.status === 403
+        ? forbidden(err.message)
+        : unauthorized(err.message);
     }
     if (err instanceof ZodError) {
       const errors = err.issues.map((e) => ({
         field: e.path.join("."),
         message: e.message,
       }));
-      return badRequest("Validation failed.", errors);
+      return badRequest("Dữ liệu không hợp lệ.", errors);
     }
     if (err instanceof Error && err.message.includes("not found")) {
-      return notFound(err.message);
+      return notFound("Không tìm thấy người dùng.");
     }
     console.error("[PATCH /api/users/:userId]", err);
     return serverError();
   }
 }
 
-// ─── DELETE /api/users/:userId ────────────────────────────────────────────────
+// ─── DELETE /api/users/:userId ───────────────────────────────────────────────────
 
 export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
@@ -128,7 +161,9 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     return ok(deactivated, "User account has been deactivated.");
   } catch (err) {
     if (err instanceof AuthError) {
-      return err.status === 403 ? forbidden(err.message) : unauthorized(err.message);
+      return err.status === 403
+        ? forbidden(err.message)
+        : unauthorized(err.message);
     }
     if (err instanceof Error && err.message.includes("not found")) {
       return notFound(err.message);

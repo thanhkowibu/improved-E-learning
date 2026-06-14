@@ -26,12 +26,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,7 +50,7 @@ const MDEditor = dynamic(
         <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
       </div>
     ),
-  }
+  },
 );
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -166,7 +161,9 @@ export default function LessonEditorDialog({
       if (res.success && res.data) {
         applyFormValues(res.data);
       } else {
-        toast.error(res.error ?? res.message ?? "Failed to load lesson content.");
+        toast.error(
+          res.error ?? res.message ?? "Không thể tải nội dung bài học.",
+        );
       }
     }
 
@@ -191,11 +188,11 @@ export default function LessonEditorDialog({
     });
 
     if (res.success && res.data) {
-      toast.success("Lesson saved.", { id: toastId });
+      toast.success("Đã lưu bài học.", { id: toastId });
       onSaved(res.data);
       onOpenChange(false);
     } else {
-      toast.error(res.error ?? "Failed to save lesson.", { id: toastId });
+      toast.error(res.error ?? "Không thể lưu bài học.", { id: toastId });
     }
     setIsSaving(false);
   }
@@ -205,7 +202,7 @@ export default function LessonEditorDialog({
       <DialogContent className="sm:max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader className="shrink-0">
           <DialogTitle className="truncate max-w-lg">
-            {lesson?.title ?? "Edit Lesson"}
+            {lesson?.title ?? "Chỉnh sửa bài học"}
           </DialogTitle>
         </DialogHeader>
 
@@ -218,11 +215,11 @@ export default function LessonEditorDialog({
           <TabsList className="shrink-0 w-fit">
             <TabsTrigger value="content" className="gap-1.5">
               <BookOpen size={13} />
-              Content
+              Nội dung
             </TabsTrigger>
             <TabsTrigger value="materials" className="gap-1.5">
               <FileText size={13} />
-              Materials
+              Tài liệu
             </TabsTrigger>
           </TabsList>
 
@@ -238,11 +235,13 @@ export default function LessonEditorDialog({
             >
               {/* Title */}
               <div className="space-y-1.5">
-                <Label htmlFor="lesson-title">Lesson Title</Label>
+                <Label htmlFor="lesson-title">Tên bài học</Label>
                 <Input
                   id="lesson-title"
-                  placeholder="e.g. Introduction to Variables"
-                  {...register("title", { required: "Title is required." })}
+                  placeholder="Ví dụ: Giới thiệu về biến"
+                  {...register("title", {
+                    required: "Vui lòng nhập tên bài học.",
+                  })}
                   className={
                     errors.title
                       ? "border-red-400 focus-visible:ring-red-400"
@@ -256,35 +255,44 @@ export default function LessonEditorDialog({
 
               {/* Markdown content — SSR-safe via next/dynamic */}
               <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-                <Label>Lesson Type</Label>
+                <Label>Loại bài học</Label>
                 <Controller
                   name="lessonType"
                   control={control}
                   render={({ field }) => (
                     <RadioGroup
                       value={field.value}
-                      onValueChange={(value) => field.onChange(value as LessonType)}
+                      onValueChange={(value) =>
+                        field.onChange(value as LessonType)
+                      }
                       className="grid gap-2 sm:grid-cols-2"
                     >
                       <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-sky-200 hover:bg-sky-50/40">
-                        <RadioGroupItem value={LessonType.LECTURE} className="mt-0.5" />
+                        <RadioGroupItem
+                          value={LessonType.LECTURE}
+                          className="mt-0.5"
+                        />
                         <span>
                           <span className="block text-sm font-semibold text-slate-800">
-                            Lecture
+                            Bài giảng
                           </span>
                           <span className="block text-xs text-slate-500">
-                            Markdown lesson content with materials.
+                            Nội dung Markdown kèm tài liệu học tập.
                           </span>
                         </span>
                       </label>
                       <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-sky-200 hover:bg-sky-50/40">
-                        <RadioGroupItem value={LessonType.QUIZ} className="mt-0.5" />
+                        <RadioGroupItem
+                          value={LessonType.QUIZ}
+                          className="mt-0.5"
+                        />
                         <span>
                           <span className="block text-sm font-semibold text-slate-800">
                             Quiz
                           </span>
                           <span className="block text-xs text-slate-500">
-                            Add questions, options, attempts, and scoring.
+                            Thêm câu hỏi, lựa chọn, số lượt làm và cách tính
+                            điểm.
                           </span>
                         </span>
                       </label>
@@ -294,7 +302,7 @@ export default function LessonEditorDialog({
               </div>
 
               <div className="space-y-1.5">
-                <Label>Lesson Content (Markdown)</Label>
+                <Label>Nội dung bài học (Markdown)</Label>
                 {/*
                  * data-color-mode="light" forces the editor into light mode
                  * regardless of the OS preference, keeping it consistent with
@@ -335,7 +343,7 @@ export default function LessonEditorDialog({
               <LessonMaterials lessonId={lesson.id} />
             ) : (
               <p className="text-sm text-slate-400 text-center py-8">
-                No lesson selected.
+                Chưa chọn bài học.
               </p>
             )}
           </TabsContent>
@@ -350,7 +358,7 @@ export default function LessonEditorDialog({
               onClick={() => onOpenChange(false)}
               disabled={isSaving}
             >
-              Cancel
+              Hủy
             </Button>
             <Button
               type="submit"
@@ -359,7 +367,7 @@ export default function LessonEditorDialog({
               className="bg-sky-500 hover:bg-sky-600 text-white gap-2"
             >
               {isSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              Save Lesson
+              Lưu bài học
             </Button>
           </DialogFooter>
         )}

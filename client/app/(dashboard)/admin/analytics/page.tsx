@@ -33,10 +33,10 @@ export default async function AnalyticsPage() {
       <div className="mx-auto px-6 md:px-12 lg:px-24 max-w-7xl py-10 space-y-6">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Analytics
+            Thống kê
           </h1>
           <p className="text-slate-500 text-sm">
-            Platform statistics and insights
+            Số liệu và xu hướng của nền tảng
           </p>
         </div>
         <AnalyticsChart data={chartData} role={user.role} />
@@ -93,9 +93,9 @@ export default async function AnalyticsPage() {
     <div className="mx-auto px-6 md:px-12 lg:px-24 max-w-7xl py-10 space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          Analytics
+          Thống kê
         </h1>
-        <p className="text-slate-500 text-sm">Your learning progress</p>
+        <p className="text-slate-500 text-sm">Tiến độ học tập của bạn</p>
       </div>
       <AnalyticsChart data={chartData} role={user.role} />
     </div>

@@ -228,7 +228,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
       setMaterials(res.data);
     } else {
       toast.error(
-        res.error ?? res.message ?? "Failed to load course materials.",
+        res.error ?? res.message ?? "Không thể tải tài liệu khóa học.",
       );
     }
 
@@ -242,7 +242,9 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
     );
 
     if (!res.success || !res.data) {
-      toast.error(res.error ?? res.message ?? "Failed to refresh lesson list.");
+      toast.error(
+        res.error ?? res.message ?? "Không thể làm mới danh sách bài học.",
+      );
       return;
     }
 
@@ -290,7 +292,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
 
   async function handleResync(materialId: string) {
     setResyncingId(materialId);
-    const toastId = toast.loading("Re-syncing material to Gemini...");
+    const toastId = toast.loading("Đang đồng bộ tài liệu lên Gemini...");
 
     const res = await api.post<CourseMaterialRow>(
       `/api/courses/${courseId}/materials/${materialId}/resync`,
@@ -304,12 +306,12 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
             : material,
         ),
       );
-      toast.success("Material re-synced to AI.", { id: toastId });
+      toast.success("Đã đồng bộ tài liệu với AI.", { id: toastId });
       window.dispatchEvent(new CustomEvent("course-materials-changed"));
       window.dispatchEvent(new CustomEvent("course-ai-settings-changed"));
       router.refresh();
     } else {
-      toast.error(res.error ?? res.message ?? "Failed to re-sync material.", {
+      toast.error(res.error ?? res.message ?? "Không thể đồng bộ tài liệu.", {
         id: toastId,
       });
     }
@@ -323,13 +325,13 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
     );
 
     if (targets.length === 0) {
-      toast.info("No expired or unsynced materials found.");
+      toast.info("Không có tài liệu hết hạn hoặc chưa đồng bộ.");
       return;
     }
 
     setIsBulkResyncing(true);
     const toastId = toast.loading(
-      `Re-syncing ${targets.length} expired material(s)...`,
+      `Đang đồng bộ ${targets.length} tài liệu hết hạn...`,
     );
     let successCount = 0;
     let skippedCount = 0;
@@ -364,19 +366,16 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
     }
 
     if (successCount > 0 && skippedCount === 0) {
-      toast.success(
-        `Successfully re-synced ${successCount} file${successCount === 1 ? "" : "s"}.`,
-        {
-          id: toastId,
-        },
-      );
+      toast.success(`Đã đồng bộ thành công ${successCount} tệp.`, {
+        id: toastId,
+      });
     } else if (successCount > 0 && skippedCount > 0) {
       toast.info(
-        `Synced ${successCount} file${successCount === 1 ? "" : "s"}. Skipped ${skippedCount} file${skippedCount === 1 ? "" : "s"} (unsupported formats).`,
+        `Đã đồng bộ ${successCount} tệp. Bỏ qua ${skippedCount} tệp do định dạng chưa hỗ trợ.`,
         { id: toastId },
       );
     } else {
-      toast.error("Failed to sync files. Formats may be unsupported.", {
+      toast.error("Không thể đồng bộ tệp. Định dạng có thể chưa được hỗ trợ.", {
         id: toastId,
       });
     }
@@ -393,11 +392,11 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
       setMaterials((current) =>
         current.filter((material) => material.id !== deletingId),
       );
-      toast.success("Material deleted.", { id: toastId });
+      toast.success("Đã xóa tài liệu.", { id: toastId });
       window.dispatchEvent(new CustomEvent("course-materials-changed"));
       router.refresh();
     } else {
-      toast.error(res.error ?? res.message ?? "Failed to delete material.", {
+      toast.error(res.error ?? res.message ?? "Không thể xóa tài liệu.", {
         id: toastId,
       });
     }
@@ -408,15 +407,13 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
 
   async function persistUploadedFile(uploaded: UploadedThingFile) {
     if (!selectedLessonId) {
-      toast.error("Select a lesson before uploading.");
+      toast.error("Vui lòng chọn bài học trước khi tải lên.");
       return;
     }
 
     const fileUrl = uploaded.url ?? uploaded.ufsUrl;
     if (!fileUrl) {
-      toast.error(
-        "Upload completed, but UploadThing did not return a file URL.",
-      );
+      toast.error("Tải lên hoàn tất nhưng UploadThing không trả về URL tệp.");
       return;
     }
 
@@ -432,14 +429,16 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
     );
 
     if (res.success) {
-      toast.success(`"${uploaded.name}" uploaded successfully.`);
+      toast.success(`Đã tải lên "${uploaded.name}".`);
       await loadMaterials();
       setIsUploadOpen(false);
       window.dispatchEvent(new CustomEvent("course-materials-changed"));
       router.refresh();
     } else {
       toast.error(
-        res.error ?? res.message ?? "Upload saved, but database sync failed.",
+        res.error ??
+          res.message ??
+          "Tệp đã tải lên nhưng chưa lưu được vào cơ sở dữ liệu.",
       );
     }
 
@@ -452,7 +451,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-              Total Files
+              Tổng số tệp
             </p>
             <p className="mt-1 text-2xl font-extrabold text-slate-900">
               {materials.length}
@@ -460,7 +459,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
           </div>
           <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-              Storage Used
+              Dung lượng đã dùng
             </p>
             <p className="mt-1 text-2xl font-extrabold text-slate-900">
               {formatBytes(totalBytes)}
@@ -476,13 +475,13 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
               }
             >
               <Plus size={16} />
-              Upload Material
+              Tải lên tài liệu
             </DialogTrigger>
             <DialogContent className="w-[calc(100vw-2rem)] max-w-3xl overflow-hidden p-6 sm:max-w-2xl md:max-w-3xl">
               <DialogHeader className="min-w-0">
-                <DialogTitle>Upload Course Material</DialogTitle>
+                <DialogTitle>Tải tài liệu khóa học</DialogTitle>
                 <DialogDescription>
-                  Choose the lesson this file belongs to, then upload through
+                  Chọn bài học chứa tài liệu này, sau đó tải lên qua
                   UploadThing.
                 </DialogDescription>
               </DialogHeader>
@@ -490,7 +489,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
               <div className="min-w-0 space-y-5 overflow-hidden">
                 <div className="min-w-0 space-y-1.5">
                   <label className="text-sm font-medium text-slate-700">
-                    Target Lesson
+                    Bài học đích
                   </label>
                   <Select
                     value={selectedLessonId}
@@ -504,7 +503,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
                           className="block min-w-0 max-w-full truncate"
                           title={selectedLessonLabel}
                         >
-                          {selectedLessonLabel || "Select a lesson"}
+                          {selectedLessonLabel || "Chọn bài học"}
                         </span>
                       </SelectValue>
                     </SelectTrigger>
@@ -533,7 +532,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
                       });
                     }}
                     onUploadError={(error) => {
-                      toast.error(error.message || "Upload failed.");
+                      toast.error(error.message || "Tải lên thất bại.");
                     }}
                     appearance={{
                       container:
@@ -547,7 +546,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
                     }}
                     content={{
                       allowedContent:
-                        "PDF, video, and image files are stored in UploadThing.",
+                        "Tệp PDF, video và hình ảnh sẽ được lưu trên UploadThing.",
                     }}
                   />
                   {(isSavingUpload || availableLessons.length === 0) && (
@@ -562,8 +561,8 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
                           <UploadCloud size={15} className="text-slate-400" />
                         )}
                         {isSavingUpload
-                          ? "Saving material..."
-                          : "Create a lesson before uploading materials."}
+                          ? "Đang lưu tài liệu..."
+                          : "Hãy tạo bài học trước khi tải tài liệu lên."}
                       </div>
                     </div>
                   )}
@@ -578,17 +577,17 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
         {isLoading ? (
           <div className="flex items-center justify-center gap-2 py-12 text-sm text-slate-500">
             <Loader2 size={16} className="animate-spin text-sky-500" />
-            Loading materials...
+            Đang tải tài liệu...
           </div>
         ) : materials.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-12 text-center">
             <UploadCloud size={28} className="text-slate-300" />
             <div>
               <p className="text-sm font-semibold text-slate-800">
-                No materials uploaded yet.
+                Chưa có tài liệu nào.
               </p>
               <p className="mt-1 text-sm text-slate-500">
-                Upload files from this dashboard or from a lesson editor.
+                Tải tệp lên từ bảng này hoặc từ trình chỉnh sửa bài học.
               </p>
             </div>
           </div>
@@ -596,12 +595,12 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="px-4 py-3">Name</TableHead>
-                <TableHead className="px-4 py-3">Type</TableHead>
-                <TableHead className="px-4 py-3">Size</TableHead>
-                <TableHead className="px-4 py-3">Location</TableHead>
-                <TableHead className="px-4 py-3">Sync Status</TableHead>
-                <TableHead className="px-4 py-3 text-right">Actions</TableHead>
+                <TableHead className="px-4 py-3">Tên</TableHead>
+                <TableHead className="px-4 py-3">Loại</TableHead>
+                <TableHead className="px-4 py-3">Dung lượng</TableHead>
+                <TableHead className="px-4 py-3">Bài học</TableHead>
+                <TableHead className="px-4 py-3">Trạng thái AI</TableHead>
+                <TableHead className="px-4 py-3 text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -653,7 +652,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
                             isFresh ? "bg-emerald-500" : "bg-amber-500",
                           )}
                         />
-                        {isFresh ? "Synced" : "Expired / Not Synced"}
+                        {isFresh ? "Đã đồng bộ" : "Hết hạn / Chưa đồng bộ"}
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3">
@@ -668,7 +667,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
                             variant="ghost"
                             size="icon-sm"
                             className="text-slate-500 hover:bg-sky-50 hover:text-sky-600"
-                            aria-label={`Download ${material.title}`}
+                            aria-label={`Tải xuống ${material.title}`}
                           >
                             <Download size={15} />
                           </Button>
@@ -686,7 +685,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
                           ) : (
                             <Sparkles size={14} />
                           )}
-                          Re-Sync to AI
+                          Đồng bộ AI
                         </Button>
                         <Button
                           type="button"
@@ -694,7 +693,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
                           size="icon-sm"
                           onClick={() => setDeletingId(material.id)}
                           className="text-slate-500 hover:bg-red-50 hover:text-red-600"
-                          aria-label={`Delete ${material.title}`}
+                          aria-label={`Xóa ${material.title}`}
                         >
                           <Trash2 size={15} />
                         </Button>
@@ -721,7 +720,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
           ) : (
             <Sparkles size={16} />
           )}
-          Re-sync All Files
+          Đồng bộ lại tất cả
         </Button>
       </div>
 
@@ -733,14 +732,14 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete material?</AlertDialogTitle>
+            <AlertDialogTitle>Xóa tài liệu?</AlertDialogTitle>
             <AlertDialogDescription>
-              This removes the file from UploadThing and deletes its database
-              record. This action cannot be undone.
+              Thao tác này xóa tệp khỏi UploadThing và xóa bản ghi trong cơ sở
+              dữ liệu. Không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               disabled={isDeleting}
@@ -751,7 +750,7 @@ export function MaterialsTable({ courseId, lessons }: MaterialsTableProps) {
               className="gap-2"
             >
               {isDeleting && <Loader2 size={14} className="animate-spin" />}
-              Delete
+              Xóa
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

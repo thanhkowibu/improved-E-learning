@@ -24,13 +24,13 @@ export default function AnalyticsChart({ data, role }: AnalyticsChartProps) {
     <Card className="border border-slate-200/80 shadow-sm bg-white">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-slate-900">
-          {isAdminOrTeacher ? "Enrollments per Course" : "Course Progress %"}
+          {isAdminOrTeacher ? "Lượt đăng ký theo khóa học" : "Tiến độ khóa học (%)"}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (
           <div className="flex h-[400px] items-center justify-center text-sm text-slate-500">
-            No data available.
+            Chưa có dữ liệu.
           </div>
         ) : (
           <div className="h-[400px] w-full">

@@ -70,15 +70,21 @@ function getGradient(id: string): string {
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
-function StatusBadge({ course, variant }: { course: CourseCardData; variant: CourseCardVariant }) {
+function StatusBadge({
+  course,
+  variant,
+}: {
+  course: CourseCardData;
+  variant: CourseCardVariant;
+}) {
   if (variant === "manage") {
     return course.isPublished ? (
       <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[11px] font-semibold">
-        Published
+        Đã xuất bản
       </Badge>
     ) : (
       <Badge variant="secondary" className="text-[11px] font-semibold">
-        Draft
+        Bản nháp
       </Badge>
     );
   }
@@ -86,11 +92,11 @@ function StatusBadge({ course, variant }: { course: CourseCardData; variant: Cou
     const s = course.enrollmentStatus;
     return s === "COMPLETED" ? (
       <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[11px] font-semibold">
-        Completed
+        Hoàn thành
       </Badge>
     ) : (
       <Badge className="bg-sky-100 text-sky-700 hover:bg-sky-100 text-[11px] font-semibold">
-        Enrolled
+        Đã đăng ký
       </Badge>
     );
   }
@@ -99,13 +105,26 @@ function StatusBadge({ course, variant }: { course: CourseCardData; variant: Cou
 
 // ─── CTA button ───────────────────────────────────────────────────────────────
 
-function CtaButton({ course, variant }: { course: CourseCardData; variant: CourseCardVariant }) {
-  const base = "w-full rounded-xl font-semibold text-sm transition-all duration-150";
+function CtaButton({
+  course,
+  variant,
+}: {
+  course: CourseCardData;
+  variant: CourseCardVariant;
+}) {
+  const base =
+    "w-full rounded-xl font-semibold text-sm transition-all duration-150";
   if (variant === "manage") {
     return (
       <Link href={`/courses/${course.id}/edit`} className="block mt-4">
-        <Button variant="outline" className={cn(base, "border-sky-300 text-sky-600 hover:bg-sky-50 hover:border-sky-400")}>
-          Manage
+        <Button
+          variant="outline"
+          className={cn(
+            base,
+            "border-sky-300 text-sky-600 hover:bg-sky-50 hover:border-sky-400",
+          )}
+        >
+          Quản lý
         </Button>
       </Link>
     );
@@ -117,7 +136,7 @@ function CtaButton({ course, variant }: { course: CourseCardData; variant: Cours
     return (
       <Link href={href} className="block mt-4">
         <Button className={cn(base, "bg-sky-500 hover:bg-sky-600 text-white")}>
-          Continue Learning
+          Tiếp tục học
         </Button>
       </Link>
     );
@@ -125,8 +144,14 @@ function CtaButton({ course, variant }: { course: CourseCardData; variant: Cours
   // catalog
   return (
     <Link href={`/courses/${course.id}`} className="block mt-4">
-      <Button variant="outline" className={cn(base, "border-sky-300 text-sky-600 hover:bg-sky-50 hover:border-sky-400")}>
-        View Course
+      <Button
+        variant="outline"
+        className={cn(
+          base,
+          "border-sky-300 text-sky-600 hover:bg-sky-50 hover:border-sky-400",
+        )}
+      >
+        Xem khóa học
       </Button>
     </Link>
   );
@@ -146,11 +171,14 @@ export default function CourseCard({
     <Card
       className={cn(
         "group border border-slate-200/80 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 rounded-2xl overflow-hidden bg-white",
-        className
+        className,
       )}
     >
       {/* ── Thumbnail ── */}
-      <Link href={`/courses/${course.id}`} className="block relative aspect-video overflow-hidden bg-slate-100">
+      <Link
+        href={`/courses/${course.id}`}
+        className="block relative aspect-video overflow-hidden bg-slate-100"
+      >
         {course.thumbnailUrl ? (
           <img
             src={course.thumbnailUrl}
@@ -160,8 +188,8 @@ export default function CourseCard({
         ) : (
           <div
             className={cn(
-              "h-full w-full bg-gradient-to-br flex items-center justify-center",
-              gradient
+              "h-full w-full bg-linear-to-br flex items-center justify-center",
+              gradient,
             )}
           >
             <BookOpen size={36} className="text-white/80" />
@@ -199,15 +227,16 @@ export default function CourseCard({
             {course._count.modules !== undefined && (
               <span className="flex items-center gap-1">
                 <Layers size={11} />
-                {course._count.modules} modules
+                {course._count.modules} học phần
               </span>
             )}
-            {course._count.enrollments !== undefined && variant !== "catalog" && (
-              <span className="flex items-center gap-1">
-                <Users size={11} />
-                {course._count.enrollments} students
-              </span>
-            )}
+            {course._count.enrollments !== undefined &&
+              variant !== "catalog" && (
+                <span className="flex items-center gap-1">
+                  <Users size={11} />
+                  {course._count.enrollments} sinh viên
+                </span>
+              )}
           </div>
         )}
 

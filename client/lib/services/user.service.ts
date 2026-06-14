@@ -13,7 +13,7 @@
  */
 
 import prisma from "@/lib/prisma";
-import type { UserAdminUpdateInput } from "@/lib/validations/user";
+import type { Prisma } from "@prisma/client";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -49,6 +49,22 @@ export async function getUserById(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     omit: EXCLUDE_PASSWORD,
+  });
+
+  if (!user) {
+    throw new Error(`User with id "${userId}" not found.`);
+  }
+
+  return user;
+}
+
+export async function getUserWithPasswordById(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      hashedPassword: true,
+    },
   });
 
   if (!user) {
@@ -101,7 +117,7 @@ export async function getAllUsers(
  */
 export async function updateUser(
   userId: string,
-  data: Partial<UserAdminUpdateInput>
+  data: Prisma.UserUpdateInput
 ) {
   // Guard: ensure the user exists first for a clear error message.
   const exists = await prisma.user.findUnique({
@@ -120,6 +136,126 @@ export async function updateUser(
   });
 
   return updated;
+}
+
+export async function updateUserPassword(userId: string, hashedPassword: string) {
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { hashedPassword },
+    omit: EXCLUDE_PASSWORD,
+  });
+
+  return updated;
+}
+
+export async function getPublicUserProfile(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      fullName: true,
+      avatarUrl: true,
+      highestEducation: true,
+      bio: true,
+      role: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error(`User with id "${userId}" not found.`);
+  }
+
+  const enrollments = await prisma.enrollment.findMany({
+    where: {
+      studentId: userId,
+      status: { not: "DROPPED" },
+    },
+    include: {
+      course: {
+        select: {
+          id: true,
+          title: true,
+          thumbnailUrl: true,
+          modules: {
+            select: {
+              lessons: {
+                select: { id: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const lessonIds = enrollments.flatMap((enrollment) =>
+    enrollment.course.modules.flatMap((module) =>
+      module.lessons.map((lesson) => lesson.id),
+    ),
+  );
+
+  const progress = lessonIds.length
+    ? await prisma.lessonProgress.findMany({
+        where: {
+          studentId: userId,
+          lessonId: { in: lessonIds },
+          isCompleted: true,
+        },
+        select: {
+          lessonId: true,
+          updatedAt: true,
+        },
+      })
+    : [];
+
+  const completedProgressByLessonId = new Map(
+    progress.map((item) => [item.lessonId, item.updatedAt]),
+  );
+
+  const completedCourses = enrollments
+    .map((enrollment) => {
+      const courseLessonIds = enrollment.course.modules.flatMap((module) =>
+        module.lessons.map((lesson) => lesson.id),
+      );
+
+      const isCompletedByProgress =
+        courseLessonIds.length > 0 &&
+        courseLessonIds.every((lessonId) =>
+          completedProgressByLessonId.has(lessonId),
+        );
+
+      const isCompleted =
+        enrollment.status === "COMPLETED" || isCompletedByProgress;
+
+      if (!isCompleted) return null;
+
+      const completedAt =
+        courseLessonIds
+          .map((lessonId) => completedProgressByLessonId.get(lessonId))
+          .filter((date): date is Date => Boolean(date))
+          .sort((a, b) => b.getTime() - a.getTime())[0] ??
+        enrollment.enrolledAt;
+
+      return {
+        id: enrollment.course.id,
+        title: enrollment.course.title,
+        thumbnailUrl: enrollment.course.thumbnailUrl,
+        completedAt,
+      };
+    })
+    .filter(
+      (course): course is {
+        id: string;
+        title: string;
+        thumbnailUrl: string | null;
+        completedAt: Date;
+      } => course !== null,
+    );
+
+  return {
+    ...user,
+    completedCourses,
+  };
 }
 
 // ─── deactivateUser ───────────────────────────────────────────────────────────

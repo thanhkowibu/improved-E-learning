@@ -3,13 +3,13 @@
 /**
  * app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx
  *
- * Phase 3E — Student Lesson Viewer with Progress Tracking.
+ * Phase 3E: Student Lesson Viewer with Progress Tracking.
  *
  * Data flow:
- *   1. GET /api/lessons/[lessonId]          — full lesson detail
- *   2. GET /api/courses/[courseId]/modules  — sibling lessons for nav pills
- *   3. GET /api/lessons/[lessonId]/progress — current user's completion status
- *   4. PUT /api/lessons/[lessonId]/progress — toggle completion (optimistic UI)
+ *   1. GET /api/lessons/[lessonId]           full lesson detail
+ *   2. GET /api/courses/[courseId]/modules   sibling lessons for nav pills
+ *   3. GET /api/lessons/[lessonId]/progress  current user's completion status
+ *   4. PUT /api/lessons/[lessonId]/progress  toggle completion (optimistic UI)
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -71,10 +71,9 @@ import {
 } from "@/components/quiz/QuizResult";
 import ReactMarkdown from "react-markdown";
 
-// ─── Dynamic import — SSR safe ────────────────────────────────────────────────
+// Dynamic import
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
+// Types
 interface MaterialItem {
   id: string;
   title: string;
@@ -123,11 +122,11 @@ interface ProgressResponse {
   isCompleted: boolean;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// Constants
 
 const CONTENT_CLS = "mx-auto px-6 md:px-12 lg:px-24 max-w-5xl";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// Helpers
 
 function formatBytes(bytes: string | number | null): string {
   if (bytes === null || bytes === undefined) return "";
@@ -138,7 +137,11 @@ function formatBytes(bytes: string | number | null): string {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function MaterialIcon({ materialType }: { materialType?: MaterialItem["materialType"] }) {
+function MaterialIcon({
+  materialType,
+}: {
+  materialType?: MaterialItem["materialType"];
+}) {
   if (materialType === "VIDEO")
     return <FileVideo size={15} className="text-violet-500 shrink-0" />;
   if (materialType === "PDF")
@@ -182,7 +185,7 @@ function MaterialViewer({
   return null;
 }
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
+// Skeleton
 
 function LessonSkeleton() {
   return (
@@ -218,7 +221,7 @@ function LessonSkeleton() {
   );
 }
 
-// ─── Mark-Complete Button ─────────────────────────────────────────────────────
+// Mark-Complete Button
 
 function MarkCompleteButton({
   isCompleted,
@@ -253,13 +256,13 @@ function MarkCompleteButton({
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// Page
 
 type QuizViewState = "HISTORY" | "TAKING" | "REVIEWING";
 
 function formatAttemptDate(value?: string | Date | null) {
-  if (!value) return "Not submitted";
-  return new Intl.DateTimeFormat("en", {
+  if (!value) return "ChÆ°a ná»™p";
+  return new Intl.DateTimeFormat("vi-VN", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -277,7 +280,9 @@ function QuizSection({ lessonId }: { lessonId: string }) {
   const [quiz, setQuiz] = useState<QuizData | null>(null);
   const [attempts, setAttempts] = useState<QuizAttemptData[]>([]);
   const [view, setView] = useState<QuizViewState>("HISTORY");
-  const [reviewAttempt, setReviewAttempt] = useState<QuizAttemptData | null>(null);
+  const [reviewAttempt, setReviewAttempt] = useState<QuizAttemptData | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -293,7 +298,7 @@ function QuizSection({ lessonId }: { lessonId: string }) {
       if (message.toLowerCase().includes("not found")) {
         setQuiz(null);
       } else {
-        setError(message || "Failed to load quiz.");
+        setError(message || "Tải quiz thất bại");
       }
       setAttempts([]);
       setIsLoading(false);
@@ -311,7 +316,7 @@ function QuizSection({ lessonId }: { lessonId: string }) {
       setError(
         attemptsRes.error ??
           attemptsRes.message ??
-          "Failed to load quiz attempt history.",
+          "Không tải được lịch sử làm bài",
       );
       setAttempts([]);
     }
@@ -329,7 +334,7 @@ function QuizSection({ lessonId }: { lessonId: string }) {
       <Card className="mb-12 border-slate-200">
         <CardContent className="flex items-center justify-center gap-2 py-10 text-sm text-slate-500">
           <Loader2 size={16} className="animate-spin text-sky-500" />
-          Loading quiz...
+          Đang tải Quiz...
         </CardContent>
       </Card>
     );
@@ -339,7 +344,7 @@ function QuizSection({ lessonId }: { lessonId: string }) {
     return (
       <Alert variant="destructive" className="mb-12">
         <AlertCircle />
-        <AlertTitle>Quiz unavailable</AlertTitle>
+        <AlertTitle>Quiz không khả dụng</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
     );
@@ -351,9 +356,11 @@ function QuizSection({ lessonId }: { lessonId: string }) {
         <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
           <ClipboardList size={28} className="text-slate-300" />
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Quiz coming soon.</h2>
+            <h2 className="text-lg font-bold text-slate-900">
+              Quiz sẽ sớm được hiển thị.
+            </h2>
             <p className="mt-1 text-sm text-slate-500">
-              The instructor has not published questions for this quiz yet.
+              Giảng viên chưa công bố câu hỏi cho quiz này.
             </p>
           </div>
         </CardContent>
@@ -381,9 +388,9 @@ function QuizSection({ lessonId }: { lessonId: string }) {
             Quiz
           </h2>
           <p className="mt-1 text-sm text-slate-500">
-            {quiz.questions.length} question{quiz.questions.length === 1 ? "" : "s"} ·{" "}
-            {quiz.maxAttempts} attempt{quiz.maxAttempts === 1 ? "" : "s"} allowed
-            {dueDate ? ` · due ${formatAttemptDate(dueDate)}` : ""}
+            {quiz.questions.length} câu hỏi · Tối đa {quiz.maxAttempts} lượt làm
+            bài
+            {dueDate ? ` · hạn nộp ${formatAttemptDate(dueDate)}` : ""}
           </p>
         </div>
         {view !== "HISTORY" && (
@@ -397,7 +404,7 @@ function QuizSection({ lessonId }: { lessonId: string }) {
             className="gap-2 rounded-lg border-slate-200 text-slate-600 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
           >
             <History size={15} />
-            Attempt History
+            Lịch sử làm bài
           </Button>
         )}
       </div>
@@ -405,9 +412,9 @@ function QuizSection({ lessonId }: { lessonId: string }) {
       {isClosed && (
         <Alert className="border-amber-200 bg-amber-50 text-amber-900">
           <AlertCircle />
-          <AlertTitle>Quiz closed.</AlertTitle>
+          <AlertTitle>Quiz đã đóng.</AlertTitle>
           <AlertDescription>
-            The due date has passed. You can still review submitted attempts.
+            Đã quá hạn nộp. Bạn vẫn có thể xem lại các lần làm bài đã nộp.
           </AlertDescription>
         </Alert>
       )}
@@ -432,14 +439,12 @@ function QuizSection({ lessonId }: { lessonId: string }) {
               <div>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <History size={16} className="text-slate-500" />
-                  Attempt History
+                  Lịch sử làm bài
                 </CardTitle>
                 <p className="mt-1 text-sm text-slate-500">
                   {remainingAttempts > 0
-                    ? `${remainingAttempts} attempt${
-                        remainingAttempts === 1 ? "" : "s"
-                      } remaining.`
-                    : "No attempts remaining."}
+                    ? `Còn ${remainingAttempts} lượt làm bài.`
+                    : "Không còn lượt làm bài."}
                 </p>
               </div>
               <Button
@@ -449,7 +454,7 @@ function QuizSection({ lessonId }: { lessonId: string }) {
                 className="gap-2 bg-sky-500 text-white hover:bg-sky-600"
               >
                 <RotateCcw size={15} />
-                Take Quiz
+                Làm bài
               </Button>
             </div>
           </CardHeader>
@@ -458,11 +463,11 @@ function QuizSection({ lessonId }: { lessonId: string }) {
               <div className="flex flex-col items-center gap-2 py-10 text-center">
                 <ClipboardList size={24} className="text-slate-300" />
                 <p className="text-sm font-medium text-slate-700">
-                  No attempts submitted yet.
+                  Bạn chưa nộp bài lần nào.
                 </p>
                 {!canTakeQuiz && (
                   <p className="text-sm text-slate-500">
-                    {isClosed ? "Quiz closed." : "No attempts remaining."}
+                    {isClosed ? "Quiz đã đóng." : "Không còn lượt làm bài."}
                   </p>
                 )}
               </div>
@@ -470,11 +475,11 @@ function QuizSection({ lessonId }: { lessonId: string }) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Attempt</TableHead>
-                    <TableHead>Submitted</TableHead>
-                    <TableHead>Score</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead>Lần làm</TableHead>
+                    <TableHead>Thời gian nộp</TableHead>
+                    <TableHead>Điểm</TableHead>
+                    <TableHead>Kết quả</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -487,9 +492,11 @@ function QuizSection({ lessonId }: { lessonId: string }) {
                     return (
                       <TableRow key={attempt.id}>
                         <TableCell className="font-medium">
-                          Attempt {attempts.length - index}
+                          Lần {attempts.length - index}
                         </TableCell>
-                        <TableCell>{formatAttemptDate(attempt.submittedAt)}</TableCell>
+                        <TableCell>
+                          {formatAttemptDate(attempt.submittedAt)}
+                        </TableCell>
                         <TableCell>
                           {attempt.score}/{attempt.totalPoints} ({percent}%)
                         </TableCell>
@@ -503,7 +510,7 @@ function QuizSection({ lessonId }: { lessonId: string }) {
                                 : "border-red-200 bg-red-50 text-red-700",
                             )}
                           >
-                            {passed ? "Pass" : "Fail"}
+                            {passed ? "Đạt" : "Chưa đạt"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
@@ -517,7 +524,7 @@ function QuizSection({ lessonId }: { lessonId: string }) {
                             }}
                             className="rounded-lg text-sky-600 hover:bg-sky-50 hover:text-sky-700"
                           >
-                            Review
+                            Xem lại
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -541,7 +548,7 @@ export default function LessonViewPage() {
 
   const api = useApi();
 
-  // ── State ──────────────────────────────────────────────────────────────────
+  // State
   const [lesson, setLesson] = useState<LessonDetail | null>(null);
   const [modules, setModules] = useState<ModuleStub[]>([]);
   const [isLessonLoading, setIsLessonLoading] = useState(true);
@@ -557,7 +564,7 @@ export default function LessonViewPage() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [isProgressPending, setIsProgressPending] = useState(false);
 
-  // ── Fetch lesson detail ────────────────────────────────────────────────────
+  // Fetch lesson detail
   const fetchLesson = useCallback(async () => {
     if (!lessonId) return;
     setIsLessonLoading(true);
@@ -566,13 +573,13 @@ export default function LessonViewPage() {
     if (res.success && res.data) {
       setLesson(res.data);
     } else {
-      setLessonError(res.error ?? res.message ?? "Lesson not found.");
+      setLessonError(res.error ?? res.message ?? "Không tìm thấy bài học.");
     }
     setIsLessonLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId]);
 
-  // ── Fetch sibling lessons ──────────────────────────────────────────────────
+  // etch sibling lessons
   const fetchModules = useCallback(async () => {
     if (!courseId) return;
     setIsNavLoading(true);
@@ -584,7 +591,7 @@ export default function LessonViewPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
-  // ── Fetch current progress ─────────────────────────────────────────────────
+  // Fetch current progress
   const fetchProgress = useCallback(async () => {
     if (!lessonId) return;
     const res = await api.get<ProgressResponse>(
@@ -606,7 +613,7 @@ export default function LessonViewPage() {
     fetchProgress();
   }, [fetchProgress]);
 
-  // ── Toggle completion ──────────────────────────────────────────────────────
+  // Toggle completion
   const handleToggleComplete = useCallback(async () => {
     const newValue = !isCompleted;
     setIsCompleted(newValue); // Optimistic update
@@ -624,7 +631,7 @@ export default function LessonViewPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCompleted, lessonId]);
 
-  // ── Derived navigation ─────────────────────────────────────────────────────
+  // Derived navigation
 
   const allLessons = useMemo<LessonStub[]>(() => {
     return modules
@@ -664,7 +671,7 @@ export default function LessonViewPage() {
     if (targetId) router.push(`/courses/${courseId}/lessons/${targetId}`);
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // Render
 
   if (isLessonLoading) return <LessonSkeleton />;
 
@@ -676,17 +683,19 @@ export default function LessonViewPage() {
         <div className="h-16 w-16 rounded-2xl bg-red-50 flex items-center justify-center">
           <AlertCircle size={32} className="text-red-400" />
         </div>
-        <p className="text-xl font-bold text-slate-800">Lesson not found</p>
+        <p className="text-xl font-bold text-slate-800">
+          Không tìm thấy bài học
+        </p>
         <p className="text-slate-500 text-sm max-w-sm">
           {lessonError ??
-            "This lesson may have been removed or is unavailable."}
+            "Bài học này có thể đã bị xóa hoặc hiện không khả dụng."}
         </p>
         <Link
           href={`/courses/${courseId}/learn`}
           className="text-sky-600 text-sm hover:underline flex items-center gap-1"
         >
           <ChevronLeft size={14} />
-          Back to Course Overview
+          Quay lại tổng quan khóa học
         </Link>
       </div>
     );
@@ -703,7 +712,7 @@ export default function LessonViewPage() {
           <Link
             href={`/courses/${courseId}/learn`}
             className="shrink-0 flex items-center justify-center h-7 w-7 rounded-md border border-slate-200 hover:border-sky-300 hover:bg-sky-50 transition-colors mr-1"
-            aria-label="Back to course overview"
+            aria-label="Quay lại tổng quan khóa học"
           >
             <BookOpen size={13} className="text-slate-500" />
           </Link>
@@ -738,7 +747,7 @@ export default function LessonViewPage() {
                       key={sib.id}
                       href={`/courses/${courseId}/lessons/${sib.id}`}
                       title={sib.title}
-                      aria-label={`Lesson ${idx + 1}: ${sib.title}`}
+                      aria-label={`Bài học ${idx + 1}: ${sib.title}`}
                       className={cn(
                         "shrink-0 flex items-center justify-center h-9 w-9 rounded-lg border transition-all duration-150 text-sm font-semibold",
                         isActive
@@ -762,7 +771,7 @@ export default function LessonViewPage() {
               className="gap-1.5 rounded-lg border-slate-200 text-slate-600 hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 disabled:opacity-40"
             >
               <ChevronLeft size={15} />
-              Previous
+              Trước
             </Button>
             <Button
               variant="outline"
@@ -771,7 +780,7 @@ export default function LessonViewPage() {
               onClick={() => navigateTo(nextLessonId)}
               className="gap-1.5 rounded-lg border-slate-200 text-slate-600 hover:border-sky-300 hover:text-sky-600 hover:bg-sky-50 disabled:opacity-40"
             >
-              Next
+              Tiếp
               <ChevronRight size={15} />
             </Button>
           </div>
@@ -797,7 +806,7 @@ export default function LessonViewPage() {
           </div>
         </div>
 
-        {/* Bookmark (secondary action — below title row) */}
+        {/* Bookmark (secondary action â€” below title row) */}
         <button
           type="button"
           onClick={() => setIsBookmarked((b) => !b)}
@@ -805,13 +814,13 @@ export default function LessonViewPage() {
             "inline-flex items-center gap-2 text-sm font-medium mb-8 transition-colors",
             isBookmarked ? "text-sky-600" : "text-slate-400 hover:text-sky-500",
           )}
-          aria-label={isBookmarked ? "Remove bookmark" : "Bookmark this lesson"}
+          aria-label={isBookmarked ? "Bỏ đánh dấu" : "Đánh dấu bài học này"}
         >
           <Bookmark
             size={15}
             className={cn("transition-all", isBookmarked && "fill-current")}
           />
-          {isBookmarked ? "Bookmarked" : "Bookmark this lesson"}
+          {isBookmarked ? "Đã đánh dấu" : "Đánh dấu bài học này"}
         </button>
 
         {/* ══ MARKDOWN CONTENT ═════════════════════════════════════════════════ */}
@@ -834,7 +843,7 @@ export default function LessonViewPage() {
             <div className="flex flex-col items-center gap-3 py-16 text-center rounded-2xl border border-dashed border-slate-200 bg-slate-50">
               <BookOpen size={28} className="text-slate-300" />
               <p className="text-slate-400 text-sm">
-                No content available for this lesson yet.
+                Chưa có nội dung cho bài học này.
               </p>
             </div>
           )}
@@ -846,11 +855,10 @@ export default function LessonViewPage() {
         <div className="mt-12 mb-12 flex flex-col items-start justify-between gap-4 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-6 sm:flex-row sm:items-center">
           <div>
             <h2 className="text-base font-bold text-slate-900">
-              Have a question about this lesson?
+              Bạn có câu hỏi về bài học này?
             </h2>
             <p className="mt-1 text-sm text-slate-600">
-              Our AI Tutor has read all the course materials and is ready to
-              help.
+              Trợ giảng AI đã đọc tài liệu khóa học và sẵn sàng hỗ trợ bạn.
             </p>
           </div>
           <Button
@@ -860,7 +868,7 @@ export default function LessonViewPage() {
             className="shrink-0 gap-2 border-indigo-200 bg-white text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800"
           >
             <Sparkles size={16} />
-            Ask AI Tutor
+            Hỏi trợ giảng AI
           </Button>
         </div>
 
@@ -870,13 +878,14 @@ export default function LessonViewPage() {
             <div className="mb-4 flex flex-col gap-1">
               <h2 className="flex items-center gap-2 text-base font-bold text-slate-800">
                 <FileText size={16} className="text-sky-500" />
-                Lesson Materials
+                Tài liệu bài học
                 <span className="ml-1 text-xs font-normal text-slate-400">
                   ({lesson.materials.length})
                 </span>
               </h2>
               <p className="text-sm text-slate-500">
-                Preview PDFs and videos inline, or download files for offline use.
+                Xem PDF và video ngay trong ứng dụng hoặc tải xuống để học
+                offline.
               </p>
             </div>
             <ul className="space-y-2">
@@ -912,7 +921,7 @@ export default function LessonViewPage() {
                           className="gap-1.5 rounded-lg text-xs font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-600"
                         >
                           <Eye size={13} />
-                          Preview
+                          Xem trước
                         </Button>
                       )}
                       <a
@@ -920,7 +929,7 @@ export default function LessonViewPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="shrink-0"
-                        aria-label={`Download ${mat.title}`}
+                        aria-label={`Tải xuống ${mat.title}`}
                       >
                         <Button
                           type="button"
@@ -929,7 +938,7 @@ export default function LessonViewPage() {
                           className="gap-1.5 rounded-lg text-xs font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-600"
                         >
                           <Download size={13} />
-                          Download
+                          Tải xuống
                         </Button>
                       </a>
                     </div>
@@ -965,7 +974,7 @@ export default function LessonViewPage() {
                           className="gap-1.5 rounded-lg border-slate-200 text-xs text-slate-600 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
                         >
                           <Download size={13} />
-                          Download
+                          Tải xuống
                         </Button>
                       </a>
                     </div>
@@ -974,7 +983,7 @@ export default function LessonViewPage() {
                         material={mat}
                         className={
                           mat.materialType === "PDF"
-                            ? "h-[38rem] md:h-[46rem]"
+                            ? "h-152 md:h-184"
                             : undefined
                         }
                       />
@@ -987,7 +996,6 @@ export default function LessonViewPage() {
         )}
 
         {/* ══ BOTTOM PAGINATION ════════════════════════════════════════════════ */}
-        <Separator className="mb-8" />
 
         <div className="flex items-center justify-center gap-4 pb-6">
           <Button
@@ -997,7 +1005,7 @@ export default function LessonViewPage() {
             className="gap-2 rounded-xl px-6 h-11 font-semibold border-slate-200 text-slate-600 hover:border-sky-300 hover:text-sky-700 hover:bg-sky-50 disabled:opacity-40"
           >
             <ChevronLeft size={16} />
-            Previous
+            Trước
           </Button>
 
           {/* Module context pill */}
@@ -1020,7 +1028,7 @@ export default function LessonViewPage() {
             onClick={() => navigateTo(nextLessonId)}
             className="gap-2 rounded-xl px-6 h-11 font-semibold border-slate-200 text-slate-600 hover:border-sky-300 hover:text-sky-700 hover:bg-sky-50 disabled:opacity-40"
           >
-            Next
+            Tiếp
             <ChevronRight size={16} />
           </Button>
         </div>
@@ -1060,7 +1068,8 @@ export default function LessonViewPage() {
                   <span className="truncate">{previewMaterial.title}</span>
                 </DialogTitle>
                 <DialogDescription>
-                  Previewing this material in the app. Use Download if you need an offline copy.
+                  Đang xem trước tài liệu trong ứng dụng. Hãy tải xuống nếu bạn
+                  cần bản ngoại tuyến.
                 </DialogDescription>
               </DialogHeader>
               <div className="max-h-[calc(92vh-7rem)] overflow-auto p-4">
@@ -1068,7 +1077,7 @@ export default function LessonViewPage() {
                   material={previewMaterial}
                   className={
                     previewMaterial.materialType === "PDF"
-                      ? "h-[calc(92vh-10rem)] min-h-[32rem]"
+                      ? "h-[calc(92vh-10rem)] min-h-128"
                       : undefined
                   }
                 />

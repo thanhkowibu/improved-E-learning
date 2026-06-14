@@ -40,7 +40,7 @@ function MaterialPreview({ material }: { material: PreviewMaterial }) {
       <PdfViewer
         url={material.fileUrl}
         title={material.title}
-        className="h-[calc(90vh-11rem)] min-h-[32rem]"
+        className="h-[calc(90vh-11rem)] min-h-128"
       />
     );
   }
@@ -69,10 +69,10 @@ function MaterialPreview({ material }: { material: PreviewMaterial }) {
       </div>
       <div>
         <p className="text-sm font-semibold text-slate-800">
-          Preview is not available for this file type.
+          Không hỗ trợ xem trước loại tệp này.
         </p>
         <p className="mt-1 text-sm text-slate-500">
-          Download the material to view it with the appropriate app.
+          Hãy tải tài liệu xuống và mở bằng ứng dụng phù hợp.
         </p>
       </div>
       <a
@@ -82,7 +82,7 @@ function MaterialPreview({ material }: { material: PreviewMaterial }) {
       >
         <Button type="button" className="gap-2">
           <Download size={15} />
-          Download Material
+          Tải tài liệu
         </Button>
       </a>
     </div>
@@ -100,9 +100,11 @@ export function MaterialPreviewModal({
         {material && (
           <>
             <DialogHeader className="border-b border-slate-100 px-5 py-4">
-              <DialogTitle className="truncate pr-10">{material.title}</DialogTitle>
+              <DialogTitle className="truncate pr-10">
+                {material.title}
+              </DialogTitle>
               <DialogDescription>
-                Preview the uploaded material before students use it.
+                Xem trước tài liệu đã tải lên trước khi sinh viên sử dụng.
               </DialogDescription>
             </DialogHeader>
             <div className="max-h-[calc(90vh-7rem)] overflow-auto p-4">

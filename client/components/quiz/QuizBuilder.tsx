@@ -19,6 +19,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 import { z } from "zod";
 import {
   CalendarIcon,
@@ -56,7 +57,11 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useApi } from "@/hooks/useApi";
@@ -64,24 +69,29 @@ import { cn } from "@/lib/utils";
 import type { QuizCreateInput } from "@/lib/validations/quiz";
 
 const quizBuilderOptionSchema = z.object({
-  optionText: z.string().min(1, "Option text cannot be empty.").max(2_000),
+  optionText: z.string().min(1, "Vui lòng nhập nội dung lựa chọn.").max(2_000),
   isCorrect: z.boolean(),
 });
 
 const quizBuilderQuestionSchema = z
   .object({
-    questionText: z.string().min(1, "Question text cannot be empty.").max(5_000),
+    questionText: z
+      .string()
+      .min(1, "Vui lòng nhập nội dung câu hỏi.")
+      .max(5_000),
     explanation: z.string().max(5_000).optional().nullable(),
     points: z.number().int().min(1).max(100),
     options: z.array(quizBuilderOptionSchema).min(2).max(6),
   })
   .superRefine((question, ctx) => {
-    const correctCount = question.options.filter((option) => option.isCorrect).length;
+    const correctCount = question.options.filter(
+      (option) => option.isCorrect,
+    ).length;
     if (correctCount !== 1) {
       ctx.addIssue({
         code: "custom",
         path: ["options"],
-        message: "Each question must have exactly one correct option.",
+        message: "Mỗi câu hỏi phải có đúng một đáp án đúng.",
       });
     }
   });
@@ -191,7 +201,7 @@ function DatePicker({
         }
       >
         <CalendarIcon size={15} />
-        {value ? format(value, "PPP") : "No due date"}
+        {value ? format(value, "PPP", { locale: vi }) : "Không đặt hạn nộp"}
       </PopoverTrigger>
       <PopoverContent align="start" className="w-auto p-2">
         <Calendar
@@ -199,6 +209,7 @@ function DatePicker({
           selected={value}
           onSelect={onChange}
           captionLayout="dropdown"
+          locale={vi}
         />
         <div className="border-t border-slate-100 pt-2">
           <Button
@@ -208,7 +219,7 @@ function DatePicker({
             onClick={() => onChange(undefined)}
             className="w-full"
           >
-            Clear due date
+            Xóa hạn nộp
           </Button>
         </div>
       </PopoverContent>
@@ -231,7 +242,8 @@ function QuestionOptions({
   watch: UseFormWatch<QuizFormValues>;
   errors: FieldErrors<QuizFormValues>;
 }) {
-  const optionsName = `questions.${questionIndex}.options` as OptionFieldArrayName;
+  const optionsName =
+    `questions.${questionIndex}.options` as OptionFieldArrayName;
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: optionsName,
@@ -256,7 +268,7 @@ function QuestionOptions({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <Label>Answer Options</Label>
+        <Label>Lựa chọn trả lời</Label>
         <Button
           type="button"
           variant="outline"
@@ -266,7 +278,7 @@ function QuestionOptions({
           className="h-8 gap-1.5 rounded-lg"
         >
           <Plus size={13} />
-          Add Option
+          Thêm lựa chọn
         </Button>
       </div>
 
@@ -283,7 +295,7 @@ function QuestionOptions({
             <RadioGroupItem
               value={String(optionIndex)}
               className="mt-2"
-              aria-label={`Mark option ${optionIndex + 1} as correct`}
+              aria-label={`Đánh dấu lựa chọn ${optionIndex + 1} là đáp án đúng`}
             />
             <input
               type="hidden"
@@ -293,7 +305,7 @@ function QuestionOptions({
             />
             <div className="min-w-0 flex-1 space-y-1">
               <Input
-                placeholder={`Option ${optionIndex + 1}`}
+                placeholder={`Lựa chọn ${optionIndex + 1}`}
                 {...register(
                   `questions.${questionIndex}.options.${optionIndex}.optionText`,
                 )}
@@ -312,7 +324,7 @@ function QuestionOptions({
                 disabled={optionIndex === 0}
                 onClick={() => move(optionIndex, optionIndex - 1)}
                 className="text-slate-400 hover:bg-sky-50 hover:text-sky-600 disabled:opacity-30"
-                aria-label={`Move option ${optionIndex + 1} up`}
+                aria-label={`Đưa lựa chọn ${optionIndex + 1} lên`}
               >
                 <ChevronUp size={14} />
               </Button>
@@ -323,7 +335,7 @@ function QuestionOptions({
                 disabled={optionIndex === fields.length - 1}
                 onClick={() => move(optionIndex, optionIndex + 1)}
                 className="text-slate-400 hover:bg-sky-50 hover:text-sky-600 disabled:opacity-30"
-                aria-label={`Move option ${optionIndex + 1} down`}
+                aria-label={`Đưa lựa chọn ${optionIndex + 1} xuống`}
               >
                 <ChevronDown size={14} />
               </Button>
@@ -337,14 +349,18 @@ function QuestionOptions({
                 const removedCorrect = options?.[optionIndex]?.isCorrect;
                 remove(optionIndex);
                 if (removedCorrect) {
-                  setValue(`questions.${questionIndex}.options.0.isCorrect`, true, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  });
+                  setValue(
+                    `questions.${questionIndex}.options.0.isCorrect`,
+                    true,
+                    {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    },
+                  );
                 }
               }}
               className="mt-1 shrink-0 text-slate-400 hover:bg-red-50 hover:text-red-600"
-              aria-label="Remove option"
+              aria-label="Xóa lựa chọn"
             >
               <Trash2 size={14} />
             </Button>
@@ -404,7 +420,7 @@ function SortableQuestionCard({
           <button
             type="button"
             className="mt-1 cursor-grab touch-none rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 active:cursor-grabbing"
-            aria-label="Drag to reorder question"
+            aria-label="Kéo để sắp xếp câu hỏi"
             {...attributes}
             {...listeners}
           >
@@ -412,13 +428,13 @@ function SortableQuestionCard({
           </button>
           <div className="min-w-0">
             <CardTitle className="flex items-center gap-2 text-sm">
-              Question {index + 1}
+              Câu hỏi {index + 1}
               <Badge variant="outline" className="rounded-md">
-                {watch(`questions.${index}.points`)} pt
+                {watch(`questions.${index}.points`)} điểm
               </Badge>
             </CardTitle>
             <CardDescription>
-              Add the prompt, points, optional explanation, and answer choices.
+              Nhập đề bài, điểm, giải thích tùy chọn và các lựa chọn trả lời.
             </CardDescription>
           </div>
           <Button
@@ -430,17 +446,17 @@ function SortableQuestionCard({
             className="gap-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600"
           >
             <Trash2 size={14} />
-            Remove
+            Xóa
           </Button>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-[1fr_7rem]">
             <div className="space-y-1.5">
-              <Label htmlFor={`question-${field.id}`}>Question Text</Label>
+              <Label htmlFor={`question-${field.id}`}>Nội dung câu hỏi</Label>
               <Textarea
                 id={`question-${field.id}`}
-                placeholder="Write the question students will answer..."
+                placeholder="Nhập câu hỏi sinh viên cần trả lời..."
                 {...register(`questions.${index}.questionText`)}
               />
               {questionErrors?.questionText?.message && (
@@ -451,7 +467,7 @@ function SortableQuestionCard({
             </div>
 
             <div className="space-y-1.5">
-              <Label>Points</Label>
+              <Label>Điểm</Label>
               <Input
                 type="number"
                 min={1}
@@ -461,15 +477,17 @@ function SortableQuestionCard({
                 })}
               />
               {questionErrors?.points?.message && (
-                <p className="text-xs text-red-500">{questionErrors.points.message}</p>
+                <p className="text-xs text-red-500">
+                  {questionErrors.points.message}
+                </p>
               )}
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Explanation</Label>
+            <Label>Giải thích</Label>
             <Textarea
-              placeholder="Optional explanation shown after review..."
+              placeholder="Giải thích tùy chọn hiển thị khi xem lại..."
               {...register(`questions.${index}.explanation`)}
             />
             {questionErrors?.explanation?.message && (
@@ -563,7 +581,9 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
 
   async function onSubmit(values: QuizFormValues) {
     setIsSubmitting(true);
-    const toastId = toast.loading(quizId ? "Updating quiz..." : "Creating quiz...");
+    const toastId = toast.loading(
+      quizId ? "Đang cập nhật Quiz..." : "Đang tạo Quiz...",
+    );
     const payload = normalizePayload(values);
     const res = quizId
       ? await api.patch<QuizResponse>(`/api/lessons/${lessonId}/quiz`, payload)
@@ -572,12 +592,14 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
     if (res.success && res.data) {
       setQuizId(res.data.id);
       reset(toFormValues(res.data));
-      toast.success(quizId ? "Quiz updated." : "Quiz created.", { id: toastId });
+      toast.success(quizId ? "Đã cập nhật Quiz." : "Đã tạo Quiz.", {
+        id: toastId,
+      });
     } else {
       toast.error(
         res.error ??
           res.message ??
-          "Failed to save quiz. Make sure the lesson type is saved as Quiz first.",
+          "Không thể lưu Quiz. Hãy đảm bảo loại bài học đã được lưu là Quiz.",
         { id: toastId },
       );
     }
@@ -588,7 +610,7 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
   async function handleGenerateWithAI() {
     const requestedCount = Math.min(Math.max(numberOfQuestions, 1), 20);
     setIsGenerating(true);
-    const toastId = toast.loading("Generating quiz questions with AI...");
+    const toastId = toast.loading("Đang tạo câu hỏi bằng AI...");
 
     const res = await api.post<QuizCreateInput["questions"]>(
       `/api/lessons/${lessonId}/quiz/generate`,
@@ -607,16 +629,13 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
           })),
         })),
       );
-      toast.success(
-        `Generated ${res.data.length} question${res.data.length === 1 ? "" : "s"}.`,
-        { id: toastId },
-      );
+      toast.success(`Đã tạo ${res.data.length} câu hỏi.`, { id: toastId });
       setIsGenerateOpen(false);
     } else {
       toast.error(
         res.error ??
           res.message ??
-          "Failed to generate questions. You can still create them manually.",
+          "Không thể tạo câu hỏi. Bạn vẫn có thể tạo thủ công.",
         { id: toastId },
       );
     }
@@ -629,7 +648,7 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
       <Card className="border-slate-200">
         <CardContent className="flex items-center justify-center gap-2 py-10 text-sm text-slate-500">
           <Loader2 size={16} className="animate-spin text-sky-500" />
-          Loading quiz builder...
+          Đang tải trình tạo Quiz...
         </CardContent>
       </Card>
     );
@@ -639,14 +658,14 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <Card className="border-slate-200 bg-slate-50/50">
         <CardHeader>
-          <CardTitle>Quiz Settings</CardTitle>
+          <CardTitle>Cài đặt Quiz</CardTitle>
           <CardDescription>
-            Configure attempts, pass threshold, and optional due date.
+            Cấu hình số lượt làm, ngưỡng đạt và hạn nộp tùy chọn.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-3">
           <div className="space-y-1.5">
-            <Label>Max Attempts</Label>
+            <Label>Số lượt làm tối đa</Label>
             <Input
               type="number"
               min={1}
@@ -654,12 +673,14 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
               {...register("maxAttempts", { valueAsNumber: true })}
             />
             {errors.maxAttempts?.message && (
-              <p className="text-xs text-red-500">{errors.maxAttempts.message}</p>
+              <p className="text-xs text-red-500">
+                {errors.maxAttempts.message}
+              </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label>Passing Score</Label>
+            <Label>Điểm đạt</Label>
             <Input
               type="number"
               min={0}
@@ -668,15 +689,17 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
               {...register("passingScore", { valueAsNumber: true })}
             />
             <p className="text-xs text-slate-400">
-              Use decimal form, e.g. 0.7 for 70%.
+              Dùng dạng thập phân, ví dụ 0.7 tương ứng 70%.
             </p>
             {errors.passingScore?.message && (
-              <p className="text-xs text-red-500">{errors.passingScore.message}</p>
+              <p className="text-xs text-red-500">
+                {errors.passingScore.message}
+              </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label>Due Date</Label>
+            <Label>Hạn nộp</Label>
             <Controller
               name="dueDate"
               control={control}
@@ -693,9 +716,9 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-slate-900">Questions</h3>
+          <h3 className="text-sm font-semibold text-slate-900">Câu hỏi</h3>
           <p className="text-xs text-slate-500">
-            Drag questions to reorder them. Each question must have exactly one correct answer.
+            Kéo câu hỏi để sắp xếp. Mỗi câu hỏi phải có đúng một đáp án đúng.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -715,19 +738,20 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
               ) : (
                 <Sparkles size={14} />
               )}
-              {isGenerating ? "Generating..." : "Generate with AI"}
+              {isGenerating ? "Đang tạo..." : "Tạo bằng AI"}
             </PopoverTrigger>
             <PopoverContent align="end" className="w-80 space-y-4">
               <div>
                 <h4 className="text-sm font-semibold text-slate-900">
-                  Generate Quiz Questions
+                  Tạo câu hỏi bằng AI
                 </h4>
                 <p className="mt-1 text-xs text-slate-500">
-                  Gemini will use this lesson content and synced course materials.
+                  Gemini sẽ dùng nội dung bài học và tài liệu khóa học đã đồng
+                  bộ.
                 </p>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="ai-question-count">Number of Questions</Label>
+                <Label htmlFor="ai-question-count">Số lượng câu hỏi</Label>
                 <Input
                   id="ai-question-count"
                   type="number"
@@ -746,7 +770,8 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
                   }}
                 />
                 <p className="text-xs text-slate-400">
-                  Default is 5. You can edit every generated question before saving.
+                  Mặc định là 5. Bạn có thể chỉnh sửa từng câu hỏi trước khi
+                  lưu.
                 </p>
               </div>
               <div className="flex justify-end gap-2">
@@ -757,7 +782,7 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
                   disabled={isGenerating}
                   onClick={() => setIsGenerateOpen(false)}
                 >
-                  Cancel
+                  Hủy
                 </Button>
                 <Button
                   type="button"
@@ -771,7 +796,7 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
                   ) : (
                     <Sparkles size={14} />
                   )}
-                  Generate
+                  Tạo
                 </Button>
               </div>
             </PopoverContent>
@@ -784,7 +809,7 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
             className="gap-1.5 rounded-lg"
           >
             <Plus size={14} />
-            Add Question
+            Thêm câu hỏi
           </Button>
         </div>
       </div>
@@ -825,11 +850,11 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
         {quizId && (
           <div className="mr-auto flex items-center gap-1.5 text-xs text-emerald-600">
             <CheckCircle2 size={14} />
-            Quiz saved
+            Đã lưu Quiz
           </div>
         )}
         {isDirty && (
-          <span className="text-xs text-slate-400">Unsaved quiz changes</span>
+          <span className="text-xs text-slate-400">Có thay đổi chưa lưu</span>
         )}
         <Button
           type="button"
@@ -837,7 +862,7 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
           onClick={() => setShowPreview((value) => !value)}
           className="rounded-lg"
         >
-          {showPreview ? "Hide Preview" : "Preview Quiz"}
+          {showPreview ? "Ẩn xem trước" : "Xem trước Quiz"}
         </Button>
         <Button
           type="submit"
@@ -849,16 +874,16 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
           ) : (
             <Save size={15} />
           )}
-          {quizId ? "Save Quiz" : "Create Quiz"}
+          {quizId ? "Lưu Quiz" : "Tạo Quiz"}
         </Button>
       </div>
 
       {showPreview && (
         <Card className="border-sky-100 bg-sky-50/40">
           <CardHeader>
-            <CardTitle>Student Preview</CardTitle>
+            <CardTitle>Xem trước cho sinh viên</CardTitle>
             <CardDescription>
-              This preview uses the current form values and does not reveal correct answers.
+              Bản xem trước dùng dữ liệu hiện tại và không hiển thị đáp án đúng.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -870,10 +895,10 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <h4 className="text-sm font-semibold text-slate-900">
                     {questionIndex + 1}.{" "}
-                    {question.questionText || "Untitled question"}
+                    {question.questionText || "Câu hỏi chưa đặt tên"}
                   </h4>
                   <Badge variant="outline" className="rounded-md">
-                    {question.points || 0} pt
+                    {question.points || 0} điểm
                   </Badge>
                 </div>
                 <div className="space-y-2">
@@ -883,7 +908,7 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
                       className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700"
                     >
                       <span className="size-3.5 rounded-full border border-slate-300" />
-                      {option.optionText || `Option ${optionIndex + 1}`}
+                      {option.optionText || `Lựa chọn ${optionIndex + 1}`}
                     </label>
                   ))}
                 </div>

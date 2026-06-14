@@ -81,7 +81,7 @@ function ModuleAccordion({
             {mod.title}
           </span>
           <span className="text-xs text-slate-400 ml-1">
-            {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}
+            {mod.lessons.length} bài học
           </span>
         </div>
         <ChevronDown
@@ -97,7 +97,7 @@ function ModuleAccordion({
         <div className="border-t border-slate-100 divide-y divide-slate-50">
           {mod.lessons.length === 0 ? (
             <p className="px-5 py-3 text-sm text-slate-400 italic">
-              No lessons yet.
+              Chưa có bài học.
             </p>
           ) : (
             mod.lessons.map((lesson) => (
@@ -120,9 +120,9 @@ function ModuleAccordion({
 
 type Tab = "overview" | "curriculum" | "teacher";
 const TABS: { id: Tab; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "curriculum", label: "Curriculum" },
-  { id: "teacher", label: "Instructor" },
+  { id: "overview", label: "Tổng quan" },
+  { id: "curriculum", label: "Chương trình học" },
+  { id: "teacher", label: "Giảng viên" },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -147,12 +147,14 @@ export default function CourseDetailPage() {
         <div className="h-16 w-16 rounded-2xl bg-red-50 flex items-center justify-center">
           <AlertCircle size={32} className="text-red-400" />
         </div>
-        <p className="text-xl font-bold text-slate-800">Course not found</p>
+        <p className="text-xl font-bold text-slate-800">
+          Không tìm thấy khóa học
+        </p>
         <p className="text-slate-500 text-sm">
-          {error ?? "This course may have been removed or is not published."}
+          {error ?? "Khóa học có thể đã bị xóa hoặc chưa được xuất bản."}
         </p>
         <Link href="/courses" className="text-sky-600 text-sm hover:underline">
-          ← Back to Catalog
+          ← Quay lại danh mục
         </Link>
       </div>
     );
@@ -183,7 +185,7 @@ export default function CourseDetailPage() {
                   href="/courses"
                   className="hover:text-white transition-colors"
                 >
-                  Courses
+                  Khóa học
                 </Link>
                 <ChevronRight size={12} />
                 <span className="text-white font-medium truncate max-w-xs">
@@ -193,7 +195,7 @@ export default function CourseDetailPage() {
 
               {!course.isPublished && (
                 <Badge className="mb-3 bg-amber-400 text-amber-900 hover:bg-amber-400 text-xs font-semibold">
-                  Draft — Not Published
+                  Bản nháp — Chưa xuất bản
                 </Badge>
               )}
 
@@ -212,11 +214,11 @@ export default function CourseDetailPage() {
                   <GraduationCap size={15} /> {course.teacher.fullName}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Users size={15} /> {course._count.enrollments} students
+                  <Users size={15} /> {course._count.enrollments} sinh viên
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Layers size={15} /> {course._count.modules} modules ·{" "}
-                  {totalLessons} lessons
+                  <Layers size={15} /> {course._count.modules} học phần ·{" "}
+                  {totalLessons} bài học
                 </span>
               </div>
 
@@ -245,7 +247,7 @@ export default function CourseDetailPage() {
                 )}
                 <div className="p-4 border-t border-slate-100">
                   <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">
-                    Instructor
+                    Giảng viên
                   </p>
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-9 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
@@ -260,7 +262,7 @@ export default function CourseDetailPage() {
                       <p className="text-sm font-semibold text-slate-900">
                         {course.teacher.fullName}
                       </p>
-                      <p className="text-xs text-slate-500">Teacher</p>
+                      <p className="text-xs text-slate-500">Giảng viên</p>
                     </div>
                   </div>
                 </div>
@@ -306,28 +308,26 @@ export default function CourseDetailPage() {
           <div className="max-w-3xl space-y-6">
             <div>
               <h2 className="text-xl font-bold text-slate-900 mb-3">
-                About this course
+                Về khóa học này
               </h2>
               {course.description ? (
                 <p className="text-slate-600 leading-relaxed text-base whitespace-pre-wrap">
                   {course.description}
                 </p>
               ) : (
-                <p className="text-slate-400 italic text-sm">
-                  No description provided.
-                </p>
+                <p className="text-slate-400 italic text-sm">Chưa có mô tả.</p>
               )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {[
                 {
-                  label: "Modules",
+                  label: "Học phần",
                   value: course.modules?.length || 0,
                   icon: Layers,
                 },
-                { label: "Lessons", value: totalLessons, icon: BookOpen },
+                { label: "Bài học", value: totalLessons, icon: BookOpen },
                 {
-                  label: "Students",
+                  label: "Sinh viên",
                   value: course._count.enrollments,
                   icon: Users,
                 },
@@ -349,12 +349,12 @@ export default function CourseDetailPage() {
         {activeTab === "curriculum" && (
           <div className="max-w-3xl">
             <h2 className="text-xl font-bold text-slate-900 mb-5">
-              Course Curriculum
+              Chương trình học
             </h2>
             {course.modules.length === 0 ? (
               <div className="flex flex-col items-center gap-3 py-16 text-center">
                 <Layers size={32} className="text-slate-300" />
-                <p className="text-slate-400 text-sm">No modules yet.</p>
+                <p className="text-slate-400 text-sm">Chưa có học phần nào.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -370,7 +370,7 @@ export default function CourseDetailPage() {
         {activeTab === "teacher" && (
           <div className="max-w-xl">
             <h2 className="text-xl font-bold text-slate-900 mb-5">
-              Instructor
+              Giảng viên
             </h2>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 flex items-center gap-5">
               <div className="h-16 w-16 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xl font-bold shrink-0 shadow-md">
@@ -386,10 +386,10 @@ export default function CourseDetailPage() {
                   {course.teacher.fullName}
                 </p>
                 <p className="text-sm text-slate-500 mt-0.5">
-                  Course Instructor
+                  Giảng viên khóa học
                 </p>
                 <Badge className="mt-2 bg-sky-100 text-sky-700 hover:bg-sky-100 text-xs">
-                  Teacher
+                  Giảng viên
                 </Badge>
               </div>
             </div>
