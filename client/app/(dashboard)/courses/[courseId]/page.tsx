@@ -35,7 +35,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useCourseDetail } from "@/hooks/useCourseDetail";
+import { useAuth } from "@/hooks/useAuth";
 import EnrollButton from "@/components/EnrollButton";
+import { CourseStudentsTable } from "@/components/courses/CourseStudentsTable";
 import type { ModuleSummary } from "@/hooks/useCourseDetail";
 
 // Shared horizontal padding — matches the Navbar container exactly.
@@ -118,8 +120,8 @@ function ModuleAccordion({
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
-type Tab = "overview" | "curriculum" | "teacher";
-const TABS: { id: Tab; label: string }[] = [
+type Tab = "overview" | "curriculum" | "teacher" | "students";
+const BASE_TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Tổng quan" },
   { id: "curriculum", label: "Chương trình học" },
   { id: "teacher", label: "Giảng viên" },
@@ -132,10 +134,17 @@ export default function CourseDetailPage() {
   const courseId = params?.courseId as string;
   const { course, enrollmentStatus, isLoading, error, refetchEnrollment } =
     useCourseDetail(courseId);
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   const totalLessons =
     course?.modules.reduce((acc, m) => acc + m.lessons.length, 0) ?? 0;
+  const canManageCourse =
+    user?.role === "ADMIN" ||
+    (user?.role === "TEACHER" && user.id === course?.teacherId);
+  const tabs = canManageCourse
+    ? [...BASE_TABS, { id: "students" as const, label: "Sinh viên" }]
+    : BASE_TABS;
 
   if (isLoading) return <DetailSkeleton />;
 
@@ -210,9 +219,12 @@ export default function CourseDetailPage() {
               )}
 
               <div className="mt-5 flex flex-wrap items-center gap-4 text-sky-100 text-sm">
-                <span className="flex items-center gap-1.5">
+                <Link
+                  href={`/profile/${course.teacher.id}`}
+                  className="flex items-center gap-1.5 hover:text-white hover:underline"
+                >
                   <GraduationCap size={15} /> {course.teacher.fullName}
-                </span>
+                </Link>
                 <span className="flex items-center gap-1.5">
                   <Users size={15} /> {course._count.enrollments} sinh viên
                 </span>
@@ -249,7 +261,10 @@ export default function CourseDetailPage() {
                   <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">
                     Giảng viên
                   </p>
-                  <div className="flex items-center gap-3">
+                  <Link
+                    href={`/profile/${course.teacher.id}`}
+                    className="flex items-center gap-3 rounded-xl transition-colors hover:text-sky-600 hover:underline"
+                  >
                     <div className="h-9 w-9 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                       {course.teacher.fullName
                         .split(" ")
@@ -264,7 +279,7 @@ export default function CourseDetailPage() {
                       </p>
                       <p className="text-xs text-slate-500">Giảng viên</p>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -278,7 +293,7 @@ export default function CourseDetailPage() {
       <div className="sticky top-16 z-30 bg-white border-b border-slate-200 shadow-sm">
         <div className={CONTENT_CLS}>
           <div className="flex items-center gap-1">
-            {TABS.map((tab) => (
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -372,7 +387,10 @@ export default function CourseDetailPage() {
             <h2 className="text-xl font-bold text-slate-900 mb-5">
               Giảng viên
             </h2>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 flex items-center gap-5">
+            <Link
+              href={`/profile/${course.teacher.id}`}
+              className="flex items-center gap-5 rounded-2xl border border-slate-200 bg-white p-6 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
+            >
               <div className="h-16 w-16 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xl font-bold shrink-0 shadow-md">
                 {course.teacher.fullName
                   .split(" ")
@@ -392,8 +410,13 @@ export default function CourseDetailPage() {
                   Giảng viên
                 </Badge>
               </div>
-            </div>
+            </Link>
           </div>
+        )}
+
+        {/* Students */}
+        {activeTab === "students" && canManageCourse && (
+          <CourseStudentsTable courseId={course.id} />
         )}
       </div>
     </div>

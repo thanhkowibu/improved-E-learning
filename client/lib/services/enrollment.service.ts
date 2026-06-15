@@ -17,6 +17,10 @@
 import prisma from "@/lib/prisma";
 import { EnrollmentStatus } from "@prisma/client";
 import { Prisma } from "@prisma/client";
+import {
+  getCompletedLessonIds,
+  getCourseProgressPercentage,
+} from "@/lib/services/progress.service";
 
 // ─── enrollStudent ────────────────────────────────────────────────────────────
 
@@ -139,61 +143,50 @@ export async function getMyEnrollments(
     },
   });
 
-  // Fetch completed progress for the student.
-  const progressRecords = await prisma.lessonProgress.findMany({
-    where: {
-      studentId,
-      isCompleted: true,
-    },
-    select: {
-      lessonId: true,
-    },
-  });
+  return Promise.all(
+    enrollments.map(async (e) => {
+      const [progress, completedLessonIds] = await Promise.all([
+        getCourseProgressPercentage(studentId, e.courseId),
+        getCompletedLessonIds(studentId, e.courseId),
+      ]);
+      const completedLessonIdSet = new Set(completedLessonIds);
 
-  const completedLessonIds = new Set(progressRecords.map((r) => r.lessonId));
-
-  return enrollments.map((e) => {
-    // Flatten lessons in order
-    const lessons = e.course.modules.flatMap((m) => m.lessons);
-    const totalLessons = lessons.length;
-    const completedCount = lessons.filter((l) => completedLessonIds.has(l.id)).length;
-    const progress = totalLessons === 0 ? 0 : Math.round((completedCount / totalLessons) * 100);
-
-    // Find the next incomplete lesson
-    let nextLessonId: string | null = null;
-    for (const m of e.course.modules) {
-      for (const l of m.lessons) {
-        if (!completedLessonIds.has(l.id)) {
-          nextLessonId = l.id;
-          break;
+      // Find the next incomplete lesson in curriculum order.
+      let nextLessonId: string | null = null;
+      for (const m of e.course.modules) {
+        for (const l of m.lessons) {
+          if (!completedLessonIdSet.has(l.id)) {
+            nextLessonId = l.id;
+            break;
+          }
         }
+        if (nextLessonId) break;
       }
-      if (nextLessonId) break;
-    }
 
-    return {
-      id: e.id,
-      studentId: e.studentId,
-      courseId: e.courseId,
-      status: e.status,
-      enrolledAt: e.enrolledAt,
-      progress,
-      nextLessonId,
-      course: {
-        id: e.course.id,
-        title: e.course.title,
-        description: e.course.description,
-        thumbnailUrl: e.course.thumbnailUrl,
-        teacherId: e.course.teacherId,
-        aiEnabled: e.course.aiEnabled,
-        isPublished: e.course.isPublished,
-        createdAt: e.course.createdAt,
-        updatedAt: e.course.updatedAt,
-        teacher: e.course.teacher,
-        _count: e.course._count,
-      },
-    };
-  });
+      return {
+        id: e.id,
+        studentId: e.studentId,
+        courseId: e.courseId,
+        status: e.status,
+        enrolledAt: e.enrolledAt,
+        progress,
+        nextLessonId,
+        course: {
+          id: e.course.id,
+          title: e.course.title,
+          description: e.course.description,
+          thumbnailUrl: e.course.thumbnailUrl,
+          teacherId: e.course.teacherId,
+          aiEnabled: e.course.aiEnabled,
+          isPublished: e.course.isPublished,
+          createdAt: e.course.createdAt,
+          updatedAt: e.course.updatedAt,
+          teacher: e.course.teacher,
+          _count: e.course._count,
+        },
+      };
+    }),
+  );
 }
 
 // ─── getCourseStudents ────────────────────────────────────────────────────────

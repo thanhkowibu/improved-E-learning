@@ -15,6 +15,7 @@ import { type NextRequest } from "next/server";
 import { getAuthUser, AuthError } from "@/lib/auth/get-auth-user";
 import { verifyCourseOwner } from "@/lib/auth/check-ownership";
 import { getCourseStudents } from "@/lib/services/enrollment.service";
+import { getCourseProgressPercentage } from "@/lib/services/progress.service";
 import { EnrollmentStatus } from "@prisma/client";
 import {
   ok,
@@ -57,7 +58,20 @@ export async function GET(request: NextRequest, context: RouteContext) {
       limit,
     });
 
-    return ok(result);
+    const items = await Promise.all(
+      result.items.map(async (enrollment) => ({
+        ...enrollment,
+        progressPercentage: await getCourseProgressPercentage(
+          enrollment.studentId,
+          courseId,
+        ),
+      })),
+    );
+
+    return ok({
+      ...result,
+      items,
+    });
   } catch (err) {
     if (err instanceof AuthError) {
       return err.status === 403 ? forbidden(err.message) : unauthorized(err.message);

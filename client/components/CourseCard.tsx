@@ -215,10 +215,13 @@ export default function CourseCard({
 
         {/* Teacher */}
         {course.teacher && (
-          <p className="mt-1.5 text-sm text-slate-500 flex items-center gap-1.5">
+          <Link
+            href={`/profile/${course.teacher.id}`}
+            className="mt-1.5 inline-flex max-w-full items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-sky-600 hover:underline"
+          >
             <GraduationCap size={13} className="shrink-0 text-slate-400" />
             <span className="truncate">{course.teacher.fullName}</span>
-          </p>
+          </Link>
         )}
 
         {/* Meta row */}

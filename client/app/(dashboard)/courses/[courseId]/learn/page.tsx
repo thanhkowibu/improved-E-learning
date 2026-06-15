@@ -13,8 +13,8 @@
  *   - Quick-action sidebar with start/continue lesson CTA.
  *
  * Layout:  Top-nav only (inherits from DashboardLayout).
- * Data:    Reuses useCourseDetail hook (already fetches modules + lessons).
- * Progress: Mocked as 0% until a dedicated progress API is implemented.
+ * Data:    Uses a dedicated learn endpoint that returns course details and
+ *          completed lesson IDs in one request.
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -46,9 +46,17 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import { cn } from "@/lib/utils";
-import { useCourseDetail } from "@/hooks/useCourseDetail";
 import { useApi } from "@/hooks/useApi";
-import type { ModuleSummary, LessonSummary } from "@/hooks/useCourseDetail";
+import type {
+  CourseDetail,
+  ModuleSummary,
+  LessonSummary,
+} from "@/hooks/useCourseDetail";
+
+interface LearnPageData {
+  course: CourseDetail;
+  completedLessonIds: string[];
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -397,34 +405,45 @@ export default function CourseLearningPage() {
   const courseId = params?.courseId as string;
 
   const api = useApi();
-  const { course, isLoading, error } = useCourseDetail(courseId);
-
-  // ── Real progress state ─────────────────────────────────────────────────────
-  // Fetches the set of lesson IDs that the student has marked as complete.
-  // Endpoint: GET /api/courses/:courseId/progress
-  // Returns: { completedLessonIds: string[] }
+  const [course, setCourse] = useState<CourseDetail | null>(null);
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(
     new Set(),
   );
-  const [isProgressLoading, setIsProgressLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
 
-  const fetchProgress = useCallback(async () => {
+  const fetchLearnData = useCallback(async () => {
     if (!courseId) return;
-    setIsProgressLoading(true);
-    const res = await api.get<{ completedLessonIds: string[] }>(
-      `/api/courses/${courseId}/progress`,
-    );
-    if (res.success && res.data) {
-      setCompletedLessonIds(new Set(res.data.completedLessonIds));
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await api.get<LearnPageData>(
+        `/api/courses/${courseId}/learn`,
+      );
+
+      if (res.success && res.data) {
+        setCourse(res.data.course);
+        setCompletedLessonIds(new Set(res.data.completedLessonIds));
+      } else {
+        setError(
+          res.error ??
+            res.message ??
+            "Không thể tải dữ liệu học tập của khóa học.",
+        );
+      }
+    } catch {
+      setError("Đã xảy ra lỗi khi tải dữ liệu học tập.");
+    } finally {
+      setIsLoading(false);
     }
-    setIsProgressLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
   useEffect(() => {
-    fetchProgress();
-  }, [fetchProgress]);
+    fetchLearnData();
+  }, [fetchLearnData]);
 
   // ── Derived stats ───────────────────────────────────────────────────────────
   const totalLessons = useMemo(
@@ -490,16 +509,11 @@ export default function CourseLearningPage() {
     useState(false);
 
   useEffect(() => {
-    if (!isLoading && !isProgressLoading && !hasInitializedOpenModule) {
+    if (!isLoading && !hasInitializedOpenModule) {
       setOpenModules(defaultOpenModule);
       setHasInitializedOpenModule(true);
     }
-  }, [
-    isLoading,
-    isProgressLoading,
-    defaultOpenModule,
-    hasInitializedOpenModule,
-  ]);
+  }, [isLoading, defaultOpenModule, hasInitializedOpenModule]);
 
   // ── Render states ───────────────────────────────────────────────────────────
 
