@@ -20,7 +20,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import {
   ChevronRight,
   GraduationCap,
@@ -38,6 +38,7 @@ import { useCourseDetail } from "@/hooks/useCourseDetail";
 import { useAuth } from "@/hooks/useAuth";
 import EnrollButton from "@/components/EnrollButton";
 import { CourseStudentsTable } from "@/components/courses/CourseStudentsTable";
+import { CourseQuizAnalytics } from "@/components/analytics/CourseQuizAnalytics";
 import type { ModuleSummary } from "@/hooks/useCourseDetail";
 
 // Shared horizontal padding — matches the Navbar container exactly.
@@ -120,7 +121,7 @@ function ModuleAccordion({
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
-type Tab = "overview" | "curriculum" | "teacher" | "students";
+type Tab = "overview" | "curriculum" | "teacher" | "students" | "analytics";
 const BASE_TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Tổng quan" },
   { id: "curriculum", label: "Chương trình học" },
@@ -131,11 +132,14 @@ const BASE_TABS: { id: Tab; label: string }[] = [
 
 export default function CourseDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const courseId = params?.courseId as string;
   const { course, enrollmentStatus, isLoading, error, refetchEnrollment } =
     useCourseDetail(courseId);
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [activeTab, setActiveTab] = useState<Tab>(
+    searchParams.get("tab") === "analytics" ? "analytics" : "overview",
+  );
 
   const totalLessons =
     course?.modules.reduce((acc, m) => acc + m.lessons.length, 0) ?? 0;
@@ -143,7 +147,11 @@ export default function CourseDetailPage() {
     user?.role === "ADMIN" ||
     (user?.role === "TEACHER" && user.id === course?.teacherId);
   const tabs = canManageCourse
-    ? [...BASE_TABS, { id: "students" as const, label: "Sinh viên" }]
+    ? [
+        ...BASE_TABS,
+        { id: "students" as const, label: "Sinh viên" },
+        { id: "analytics" as const, label: "Thống kê quiz" },
+      ]
     : BASE_TABS;
 
   if (isLoading) return <DetailSkeleton />;
@@ -417,6 +425,11 @@ export default function CourseDetailPage() {
         {/* Students */}
         {activeTab === "students" && canManageCourse && (
           <CourseStudentsTable courseId={course.id} />
+        )}
+
+        {/* Quiz analytics */}
+        {activeTab === "analytics" && canManageCourse && (
+          <CourseQuizAnalytics courseId={course.id} />
         )}
       </div>
     </div>

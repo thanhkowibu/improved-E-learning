@@ -367,3 +367,61 @@ export async function getQuizSubmissionsForTeacher(quizId: string) {
     };
   });
 }
+
+export async function getCourseQuizAnalytics(courseId: string) {
+  const lessons = await prisma.lesson.findMany({
+    where: {
+      module: {
+        courseId,
+      },
+      quiz: {
+        isNot: null,
+      },
+    },
+    orderBy: [
+      { module: { orderIndex: "asc" } },
+      { orderIndex: "asc" },
+    ],
+    select: {
+      id: true,
+      title: true,
+      quiz: {
+        select: {
+          id: true,
+          attempts: {
+            select: {
+              score: true,
+              totalPoints: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return lessons.flatMap((lesson) => {
+    if (!lesson.quiz) return [];
+
+    const submittedAttempts = lesson.quiz.attempts.filter(
+      (attempt) => attempt.score !== null,
+    );
+    const totalSubmissions = submittedAttempts.length;
+    const averageScore =
+      totalSubmissions === 0
+        ? 0
+        : Math.round(
+            submittedAttempts.reduce((sum, attempt) => {
+              if (!attempt.totalPoints || attempt.totalPoints <= 0) return sum;
+              return sum + ((attempt.score ?? 0) / attempt.totalPoints) * 100;
+            }, 0) / totalSubmissions,
+          );
+
+    return {
+      quizId: lesson.quiz.id,
+      lessonId: lesson.id,
+      quizTitle: lesson.title,
+      totalSubmissions,
+      averageScore,
+    };
+  });
+}

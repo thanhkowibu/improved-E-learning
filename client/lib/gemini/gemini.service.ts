@@ -25,6 +25,11 @@ interface QuizExplanationInput {
   studentOption: string;
 }
 
+interface QuizTeachingAdviceQuestion {
+  questionText: string;
+  errorRatePercentage: number;
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -422,8 +427,88 @@ class GeminiService {
       throw error;
     }
   }
+
+  async generateQuizTeachingAdvice(
+    topQuestions: QuizTeachingAdviceQuestion[]
+  ): Promise<string> {
+    const prompt = `You are a pedagogical expert and higher education learning consultant. Here is a list of multiple-choice quiz questions that my students frequently answer incorrectly, along with their error rates: ${JSON.stringify(topQuestions, null, 2)}. Based on the content of these questions, briefly analyze why students might misunderstand or get confused. Then, propose 3 concrete actions or teaching methods (e.g., real-world examples, visual aids, alternative explanations) that I can implement to update my curriculum and help students understand the material better. Keep it concise, professional, and properly formatted in Markdown. Answer in natural and professional Vietnamese.`;
+
+    const contents: Content[] = [
+      {
+        role: "user",
+        parts: [{ text: prompt }],
+      },
+    ];
+
+    const generate = async () =>
+      ai.models.generateContent({
+        model: DEFAULT_MODEL,
+        contents,
+      });
+
+    try {
+      let response: Awaited<ReturnType<typeof generate>>;
+
+      try {
+        response = await generate();
+      } catch (error) {
+        if (!isRateLimitError(error)) {
+          throw error;
+        }
+
+        console.error("Gemini quiz teaching advice rate limit hit. Retrying once after delay.", {
+          delayMs: RATE_LIMIT_RETRY_DELAY_MS,
+          error,
+        });
+        await sleep(RATE_LIMIT_RETRY_DELAY_MS);
+        response = await generate();
+      }
+
+      const candidate = response.candidates?.[0];
+
+      console.log("Gemini quiz teaching advice usage metadata.", {
+        promptTokenCount: response.usageMetadata?.promptTokenCount,
+        candidatesTokenCount: response.usageMetadata?.candidatesTokenCount,
+        totalTokenCount: response.usageMetadata?.totalTokenCount,
+      });
+
+      console.log("Gemini quiz teaching advice response metadata.", {
+        finishReason: candidate?.finishReason,
+        finishMessage: candidate?.finishMessage,
+        safetyRatings: candidate?.safetyRatings,
+        promptFeedback: response.promptFeedback,
+      });
+
+      if (response.promptFeedback?.blockReason) {
+        throw new Error(
+          response.promptFeedback.blockReasonMessage ??
+            `Gemini blocked quiz teaching advice. Block reason: ${response.promptFeedback.blockReason}.`
+        );
+      }
+
+      const responseText = response.text;
+      if (!responseText) {
+        throw new Error(
+          candidate?.finishMessage ??
+            `Gemini returned no teaching advice text. Finish reason: ${candidate?.finishReason ?? "unknown"}.`
+        );
+      }
+
+      return responseText;
+    } catch (error) {
+      console.error("Failed to generate Gemini quiz teaching advice.", {
+        questionCount: topQuestions.length,
+        error,
+      });
+      throw error;
+    }
+  }
 }
 
 export const geminiService = new GeminiService();
 export { GeminiService };
-export type { ChatHistoryItem, QuizExplanationInput };
+export type {
+  ChatHistoryItem,
+  QuizExplanationInput,
+  QuizTeachingAdviceQuestion,
+};
