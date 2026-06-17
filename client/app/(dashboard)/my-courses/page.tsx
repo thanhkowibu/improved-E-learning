@@ -41,8 +41,8 @@ function usePageMeta(role?: string) {
       };
     default:
       return {
-        title: "Lớp học của tôi",
-        subtitle: "Tiếp tục từ nơi bạn đã dừng lại.",
+        title: "Khóa học của tôi",
+        subtitle: "Tiếp tục bài học đang dang dở.",
         showCreate: false,
         emptyMsg: "Bạn chưa đăng ký khóa học nào.",
       };
@@ -55,7 +55,10 @@ function MyCourseSkeleton() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="rounded-2xl overflow-hidden border border-slate-200 bg-white">
+        <div
+          key={i}
+          className="rounded-2xl overflow-hidden border border-slate-200 bg-white"
+        >
           <Skeleton className="aspect-video w-full" />
           <div className="p-4 space-y-3">
             <Skeleton className="h-5 w-3/4 rounded-lg" />
@@ -101,9 +104,7 @@ export default function MyCoursesPage() {
 
       {/* ── Count ── */}
       {!isLoading && !error && courses.length > 0 && (
-        <p className="mb-5 text-sm text-slate-500">
-          {courses.length} khóa học
-        </p>
+        <p className="mb-5 text-sm text-slate-500">{courses.length} khóa học</p>
       )}
 
       {/* ── Loading ── */}

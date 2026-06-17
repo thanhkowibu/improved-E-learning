@@ -316,7 +316,7 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
                         href="/my-courses"
                         className="text-sky-500 hover:underline"
                       >
-                        Lớp học của tôi
+                        Khóa học của tôi
                       </Link>
                     </p>
                   )}

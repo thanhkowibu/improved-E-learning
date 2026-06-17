@@ -67,6 +67,7 @@ model User {
   chatThreads    ChatThread[]     @relation("StudentChatThreads")
   lessonProgress LessonProgress[] @relation("StudentLessonProgress")
   quizAttempts   QuizAttempt[]    @relation("StudentQuizAttempts")
+  bookmarks      Bookmark[]       @relation("UserBookmarks")
 
   @@index([email])
   @@index([role])
@@ -126,6 +127,7 @@ model Lesson {
   module    Module           @relation("ModuleLessons", fields: [moduleId], references: [id], onDelete: Cascade)
   materials Material[]       @relation("LessonMaterials")
   progress  LessonProgress[] @relation("LessonProgress")
+  bookmarks Bookmark[]       @relation("LessonBookmarks")
   quiz      Quiz?
 
   @@index([moduleId])
@@ -215,6 +217,22 @@ model LessonProgress {
   @@index([studentId])
   @@index([lessonId])
   @@map("lesson_progress")
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  lessonId  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user   User   @relation("UserBookmarks", fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation("LessonBookmarks", fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+  @@map("bookmarks")
 }
 
 model Quiz {

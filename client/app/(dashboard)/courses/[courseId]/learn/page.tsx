@@ -20,11 +20,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 import {
   ChevronRight,
   GraduationCap,
   Layers,
   BookOpen,
+  Bookmark as BookmarkIcon,
   PlayCircle,
   CheckCircle2,
   AlertCircle,
@@ -45,6 +47,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import { StickyChatTrigger } from "@/components/chat/StickyChatTrigger";
+import { BookmarksDialog } from "@/components/bookmarks/BookmarksDialog";
 import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/useApi";
 import type {
@@ -56,6 +59,12 @@ import type {
 interface LearnPageData {
   course: CourseDetail;
   completedLessonIds: string[];
+}
+
+interface CourseBookmarkItem {
+  lesson: {
+    id: string;
+  };
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -96,17 +105,22 @@ function LessonRow({
   courseId,
   isCompleted,
   isNext,
+  isBookmarked,
+  isBookmarkPending,
+  onToggleBookmark,
   index,
 }: {
   lesson: LessonSummary;
   courseId: string;
   isCompleted: boolean;
   isNext: boolean;
+  isBookmarked: boolean;
+  isBookmarkPending: boolean;
+  onToggleBookmark: (lessonId: string) => void;
   index: number;
 }) {
   return (
-    <Link
-      href={`/courses/${courseId}/lessons/${lesson.id}`}
+    <div
       className={cn(
         "group flex w-full min-w-0 max-w-full items-center gap-2 overflow-hidden rounded-xl px-3 py-3 transition-all duration-150 sm:gap-3 sm:px-4",
         "hover:bg-sky-50/80 hover:shadow-sm",
@@ -114,52 +128,76 @@ function LessonRow({
         isCompleted && "opacity-80",
       )}
     >
-      {/* Status icon */}
-      <div className="shrink-0 flex items-center justify-center w-7 h-7">
-        {isCompleted ? (
-          <CheckCircle2
-            size={18}
-            className="text-emerald-500"
-            aria-label="Đã hoàn thành"
-          />
-        ) : isNext ? (
-          <PlayCircle
-            size={18}
-            className="text-sky-500 group-hover:scale-110 transition-transform"
-            aria-label="Tiếp tục bài học"
-          />
-        ) : (
-          <span className="text-xs font-semibold text-slate-400 w-5 text-center tabular-nums">
-            {index + 1}
-          </span>
-        )}
-      </div>
-
-      {/* Lesson title */}
-      <span
-        className={cn(
-          "min-w-0 flex-1 truncate text-sm font-medium leading-snug",
-          isCompleted
-            ? "text-slate-500 line-through decoration-slate-300"
-            : "text-slate-700 group-hover:text-sky-700",
-        )}
+      <Link
+        href={`/courses/${courseId}/lessons/${lesson.id}`}
+        className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3"
       >
-        {lesson.title}
-      </span>
+        {/* Status icon */}
+        <div className="shrink-0 flex items-center justify-center w-7 h-7">
+          {isCompleted ? (
+            <CheckCircle2
+              size={18}
+              className="text-emerald-500"
+              aria-label="Đã hoàn thành"
+            />
+          ) : isNext ? (
+            <PlayCircle
+              size={18}
+              className="text-sky-500 group-hover:scale-110 transition-transform"
+              aria-label="Tiếp tục bài học"
+            />
+          ) : (
+            <span className="text-xs font-semibold text-slate-400 w-5 text-center tabular-nums">
+              {index + 1}
+            </span>
+          )}
+        </div>
 
-      {/* "Next" chip */}
-      {isNext && (
-        <Badge className="hidden h-5 shrink-0 bg-sky-100 text-[10px] font-semibold text-sky-700 sm:inline-flex">
-          Tiếp theo
-        </Badge>
-      )}
+        {/* Lesson title */}
+        <span
+          className={cn(
+            "min-w-0 flex-1 truncate text-sm font-medium leading-snug",
+            isCompleted
+              ? "text-slate-500 line-through decoration-slate-300"
+              : "text-slate-700 group-hover:text-sky-700",
+          )}
+        >
+          {lesson.title}
+        </span>
+
+        {/* "Next" chip */}
+        {isNext && (
+          <Badge className="hidden h-5 shrink-0 bg-sky-100 text-[10px] font-semibold text-sky-700 sm:inline-flex">
+            Tiếp theo
+          </Badge>
+        )}
+      </Link>
+
+      <button
+        type="button"
+        disabled={isBookmarkPending}
+        onClick={() => onToggleBookmark(lesson.id)}
+        className={cn(
+          "flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors",
+          isBookmarked
+            ? "bg-sky-50 text-sky-600 hover:bg-sky-100"
+            : "text-slate-300 hover:bg-sky-50 hover:text-sky-600",
+          isBookmarkPending && "cursor-wait opacity-60",
+        )}
+        aria-label={isBookmarked ? "Bỏ lưu bài học" : "Lưu bài học"}
+      >
+        <BookmarkIcon
+          size={16}
+          className={cn(isBookmarked && "fill-current")}
+        />
+      </button>
 
       {/* Arrow on hover */}
       <ChevronRight
         size={14}
         className="shrink-0 text-slate-300 group-hover:text-sky-500 transition-colors"
       />
-    </Link>
+    </div>
   );
 }
 
@@ -171,12 +209,18 @@ function ModuleItem({
   courseId,
   completedLessonIds,
   nextLessonId,
+  bookmarkedLessonIds,
+  pendingBookmarkId,
+  onToggleBookmark,
 }: {
   mod: ModuleSummary;
   index: number;
   courseId: string;
   completedLessonIds: Set<string>;
   nextLessonId: string | null;
+  bookmarkedLessonIds: Set<string>;
+  pendingBookmarkId: string | null;
+  onToggleBookmark: (lessonId: string) => void;
 }) {
   const completedCount = mod.lessons.filter((l) =>
     completedLessonIds.has(l.id),
@@ -250,6 +294,9 @@ function ModuleItem({
                 courseId={courseId}
                 isCompleted={completedLessonIds.has(lesson.id)}
                 isNext={lesson.id === nextLessonId}
+                isBookmarked={bookmarkedLessonIds.has(lesson.id)}
+                isBookmarkPending={pendingBookmarkId === lesson.id}
+                onToggleBookmark={onToggleBookmark}
                 index={lessonIdx}
               />
             ))}
@@ -410,6 +457,13 @@ export default function CourseLearningPage() {
   const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(
     new Set(),
   );
+  const [bookmarkedLessonIds, setBookmarkedLessonIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [pendingBookmarkId, setPendingBookmarkId] = useState<string | null>(
+    null,
+  );
+  const [bookmarksVersion, setBookmarksVersion] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
@@ -445,6 +499,61 @@ export default function CourseLearningPage() {
   useEffect(() => {
     fetchLearnData();
   }, [fetchLearnData]);
+
+  const fetchBookmarks = useCallback(async () => {
+    if (!courseId) return;
+
+    const res = await api.get<CourseBookmarkItem[]>(
+      `/api/courses/${courseId}/bookmarks`,
+    );
+
+    if (res.success && res.data) {
+      setBookmarkedLessonIds(
+        new Set(res.data.map((bookmark) => bookmark.lesson.id)),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId]);
+
+  useEffect(() => {
+    void fetchBookmarks();
+  }, [fetchBookmarks]);
+
+  async function handleToggleBookmark(lessonId: string) {
+    if (pendingBookmarkId) return;
+
+    setPendingBookmarkId(lessonId);
+    try {
+      const res = await api.post<{ bookmarked: boolean }>(
+        `/api/lessons/${lessonId}/bookmark`,
+      );
+
+      if (res.success && res.data) {
+        setBookmarkedLessonIds((current) => {
+          const next = new Set(current);
+          if (res.data?.bookmarked) {
+            next.add(lessonId);
+          } else {
+            next.delete(lessonId);
+          }
+          return next;
+        });
+        setBookmarksVersion((current) => current + 1);
+        toast.success(
+          res.message ??
+            (res.data.bookmarked ? "Đã lưu bài học." : "Đã bỏ lưu bài học."),
+        );
+      } else {
+        toast.error(
+          res.error ?? res.message ?? "Không thể cập nhật bài học đã lưu.",
+        );
+      }
+    } catch {
+      toast.error("Không thể cập nhật bài học đã lưu. Vui lòng thử lại sau.");
+    } finally {
+      setPendingBookmarkId(null);
+    }
+  }
 
   // ── Derived stats ───────────────────────────────────────────────────────────
   const totalLessons = useMemo(
@@ -645,14 +754,21 @@ export default function CourseLearningPage() {
               <h2 className="text-xl font-bold text-slate-900">
                 Chương trình học
               </h2>
-              {totalLessons > 0 && (
-                <span className="text-sm text-slate-500">
-                  <span className="font-semibold text-slate-700">
-                    {completedCount}
-                  </span>{" "}
-                  / {totalLessons} bài học
-                </span>
-              )}
+              <div className="flex flex-wrap items-center gap-2">
+                {totalLessons > 0 && (
+                  <span className="text-sm text-slate-500">
+                    <span className="font-semibold text-slate-700">
+                      {completedCount}
+                    </span>{" "}
+                    / {totalLessons}{" "}
+                    <span className="italic">đã hoàn thành</span>
+                  </span>
+                )}
+                <BookmarksDialog
+                  courseId={courseId}
+                  refreshKey={bookmarksVersion}
+                />
+              </div>
             </div>
 
             {course.modules.length === 0 ? (
@@ -683,6 +799,9 @@ export default function CourseLearningPage() {
                     courseId={courseId}
                     completedLessonIds={completedLessonIds}
                     nextLessonId={nextLessonId}
+                    bookmarkedLessonIds={bookmarkedLessonIds}
+                    pendingBookmarkId={pendingBookmarkId}
+                    onToggleBookmark={handleToggleBookmark}
                   />
                 ))}
               </Accordion>

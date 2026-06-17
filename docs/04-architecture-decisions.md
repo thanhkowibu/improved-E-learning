@@ -754,3 +754,25 @@ Add `GET /api/users/[userId]/public` for authenticated public profile reads. Thi
 ### Rationale
 
 Keeping settings updates on the existing user endpoint avoids a parallel account API while still enforcing strict self-only authorization for sensitive changes. A separate public profile endpoint makes the privacy boundary explicit and prevents accidental exposure of email, phone number, or password-related data.
+
+---
+
+## ADR-017 · Lesson Bookmarks
+
+**Date:** 2026-06-17
+**Phase:** Post-8D (Learning Experience Polish)
+**Status:** Adopted
+
+### Context
+
+Students need a lightweight way to save important lessons for quick return without adding visual clutter to the course learning page. The feature should work across a course and remain tied to the existing user and lesson model.
+
+### Decision
+
+Add a `Bookmark` model linking `User` and `Lesson` with a unique `[userId, lessonId]` constraint. Provide a lesson-level toggle endpoint and a course-level bookmarks endpoint that returns a flat list of saved lessons with their parent module titles.
+
+Expose the saved lessons through a compact dialog on the course learning page, while each lesson row gets a small bookmark action button.
+
+### Rationale
+
+A dedicated join table keeps bookmarks independent from lesson progress and enrollment state. The unique constraint makes toggling idempotent from the user's perspective, and the flat dialog keeps the curriculum layout clean on desktop and mobile.

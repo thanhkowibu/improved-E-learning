@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   ChevronLeft,
   ChevronRight,
@@ -120,6 +121,12 @@ interface ModuleStub {
 
 interface ProgressResponse {
   isCompleted: boolean;
+}
+
+interface CourseBookmarkItem {
+  lesson: {
+    id: string;
+  };
 }
 
 // Constants
@@ -564,6 +571,7 @@ export default function LessonViewPage() {
   const [isNavLoading, setIsNavLoading] = useState(true);
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isBookmarkPending, setIsBookmarkPending] = useState(false);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
   const [previewMaterial, setPreviewMaterial] = useState<MaterialItem | null>(
     null,
@@ -612,6 +620,22 @@ export default function LessonViewPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId]);
 
+  const fetchBookmarkState = useCallback(async () => {
+    if (!courseId || !lessonId) return;
+    setIsBookmarked(false);
+
+    const res = await api.get<CourseBookmarkItem[]>(
+      `/api/courses/${courseId}/bookmarks`,
+    );
+
+    if (res.success && res.data) {
+      setIsBookmarked(
+        res.data.some((bookmark) => bookmark.lesson.id === lessonId),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, lessonId]);
+
   useEffect(() => {
     fetchLesson();
   }, [fetchLesson]);
@@ -621,6 +645,9 @@ export default function LessonViewPage() {
   useEffect(() => {
     fetchProgress();
   }, [fetchProgress]);
+  useEffect(() => {
+    void fetchBookmarkState();
+  }, [fetchBookmarkState]);
 
   // Toggle completion
   const handleToggleComplete = useCallback(async () => {
@@ -639,6 +666,39 @@ export default function LessonViewPage() {
     setIsProgressPending(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCompleted, lessonId]);
+
+  const handleToggleBookmark = useCallback(async () => {
+    if (!lessonId || isBookmarkPending) return;
+
+    setIsBookmarkPending(true);
+
+    try {
+      const res = await api.post<{ bookmarked: boolean }>(
+        `/api/lessons/${lessonId}/bookmark`,
+      );
+
+      if (res.success && res.data) {
+        setIsBookmarked(res.data.bookmarked);
+        toast.success(
+          res.message ??
+            (res.data.bookmarked
+              ? "Đã lưu bài học."
+              : "Đã bỏ lưu bài học."),
+        );
+      } else {
+        toast.error(
+          res.error ?? res.message ?? "Không thể cập nhật bài học đã lưu.",
+        );
+      }
+    } catch {
+      toast.error(
+        "Không thể cập nhật bài học đã lưu. Vui lòng thử lại sau.",
+      );
+    } finally {
+      setIsBookmarkPending(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isBookmarkPending, lessonId]);
 
   // Derived navigation
 
@@ -818,17 +878,23 @@ export default function LessonViewPage() {
         {/* Bookmark (secondary action â€” below title row) */}
         <button
           type="button"
-          onClick={() => setIsBookmarked((b) => !b)}
+          disabled={isBookmarkPending}
+          onClick={handleToggleBookmark}
           className={cn(
             "inline-flex items-center gap-2 text-sm font-medium mb-8 transition-colors",
             isBookmarked ? "text-sky-600" : "text-slate-400 hover:text-sky-500",
+            isBookmarkPending && "cursor-wait opacity-70",
           )}
           aria-label={isBookmarked ? "Bỏ đánh dấu" : "Đánh dấu bài học này"}
         >
-          <Bookmark
-            size={15}
-            className={cn("transition-all", isBookmarked && "fill-current")}
-          />
+          {isBookmarkPending ? (
+            <Loader2 size={15} className="animate-spin" />
+          ) : (
+            <Bookmark
+              size={15}
+              className={cn("transition-all", isBookmarked && "fill-current")}
+            />
+          )}
           {isBookmarked ? "Đã đánh dấu" : "Đánh dấu bài học này"}
         </button>
 
