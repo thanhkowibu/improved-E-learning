@@ -206,12 +206,12 @@ export default function CurriculumEditor({ courseId }: Props) {
   return (
     <div className="pt-8">
       {/* Section header */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-lg bg-sky-50 flex items-center justify-center">
+      <div className="mb-5 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-start gap-2.5 sm:items-center">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-50">
             <BookOpen size={16} className="text-sky-500" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h2 className="text-base font-semibold text-slate-900">
               Chương trình học
             </h2>
@@ -222,7 +222,7 @@ export default function CurriculumEditor({ courseId }: Props) {
           </div>
         </div>
         {/* Module count badge */}
-        <span className="text-xs text-slate-400 font-medium tabular-nums">
+        <span className="shrink-0 text-xs font-medium tabular-nums text-slate-400">
           {sortedModules.length} học phần
         </span>
       </div>
@@ -296,7 +296,7 @@ export default function CurriculumEditor({ courseId }: Props) {
         {isAddingModule ? (
           <form
             onSubmit={handleCreateModuleSubmit}
-            className="flex items-center gap-2 p-3 rounded-xl border border-dashed border-sky-300 bg-sky-50/50"
+            className="flex min-w-0 flex-col gap-2 rounded-xl border border-dashed border-sky-300 bg-sky-50/50 p-3 sm:flex-row sm:items-center"
           >
             <input
               autoFocus
@@ -314,13 +314,13 @@ export default function CurriculumEditor({ courseId }: Props) {
                 }
               }}
               placeholder="New module title…"
-              className="flex-1 bg-transparent border-none outline-none text-sm text-slate-900 placeholder-slate-400 disabled:cursor-not-allowed disabled:opacity-60"
+              className="min-w-0 flex-1 border-none bg-transparent text-sm text-slate-900 outline-none placeholder-slate-400 disabled:cursor-not-allowed disabled:opacity-60"
             />
             <Button
               type="submit"
               size="sm"
               disabled={isCreatingModule || !newModuleTitle.trim()}
-              className="h-8 bg-sky-500 hover:bg-sky-600 text-white gap-1 shrink-0"
+              className="h-8 shrink-0 gap-1 bg-sky-500 text-white hover:bg-sky-600"
             >
               {isCreatingModule ? (
                 <Loader2 size={12} className="animate-spin" />
@@ -338,7 +338,7 @@ export default function CurriculumEditor({ courseId }: Props) {
                 setNewModuleTitle("");
               }}
               disabled={isCreatingModule}
-              className="h-8 text-slate-500 shrink-0"
+              className="h-8 shrink-0 text-slate-500"
             >
               Hủy
             </Button>

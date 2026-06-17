@@ -150,7 +150,7 @@ function CourseRow({ course }: { course: CourseItem }) {
             className="h-8 px-3 bg-sky-500 hover:bg-sky-600 text-white gap-1.5"
           >
             <Pencil size={12} />
-            Edit
+            Sửa
           </Button>
         </Link>
       </div>

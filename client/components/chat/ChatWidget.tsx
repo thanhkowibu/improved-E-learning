@@ -351,7 +351,7 @@ export function ChatWidget({
     >
       <WidgetHeader courseId={courseId} isStandalone={isStandalone} />
 
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <ThreadSidebar
           threads={threads}
           activeThreadId={activeThreadId}
@@ -360,7 +360,7 @@ export function ChatWidget({
           onDeleteThread={handleDeleteThread}
         />
 
-        <section className="flex min-w-0 flex-1 flex-col">
+        <section className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="min-h-0 flex-1">
             <MessageList
               messages={messages}

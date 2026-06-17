@@ -277,7 +277,7 @@ export default function ModuleItem({
       <div ref={setNodeRef} style={style}>
         <Card className="border border-slate-200 shadow-sm bg-white rounded-xl overflow-hidden">
           {/* ── Module Header ── */}
-          <CardHeader className="flex-row items-center gap-3 py-3 px-4 border-b border-slate-100 bg-slate-50/60 rounded-none">
+          <CardHeader className="flex-row items-center gap-2 rounded-none border-b border-slate-100 bg-slate-50/60 px-3 py-3 sm:gap-3 sm:px-4">
             {/* Drag handle — touch target isolated from card click area */}
             <button
               type="button"
@@ -292,7 +292,7 @@ export default function ModuleItem({
             {/* Title or inline edit */}
             <div className="flex-1 min-w-0">
               {isEditingTitle ? (
-                <div className="flex items-center gap-2">
+                <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
                   <Input
                     autoFocus
                     value={editTitle}
@@ -301,7 +301,7 @@ export default function ModuleItem({
                       if (e.key === "Enter") saveTitle();
                       if (e.key === "Escape") cancelTitleEdit();
                     }}
-                    className="h-8 text-sm font-semibold"
+                    className="h-8 min-w-0 text-sm font-semibold"
                   />
                   <Button
                     type="button"
@@ -330,7 +330,7 @@ export default function ModuleItem({
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex min-w-0 items-center gap-2">
                   <span className="text-sm font-semibold text-slate-900 truncate">
                     {module.title}
                   </span>
@@ -346,7 +346,7 @@ export default function ModuleItem({
 
             {/* Module action buttons */}
             {!isEditingTitle && (
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex shrink-0 items-center gap-1">
                 <Button
                   type="button"
                   variant="ghost"
@@ -393,7 +393,7 @@ export default function ModuleItem({
                 {sortedLessons.map((lesson, idx) => (
                   <li
                     key={lesson.id}
-                    className="flex items-center gap-3 px-4 py-2.5 bg-white hover:bg-slate-50/80 transition-colors group/lesson"
+                    className="flex min-w-0 items-center gap-2 bg-white px-3 py-2.5 transition-colors hover:bg-slate-50/80 sm:gap-3 sm:px-4 group/lesson"
                   >
                     {/* Lesson index */}
                     <span className="text-xs font-medium text-slate-400 w-5 text-center shrink-0 tabular-nums">
@@ -406,7 +406,7 @@ export default function ModuleItem({
                     </span>
 
                     {/* Lesson action buttons */}
-                    <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover/lesson:opacity-100 transition-opacity">
+                    <div className="flex shrink-0 items-center gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover/lesson:opacity-100">
                       {/* Up */}
                       <Button
                         type="button"
@@ -483,7 +483,7 @@ export default function ModuleItem({
             <div className="px-4 py-3 border-t border-dashed border-slate-200 bg-slate-50/40">
               {isAddingLesson ? (
                 <form onSubmit={handleCreateLessonSubmit} className="space-y-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
                     <Input
                       autoFocus
                       value={newLessonTitle}
@@ -501,13 +501,13 @@ export default function ModuleItem({
                           setNewLessonType(LessonType.LECTURE);
                         }
                       }}
-                      className="h-8 text-sm"
+                      className="h-8 min-w-0 text-sm"
                     />
                     <Button
                       type="submit"
                       size="sm"
                       disabled={isCreatingLesson || !newLessonTitle.trim()}
-                      className="h-8 bg-sky-500 hover:bg-sky-600 text-white shrink-0 gap-1"
+                      className="h-8 shrink-0 gap-1 bg-sky-500 text-white hover:bg-sky-600"
                     >
                       {isCreatingLesson ? (
                         <Loader2 size={12} className="animate-spin" />

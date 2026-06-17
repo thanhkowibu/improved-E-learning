@@ -61,7 +61,8 @@ interface LearnPageData {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 /** Shared container — mirrors the Navbar exactly. */
-const CONTENT_CLS = "mx-auto px-6 md:px-12 lg:px-24 max-w-7xl";
+const CONTENT_CLS =
+  "mx-auto w-full min-w-0 max-w-7xl overflow-x-hidden px-4 sm:px-6 md:px-12 lg:px-24";
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -107,7 +108,7 @@ function LessonRow({
     <Link
       href={`/courses/${courseId}/lessons/${lesson.id}`}
       className={cn(
-        "group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-150",
+        "group flex w-full min-w-0 max-w-full items-center gap-2 overflow-hidden rounded-xl px-3 py-3 transition-all duration-150 sm:gap-3 sm:px-4",
         "hover:bg-sky-50/80 hover:shadow-sm",
         isNext && "bg-sky-50/60 ring-1 ring-sky-200",
         isCompleted && "opacity-80",
@@ -137,7 +138,7 @@ function LessonRow({
       {/* Lesson title */}
       <span
         className={cn(
-          "flex-1 text-sm font-medium leading-snug",
+          "min-w-0 flex-1 truncate text-sm font-medium leading-snug",
           isCompleted
             ? "text-slate-500 line-through decoration-slate-300"
             : "text-slate-700 group-hover:text-sky-700",
@@ -148,7 +149,7 @@ function LessonRow({
 
       {/* "Next" chip */}
       {isNext && (
-        <Badge className="bg-sky-100 text-sky-700 text-[10px] font-semibold shrink-0 h-5">
+        <Badge className="hidden h-5 shrink-0 bg-sky-100 text-[10px] font-semibold text-sky-700 sm:inline-flex">
           Tiếp theo
         </Badge>
       )}
@@ -186,15 +187,15 @@ function ModuleItem({
   return (
     <AccordionItem
       value={mod.id}
-      className="border border-slate-200 rounded-2xl bg-white overflow-hidden shadow-xs"
+      className="box-border w-full min-w-0 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs sm:max-w-full"
     >
       <AccordionTrigger
         className={cn(
-          "px-5 py-4 hover:no-underline hover:bg-slate-50/60 transition-colors rounded-none",
+          "box-border w-full min-w-0 max-w-full overflow-hidden rounded-none px-4 py-4 transition-colors hover:bg-slate-50/60 hover:no-underline sm:px-5",
           "[&>svg]:hidden", // hide default chevron — we render our own badge
         )}
       >
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex min-w-0 max-w-full flex-1 items-center gap-2 overflow-hidden sm:gap-3">
           {/* Module number badge */}
           <span
             className={cn(
@@ -212,7 +213,7 @@ function ModuleItem({
           </span>
 
           {/* Title + count */}
-          <div className="flex-1 min-w-0 text-left">
+          <div className="min-w-0 flex-1 overflow-hidden text-left">
             <p className="font-semibold text-slate-900 text-sm leading-snug truncate">
               {mod.title}
             </p>
@@ -235,13 +236,13 @@ function ModuleItem({
         </div>
       </AccordionTrigger>
 
-      <AccordionContent className="px-2 pb-2">
+      <AccordionContent className="min-w-0 max-w-full overflow-hidden px-1 pb-2 sm:px-2">
         {mod.lessons.length === 0 ? (
           <p className="px-4 py-3 text-sm text-slate-400 italic">
             Chưa có bài học trong học phần này.
           </p>
         ) : (
-          <div className="space-y-0.5 pt-1">
+          <div className="min-w-0 max-w-full space-y-0.5 overflow-hidden pt-1">
             {mod.lessons.map((lesson, lessonIdx) => (
               <LessonRow
                 key={lesson.id}
@@ -547,7 +548,7 @@ export default function CourseLearningPage() {
   // ── Main render ─────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 pb-20">
       {/* ══════════════════════════════════════════════════════════════
           HERO STRIP — sky gradient with course title & progress
       ══════════════════════════════════════════════════════════════ */}
@@ -562,7 +563,7 @@ export default function CourseLearningPage() {
 
         <div className={`relative ${CONTENT_CLS} py-10`}>
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-sky-100 text-xs mb-5">
+          <nav className="mb-5 flex min-w-0 items-center gap-1.5 overflow-hidden text-xs text-sky-100">
             <Link
               href="/courses"
               className="hover:text-white transition-colors"
@@ -572,7 +573,7 @@ export default function CourseLearningPage() {
             <ChevronRight size={11} className="opacity-60" />
             <Link
               href={`/courses/${courseId}`}
-              className="hover:text-white transition-colors truncate max-w-xs"
+              className="max-w-[45vw] truncate transition-colors hover:text-white sm:max-w-xs"
             >
               {course.title}
             </Link>
@@ -582,7 +583,7 @@ export default function CourseLearningPage() {
 
           {/* Title row */}
           <div className="flex flex-col md:flex-row md:items-end gap-6">
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight line-clamp-2">
                 {course.title}
               </h1>
@@ -637,10 +638,10 @@ export default function CourseLearningPage() {
           MAIN CONTENT — two-column layout (accordion + sidebar)
       ══════════════════════════════════════════════════════════════ */}
       <div className={`${CONTENT_CLS} pt-8`}>
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className="flex w-full min-w-0 max-w-full flex-col items-start gap-8 overflow-x-hidden lg:flex-row">
           {/* ── Left: Curriculum Accordion ── */}
-          <section className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-5">
+          <section className="w-full min-w-0 max-w-full flex-1 overflow-x-hidden">
+            <div className="mb-5 flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-xl font-bold text-slate-900">
                 Chương trình học
               </h2>
@@ -672,7 +673,7 @@ export default function CourseLearningPage() {
               <Accordion
                 value={openModules}
                 onValueChange={setOpenModules}
-                className="space-y-3"
+                className="w-full min-w-0 max-w-full space-y-3 overflow-hidden"
               >
                 {course.modules.map((mod, i) => (
                   <ModuleItem

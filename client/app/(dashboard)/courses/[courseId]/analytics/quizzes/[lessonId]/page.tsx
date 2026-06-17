@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
 import { toast } from "sonner";
 import {
   AlertCircle,
@@ -409,7 +411,12 @@ export default function QuizAnalyticsDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed">
-                    <ReactMarkdown>{aiAdvice}</ReactMarkdown>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkMath]}
+                      rehypePlugins={[rehypeKatex]}
+                    >
+                      {aiAdvice}
+                    </ReactMarkdown>
                   </div>
                 </CardContent>
               </Card>

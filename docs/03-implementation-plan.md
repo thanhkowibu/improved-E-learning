@@ -589,13 +589,12 @@
 
 ### 8D — Responsive Design Pass
 
-- [ ] **[Next.js]** Audit and fix the dashboard sidebar — collapse to a hamburger menu or bottom nav on mobile breakpoints (`md:` and below)
-- [ ] **[Next.js]** Fix course catalog grid — ensure cards stack to single-column on mobile, 2 columns on tablet, 3–4 on desktop
-- [ ] **[Next.js]** Fix Course Learning page — ensure no x-overflow in each lesson item on mobile
-- [ ] **[Next.js]** Fix standalone AI Tutor chat page — ensure the chat history sidebar not taking up the screen and hide the chat content on mobile
-- [ ] **[Next.js]** Fix the quiz builder — ensure the dynamic form is usable on tablet-width screens (stack question options vertically)
-- [ ] **[Next.js]** Fix the admin tables (users, analytics) — add horizontal scroll wrapper (`overflow-x-auto`) for data tables on mobile
-- [ ] **[Next.js]** Test all critical flows on Chrome DevTools mobile emulator (iPhone SE, iPad, and standard desktop)
+- [x] **[Next.js]** Audit and fix the top navbar — collapse to a Navigation Menu component of ShadCN on mobile breakpoints (`md:` and below)
+- [x] **[Next.js]** Fix course catalog grid — ensure cards stack to single-column on mobile, 2 columns on tablet, 3 on desktop
+- [x] **[Next.js]** Fix Course Learning page — ensure no x-overflow in each lesson item on mobile
+- [x] **[Next.js]** Fix AI Tutor chat Sheet in Lesson page & standalone AI Tutor chat page — ensure the chat history sidebar not taking up the screen and hide the chat content on mobile
+- [x] **[Next.js]** Fix overflow buttons when click "Thêm học phần" (Add new module) in Course Edit page
+- [x] **[Next.js]** Test all critical flows on Chrome DevTools mobile emulator (iPhone SE, iPad, and standard desktop)
 
 ### 8E — Final Production Deployment
 

@@ -31,9 +31,17 @@ import {
   ChevronDown,
   GraduationCap,
   LogOut,
+  Menu,
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -126,6 +134,7 @@ function NavLink({ item }: { item: NavItem }) {
 
 export default function Navbar() {
   const { user, isAuthenticated, logout, isLoading } = useAuth();
+  const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navItems = getNav(user?.role);
@@ -166,6 +175,38 @@ export default function Navbar() {
               <NavLink key={item.href} item={item} />
             ))}
           </nav>
+
+          <NavigationMenu
+            className="flex flex-1 justify-start md:hidden"
+            aria-label="Mobile navigation"
+          >
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="gap-1.5 text-slate-600">
+                  <Menu size={16} />
+                  Menu
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="w-56 p-2">
+                  <div className="grid gap-1">
+                    {navItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                          "rounded-lg px-3 py-2 text-sm font-semibold transition-colors",
+                          pathname === item.href
+                            ? "bg-sky-50 text-sky-700"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
 
           {/* ── Right actions ── */}
           <div className="ml-auto flex items-center gap-2">

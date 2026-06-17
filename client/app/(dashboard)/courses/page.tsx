@@ -16,7 +16,7 @@ import { useCourses } from "@/hooks/useCourses";
 
 function CourseGridSkeleton() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="rounded-2xl overflow-hidden border border-slate-200 bg-white">
           <Skeleton className="aspect-video w-full" />
@@ -37,7 +37,7 @@ export default function CourseCatalogPage() {
   const { courses, isLoading, error, refetch } = useCourses({ search });
 
   return (
-    <div className="container mx-auto px-6 md:px-24 py-8 max-w-7xl">
+    <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-12 lg:px-24">
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Danh mục khóa học
@@ -47,8 +47,8 @@ export default function CourseCatalogPage() {
         </p>
       </div>
 
-      <div className="mb-8 flex gap-3 max-w-xl">
-        <div className="relative flex-1">
+      <div className="mb-8 flex max-w-xl flex-col gap-3 sm:flex-row">
+        <div className="relative min-w-0 flex-1">
           <Search
             size={16}
             className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
@@ -129,7 +129,7 @@ export default function CourseCatalogPage() {
       )}
 
       {!isLoading && !error && courses.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {courses.map((course) => (
             <CourseCard key={course.id} course={course} variant="catalog" />
           ))}
