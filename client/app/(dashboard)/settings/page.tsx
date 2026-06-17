@@ -160,7 +160,7 @@ function SettingsSkeleton() {
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user, isLoading: isAuthLoading, refreshUser } = useAuth();
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
@@ -273,6 +273,7 @@ export default function SettingsPage() {
         throw new Error(json.message ?? "Không thể cập nhật hồ sơ.");
       }
 
+      await refreshUser();
       toast.success("Cập nhật hồ sơ thành công!", { id: toastId });
       router.refresh();
     } catch (error) {

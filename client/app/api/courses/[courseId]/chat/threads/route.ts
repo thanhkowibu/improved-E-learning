@@ -23,6 +23,14 @@ function serviceErrorResponse(error: ChatServiceError) {
   return apiError(error.message, error.status);
 }
 
+function isAiReadinessError(error: ChatServiceError) {
+  const normalized = error.message.toLowerCase();
+  return (
+    (error.status === 403 || error.status === 422) &&
+    normalized.includes("ai tutor")
+  );
+}
+
 export async function GET(request: NextRequest, context: RouteContext) {
   try {
     const { courseId } = await context.params;
@@ -35,6 +43,14 @@ export async function GET(request: NextRequest, context: RouteContext) {
       return err.status === 403 ? forbidden(err.message) : unauthorized(err.message);
     }
     if (err instanceof ChatServiceError) {
+      if (isAiReadinessError(err)) {
+        return ok({
+          aiEnabled: false,
+          message: err.message,
+          threads: [],
+        });
+      }
+
       return serviceErrorResponse(err);
     }
     console.error("[GET /api/courses/:courseId/chat/threads]", err);

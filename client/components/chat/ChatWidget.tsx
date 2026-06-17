@@ -35,6 +35,12 @@ interface ApiThread {
   updatedAt: string;
 }
 
+interface ChatThreadsStatus {
+  aiEnabled: false;
+  message?: string;
+  threads: ApiThread[];
+}
+
 interface ApiMessage {
   id: string;
   role: "user" | "model";
@@ -123,7 +129,7 @@ export function ChatWidget({
     setIsThreadLoading(true);
 
     try {
-      const response = await api.get<ApiThread[]>(
+      const response = await api.get<ApiThread[] | ChatThreadsStatus>(
         `/api/courses/${courseId}/chat/threads`,
       );
 
@@ -141,6 +147,20 @@ export function ChatWidget({
       }
 
       setAiUnavailableMessage(null);
+      if (!Array.isArray(response.data)) {
+        if (response.data.aiEnabled === false) {
+          setAiUnavailableMessage(
+            response.data.message ?? "Trợ giảng AI chưa sẵn sàng.",
+          );
+          setThreads([]);
+          setActiveThreadId(null);
+          setMessages([]);
+          return;
+        }
+
+        throw new Error("Không thể tải danh sách trò chuyện.");
+      }
+
       const loadedThreads = response.data;
       setThreads(loadedThreads);
       setActiveThreadId((current) => current ?? loadedThreads[0]?.id ?? null);

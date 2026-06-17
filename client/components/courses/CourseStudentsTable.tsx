@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, Loader2, UserRound, Users } from "lucide-react";
+import { AlertCircle, ArrowUpDown, UserRound, Users } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -41,6 +41,9 @@ interface CourseStudentsResponse {
   limit: number;
   pages: number;
 }
+
+type SortColumn = "enrolledAt" | "progressPercentage";
+type SortDirection = "asc" | "desc";
 
 function getInitials(name: string) {
   return name
@@ -84,6 +87,33 @@ export function CourseStudentsTable({ courseId }: CourseStudentsTableProps) {
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortColumn, setSortColumn] = useState<SortColumn>("enrolledAt");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  const sortedStudents = useMemo(() => {
+    return [...students].sort((a, b) => {
+      const left =
+        sortColumn === "enrolledAt"
+          ? new Date(a.enrolledAt).getTime()
+          : a.progressPercentage;
+      const right =
+        sortColumn === "enrolledAt"
+          ? new Date(b.enrolledAt).getTime()
+          : b.progressPercentage;
+
+      return sortDirection === "asc" ? left - right : right - left;
+    });
+  }, [students, sortColumn, sortDirection]);
+
+  function handleSort(column: SortColumn) {
+    if (sortColumn === column) {
+      setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
+      return;
+    }
+
+    setSortColumn(column);
+    setSortDirection("desc");
+  }
 
   const loadStudents = useCallback(async () => {
     setIsLoading(true);
@@ -169,12 +199,30 @@ export function CourseStudentsTable({ courseId }: CourseStudentsTableProps) {
             <TableRow>
               <TableHead className="px-4 py-3">Sinh viên</TableHead>
               <TableHead className="px-4 py-3">Email</TableHead>
-              <TableHead className="px-4 py-3">Ngày đăng ký</TableHead>
-              <TableHead className="px-4 py-3">Tiến độ</TableHead>
+              <TableHead className="px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => handleSort("enrolledAt")}
+                  className="inline-flex items-center gap-1.5 font-semibold text-slate-700 hover:text-sky-600"
+                >
+                  Ngày đăng ký
+                  <ArrowUpDown size={14} />
+                </button>
+              </TableHead>
+              <TableHead className="px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => handleSort("progressPercentage")}
+                  className="inline-flex items-center gap-1.5 font-semibold text-slate-700 hover:text-sky-600"
+                >
+                  Tiến độ
+                  <ArrowUpDown size={14} />
+                </button>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {students.map((enrollment) => {
+            {sortedStudents.map((enrollment) => {
               const progress = Math.max(
                 0,
                 Math.min(100, enrollment.progressPercentage),

@@ -292,7 +292,16 @@ function QuizSection({ lessonId }: { lessonId: string }) {
     setView("HISTORY");
     setReviewAttempt(null);
 
-    const quizRes = await api.get<QuizData>(`/api/lessons/${lessonId}/quiz`);
+    const quizRes = await api.get<QuizData | null>(
+      `/api/lessons/${lessonId}/quiz`,
+    );
+    if (quizRes.success && quizRes.data === null) {
+      setQuiz(null);
+      setAttempts([]);
+      setIsLoading(false);
+      return;
+    }
+
     if (!quizRes.success || !quizRes.data) {
       const message = quizRes.error ?? quizRes.message ?? "";
       if (message.toLowerCase().includes("not found")) {

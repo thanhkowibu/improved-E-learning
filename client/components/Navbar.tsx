@@ -33,8 +33,10 @@ import {
   LogOut,
   Menu,
   Settings,
+  UserRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -233,9 +235,12 @@ export default function Navbar() {
                     aria-expanded={dropdownOpen}
                   >
                     {/* Avatar */}
-                    <div className="h-8 w-8 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shadow-sm shrink-0">
-                      {getInitials(user.fullName)}
-                    </div>
+                    <Avatar className="h-8 w-8 shrink-0 shadow-sm">
+                      <AvatarImage src={user.avatarUrl ?? undefined} />
+                      <AvatarFallback className="bg-linear-to-br from-sky-400 to-sky-600 text-xs font-bold text-white">
+                        {getInitials(user.fullName)}
+                      </AvatarFallback>
+                    </Avatar>
                     {/* Name + role */}
                     <div className="hidden sm:block text-left">
                       <p className="text-sm font-semibold text-slate-800 leading-none">
@@ -296,6 +301,16 @@ export default function Navbar() {
                           Bảng điều khiển
                         </Link>
                         <Link
+                          href={`/profile/${user.id}`}
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                            <UserRound size={14} className="text-slate-500" />
+                          </div>
+                          Hồ sơ cá nhân
+                        </Link>
+                        <Link
                           href="/settings"
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
@@ -303,7 +318,7 @@ export default function Navbar() {
                           <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
                             <Settings size={14} className="text-slate-500" />
                           </div>
-                          Hồ sơ & cài đặt
+                          Cài đặt
                         </Link>
                       </div>
 

@@ -62,12 +62,20 @@ export async function GET(request: NextRequest, context: RouteContext) {
     assertQuizLesson(lesson.lessonType);
 
     const quiz = await getQuizByLessonId(lessonId, caller.role);
+    if (quiz.questions.length === 0) {
+      return ok(null);
+    }
+
     return ok(quiz);
   } catch (err) {
     if (err instanceof AuthError) {
       return err.status === 403 ? forbidden(err.message) : unauthorized(err.message);
     }
     if (err instanceof QuizServiceError) {
+      if (err.status === 404) {
+        return ok(null);
+      }
+
       return quizError(err);
     }
     if (err instanceof Error && err.message.includes("not found")) {

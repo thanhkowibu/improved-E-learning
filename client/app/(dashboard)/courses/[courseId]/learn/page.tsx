@@ -30,7 +30,6 @@ import {
   AlertCircle,
   ArrowLeft,
   Award,
-  Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,8 +42,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ChatWidget } from "@/components/chat/ChatWidget";
+import { StickyChatTrigger } from "@/components/chat/StickyChatTrigger";
 import { cn } from "@/lib/utils";
 import { useApi } from "@/hooks/useApi";
 import type {
@@ -703,19 +703,11 @@ export default function CourseLearningPage() {
         </div>
       </div>
 
-      <Button
-        type="button"
-        onClick={() => setIsTutorOpen(true)}
-        className="group fixed right-8 bottom-8 z-50 h-14 rounded-full bg-linear-to-r from-blue-600 via-indigo-500 to-purple-600 px-6 text-white shadow-xl shadow-indigo-500/30 transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50"
-      >
-        <Sparkles size={18} className="group-hover:animate-pulse" />
-        <span className="font-semibold tracking-tight">Hỏi trợ giảng AI</span>
-      </Button>
-
       <Sheet open={isTutorOpen} onOpenChange={setIsTutorOpen}>
+        <SheetTrigger render={<StickyChatTrigger />} />
         <SheetContent
-          side="right"
-          className="flex flex-col gap-0 p-0 data-[side=right]:w-full! data-[side=right]:max-w-none! sm:data-[side=right]:w-4/5! lg:data-[side=right]:w-2/3! 2xl:data-[side=right]:w-[60vw]!"
+          side="left"
+          className="flex flex-col gap-0 p-0 data-[side=left]:w-full! data-[side=left]:max-w-none! sm:data-[side=left]:w-4/5! lg:data-[side=left]:w-2/3! 2xl:data-[side=left]:w-[60vw]!"
         >
           <ChatWidget courseId={courseId} />
         </SheetContent>

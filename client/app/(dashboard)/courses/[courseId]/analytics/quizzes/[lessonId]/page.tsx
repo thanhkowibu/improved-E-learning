@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
@@ -9,6 +9,7 @@ import remarkMath from "remark-math";
 import { toast } from "sonner";
 import {
   AlertCircle,
+  ArrowUpDown,
   ArrowLeft,
   BarChart3,
   Bot,
@@ -61,6 +62,9 @@ interface QuestionAnalyticsRow {
   wrongCount: number;
   errorRatePercentage: number;
 }
+
+type ScoreboardSortColumn = "score" | "submittedAt";
+type SortDirection = "asc" | "desc";
 
 function getStudentName(student: TeacherQuizAttempt["student"]) {
   return `${student.firstName} ${student.lastName}`.trim() || "Học viên";
@@ -134,6 +138,41 @@ export default function QuizAnalyticsDetailPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [scoreboardSortColumn, setScoreboardSortColumn] =
+    useState<ScoreboardSortColumn>("submittedAt");
+  const [scoreboardSortDirection, setScoreboardSortDirection] =
+    useState<SortDirection>("desc");
+
+  const sortedAttempts = useMemo(() => {
+    return [...attempts].sort((a, b) => {
+      const left =
+        scoreboardSortColumn === "score"
+          ? a.totalPoints && a.totalPoints > 0 && a.score !== null
+            ? a.score / a.totalPoints
+            : -1
+          : new Date(a.submittedAt ?? a.startedAt).getTime();
+      const right =
+        scoreboardSortColumn === "score"
+          ? b.totalPoints && b.totalPoints > 0 && b.score !== null
+            ? b.score / b.totalPoints
+            : -1
+          : new Date(b.submittedAt ?? b.startedAt).getTime();
+
+      return scoreboardSortDirection === "asc" ? left - right : right - left;
+    });
+  }, [attempts, scoreboardSortColumn, scoreboardSortDirection]);
+
+  function handleScoreboardSort(column: ScoreboardSortColumn) {
+    if (scoreboardSortColumn === column) {
+      setScoreboardSortDirection((current) =>
+        current === "asc" ? "desc" : "asc",
+      );
+      return;
+    }
+
+    setScoreboardSortColumn(column);
+    setScoreboardSortDirection("desc");
+  }
 
   const loadData = useCallback(async () => {
     if (!lessonId) return;
@@ -324,14 +363,30 @@ export default function QuizAnalyticsDetailPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="px-4 py-3">Học viên</TableHead>
-                      <TableHead className="px-4 py-3">Điểm số</TableHead>
                       <TableHead className="px-4 py-3">
-                        Thời gian nộp bài
+                        <button
+                          type="button"
+                          onClick={() => handleScoreboardSort("score")}
+                          className="inline-flex items-center gap-1.5 font-semibold text-slate-700 hover:text-sky-600"
+                        >
+                          Điểm số
+                          <ArrowUpDown size={14} />
+                        </button>
+                      </TableHead>
+                      <TableHead className="px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => handleScoreboardSort("submittedAt")}
+                          className="inline-flex items-center gap-1.5 font-semibold text-slate-700 hover:text-sky-600"
+                        >
+                          Thời gian nộp bài
+                          <ArrowUpDown size={14} />
+                        </button>
                       </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {attempts.map((attempt) => {
+                    {sortedAttempts.map((attempt) => {
                       const name = getStudentName(attempt.student);
 
                       return (
