@@ -215,7 +215,7 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
                 <div>
                   <p className="text-sky-100 text-sm font-medium flex items-center gap-1.5">
                     <Flame size={13} className="text-amber-300" />
-                    Chào mừng quay lại
+                    Chào mừng bạn trở lại,
                   </p>
                   <h2 className="mt-1 text-2xl md:text-3xl font-bold">
                     {firstName}! 👋

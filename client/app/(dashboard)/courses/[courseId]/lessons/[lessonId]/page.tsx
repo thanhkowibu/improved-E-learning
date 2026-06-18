@@ -258,7 +258,7 @@ function MarkCompleteButton({
       ) : (
         <Circle size={15} />
       )}
-      {isCompleted ? "Completed" : "Mark as Complete"}
+      {isCompleted ? "Đã hoàn thành" : "Đánh dấu đã hoàn thành"}
     </Button>
   );
 }
@@ -681,9 +681,7 @@ export default function LessonViewPage() {
         setIsBookmarked(res.data.bookmarked);
         toast.success(
           res.message ??
-            (res.data.bookmarked
-              ? "Đã lưu bài học."
-              : "Đã bỏ lưu bài học."),
+            (res.data.bookmarked ? "Đã lưu bài học." : "Đã bỏ lưu bài học."),
         );
       } else {
         toast.error(
@@ -691,9 +689,7 @@ export default function LessonViewPage() {
         );
       }
     } catch {
-      toast.error(
-        "Không thể cập nhật bài học đã lưu. Vui lòng thử lại sau.",
-      );
+      toast.error("Không thể cập nhật bài học đã lưu. Vui lòng thử lại sau.");
     } finally {
       setIsBookmarkPending(false);
     }

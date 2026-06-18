@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Geist } from "next/font/google";
+import {
+  Inter,
+  Geist,
+  Space_Grotesk,
+  Plus_Jakarta_Sans,
+} from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -8,6 +13,16 @@ import { Toaster } from "@/components/ui/sonner";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const inter = Inter({ subsets: ["latin"] });
+
+const space_grotesk = Space_Grotesk({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-space",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-plus-jakarta",
+});
 
 export const metadata: Metadata = {
   title: "LearnAI — LMS thông minh",
@@ -21,8 +36,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={cn("font-sans", geist.variable)}>
-      <body className={`${inter.className} antialiased min-h-screen bg-white`}>
+    <html
+      lang="vi"
+      className={cn(
+        "font-sans",
+        geist.variable,
+        space_grotesk.variable,
+        plusJakartaSans.variable,
+      )}
+    >
+      <body
+        className={`${plusJakartaSans.className} antialiased min-h-screen bg-white`}
+      >
         <AuthProvider>{children}</AuthProvider>
         <Toaster position="top-center" richColors theme="light" />
       </body>
