@@ -776,3 +776,23 @@ Expose the saved lessons through a compact dialog on the course learning page, w
 ### Rationale
 
 A dedicated join table keeps bookmarks independent from lesson progress and enrollment state. The unique constraint makes toggling idempotent from the user's perspective, and the flat dialog keeps the curriculum layout clean on desktop and mobile.
+
+---
+
+## ADR-018 · Private Course Enrollment Control
+
+**Date:** 2026-06-18
+**Phase:** Post-8D (University Course Administration)
+**Status:** Adopted
+
+### Context
+
+Some university courses are mandatory or closed-enrollment classes. In these courses, students should not self-enroll or self-unenroll; enrollment must be controlled by teachers through administrative actions.
+
+### Decision
+
+Add `Course.isPrivate` as a persisted boolean flag. When enabled, the public student enrollment CTA is disabled and self-service enrollment/drop endpoints reject the action. Teachers and admins can bulk-add students from the course student table by submitting comma- or newline-separated student emails to a dedicated course enrollment API.
+
+### Rationale
+
+Keeping the access mode on the `Course` record makes the rule explicit and easy to enforce at both UI and API layers. Bulk email enrollment fits university workflows while avoiding manual one-by-one enrollment and preserving the existing `Enrollment` model as the single source of truth for course membership.

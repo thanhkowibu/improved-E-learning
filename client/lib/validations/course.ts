@@ -73,6 +73,10 @@ export const courseUpdateSchema = z
       .boolean({ error: "isPublished must be a boolean." })
       .optional(),
 
+    isPrivate: z
+      .boolean({ error: "isPrivate must be a boolean." })
+      .optional(),
+
     aiEnabled: z
       .boolean({ error: "aiEnabled must be a boolean." })
       .optional(),

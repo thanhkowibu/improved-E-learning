@@ -82,6 +82,7 @@ model Course {
   teacherId    String
   aiEnabled    Boolean  @default(false)
   isPublished  Boolean  @default(false)
+  isPrivate    Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

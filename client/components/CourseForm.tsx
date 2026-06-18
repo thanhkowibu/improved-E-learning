@@ -20,7 +20,15 @@ import { useEffect, useImperativeHandle, forwardRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, BookOpen, Image, FileText, Globe, Bot } from "lucide-react";
+import {
+  Loader2,
+  BookOpen,
+  Image,
+  FileText,
+  Globe,
+  Bot,
+  LockKeyhole,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -48,6 +56,7 @@ const courseFormSchema = z.object({
     .union([z.string().url("Must be a valid URL (https://…)"), z.literal("")])
     .optional(),
   isPublished: z.boolean().default(false),
+  isPrivate: z.boolean().default(false),
   aiEnabled: z.boolean().default(false),
 });
 
@@ -120,6 +129,7 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
         description: "",
         thumbnailUrl: "",
         isPublished: false,
+        isPrivate: false,
         aiEnabled: false,
         ...defaultValues,
       },
@@ -134,6 +144,7 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
           description: "",
           thumbnailUrl: "",
           isPublished: false,
+          isPrivate: false,
           aiEnabled: false,
           ...values,
         });
@@ -141,6 +152,7 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
     }));
 
     const watchedAiEnabled = watch("aiEnabled");
+    const watchedIsPrivate = watch("isPrivate");
 
     useEffect(() => {
       if (mode !== "edit" || typeof defaultValues?.aiEnabled !== "boolean") {
@@ -153,6 +165,18 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
         shouldValidate: false,
       });
     }, [defaultValues?.aiEnabled, mode, setValue]);
+
+    useEffect(() => {
+      if (mode !== "edit" || typeof defaultValues?.isPrivate !== "boolean") {
+        return;
+      }
+
+      setValue("isPrivate", defaultValues.isPrivate, {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+    }, [defaultValues?.isPrivate, mode, setValue]);
 
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-7" noValidate>
@@ -250,6 +274,37 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
               />
             </div>
 
+            {/* isPrivate */}
+            <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <div className="flex items-start gap-3">
+                <LockKeyhole
+                  size={18}
+                  className="text-sky-500 mt-0.5 shrink-0"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">
+                    Khóa học Nội bộ (Chỉ Giảng viên mới được thêm sinh viên)
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Khi bật, sinh viên không thể tự do đăng ký hoặc hủy đăng ký
+                    khóa học này.
+                  </p>
+                </div>
+              </div>
+              <Controller
+                name="isPrivate"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    id="course-private"
+                    checked={!!watchedIsPrivate}
+                    onCheckedChange={field.onChange}
+                    className="data-[state=checked]:bg-sky-500"
+                  />
+                )}
+              />
+            </div>
+
             {/* aiEnabled */}
 
             <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50">
@@ -291,7 +346,7 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
             {isSubmitting && <Loader2 size={16} className="animate-spin" />}
             {mode === "create" ? "Tạo khóa học" : "Lưu thay đổi"}
           </Button>
-          {isSubmitting && <p className="text-sm text-slate-500">Saving…</p>}
+          {isSubmitting && <p className="text-sm text-slate-500">Đang lưu…</p>}
         </div>
       </form>
     );

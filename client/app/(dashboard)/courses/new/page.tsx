@@ -37,7 +37,7 @@ export default function NewCoursePage() {
     const toastId = toast.loading("Creating your course…");
 
     // Filter out fields that isn't needed for course creation
-    const { aiEnabled, isPublished, ...submitData } = values;
+    const { aiEnabled, isPublished, isPrivate, ...submitData } = values;
 
     // Map empty thumbnailUrl to null for the API
     const body = {

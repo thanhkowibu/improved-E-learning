@@ -46,7 +46,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
       if (err.message.includes("not found")) return notFound(err.message);
       if (
         err.message.includes("already enrolled") ||
-        err.message.includes("not yet published")
+        err.message.includes("not yet published") ||
+        err.message.includes("nội bộ")
       ) {
         return badRequest(err.message);
       }
@@ -74,7 +75,8 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     if (err instanceof Error) {
       if (
         err.message.includes("not enrolled") ||
-        err.message.includes("already dropped")
+        err.message.includes("already dropped") ||
+        err.message.includes("nội bộ")
       ) {
         return badRequest(err.message);
       }

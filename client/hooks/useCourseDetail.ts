@@ -44,6 +44,7 @@ export interface CourseDetail {
   description: string | null;
   thumbnailUrl: string | null;
   isPublished: boolean;
+  isPrivate: boolean;
   aiEnabled: boolean;
   teacherId: string;
   teacher: { id: string; fullName: string; avatarUrl: string | null };

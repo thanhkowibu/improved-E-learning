@@ -257,6 +257,7 @@ export default function CourseDetailPage() {
                 <EnrollButton
                   courseId={courseId}
                   enrollmentStatus={enrollmentStatus}
+                  isPrivate={course.isPrivate}
                   onStatusChange={refetchEnrollment}
                 />
               </div>

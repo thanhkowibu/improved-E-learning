@@ -35,15 +35,19 @@ export async function enrollStudent(studentId: string, courseId: string) {
   // Confirm the course exists and is published before enrolling.
   const course = await prisma.course.findUnique({
     where: { id: courseId },
-    select: { id: true, isPublished: true },
+    select: { id: true, isPublished: true, isPrivate: true },
   });
 
   if (!course) {
-    throw new Error(`Course with id "${courseId}" not found.`);
+    throw new Error(`Khóa học "${courseId}" không tồn tại.`);
   }
 
   if (!course.isPublished) {
-    throw new Error("You cannot enroll in a course that is not yet published.");
+    throw new Error("Bạn không thể tham gia khóa học chưa xuất bản.");
+  }
+
+  if (course.isPrivate) {
+    throw new Error("Khóa học nội bộ chỉ cho phép giảng viên thêm sinh viên.");
   }
 
   // Check for an existing enrollment (any status).
@@ -53,7 +57,7 @@ export async function enrollStudent(studentId: string, courseId: string) {
   });
 
   if (existing?.status === EnrollmentStatus.ACTIVE) {
-    throw new Error("You are already enrolled in this course.");
+    throw new Error("Bạn đã ở trong khóa học rồi.");
   }
 
   // Upsert: create new or reactivate a DROPPED enrollment.
@@ -77,17 +81,30 @@ export async function enrollStudent(studentId: string, courseId: string) {
  * @throws Error if no ACTIVE enrollment exists for this student+course pair.
  */
 export async function dropEnrollment(studentId: string, courseId: string) {
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    select: { id: true, isPrivate: true },
+  });
+
+  if (!course) {
+    throw new Error(`Course with id "${courseId}" not found.`);
+  }
+
+  if (course.isPrivate) {
+    throw new Error("Không thể hủy đăng ký khóa học nội bộ.");
+  }
+
   const enrollment = await prisma.enrollment.findUnique({
     where: { studentId_courseId: { studentId, courseId } },
     select: { status: true },
   });
 
   if (!enrollment) {
-    throw new Error("You are not enrolled in this course.");
+    throw new Error("Bạn chưa tham gia khóa học này.");
   }
 
   if (enrollment.status === EnrollmentStatus.DROPPED) {
-    throw new Error("You have already dropped this course.");
+    throw new Error("Bạn đã hủy tham gia khóa học rồi.");
   }
 
   return prisma.enrollment.update({
@@ -104,7 +121,7 @@ export async function dropEnrollment(studentId: string, courseId: string) {
  */
 export async function getMyEnrollments(
   studentId: string,
-  statusFilter?: EnrollmentStatus
+  statusFilter?: EnrollmentStatus,
 ) {
   const where: Prisma.EnrollmentWhereInput = { studentId };
   if (statusFilter) {
@@ -201,7 +218,7 @@ export async function getCourseStudents(
     status?: EnrollmentStatus;
     page?: number;
     limit?: number;
-  } = {}
+  } = {},
 ) {
   const page = Math.max(1, options.page ?? 1);
   const limit = Math.min(100, Math.max(1, options.limit ?? 20));

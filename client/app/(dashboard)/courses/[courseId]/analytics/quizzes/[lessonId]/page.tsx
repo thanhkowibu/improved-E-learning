@@ -311,7 +311,7 @@ export default function QuizAnalyticsDetailPage() {
           Chi tiết thống kê quiz
         </h1>
         <p className="mt-1 text-base text-slate-500">
-          Xem bảng điểm của học viên và các câu hỏi mà lớp thường trả lời sai.
+          Xem bảng điểm của sinh viên và các câu hỏi mà lớp thường trả lời sai.
         </p>
       </div>
 
@@ -341,7 +341,7 @@ export default function QuizAnalyticsDetailPage() {
             <div>
               <h2 className="text-xl font-bold text-slate-900">Bảng điểm</h2>
               <p className="mt-1 text-sm text-slate-500">
-                Danh sách lượt nộp bài của học viên trong bài kiểm tra này.
+                Danh sách lượt nộp bài của sinh viên trong bài kiểm tra này.
               </p>
             </div>
 
@@ -353,7 +353,7 @@ export default function QuizAnalyticsDetailPage() {
                     Chưa có lượt nộp bài
                   </p>
                   <p className="mt-1 text-sm text-slate-500">
-                    Khi học viên nộp bài, bảng điểm sẽ xuất hiện tại đây.
+                    Khi sinh viên nộp bài, bảng điểm sẽ xuất hiện tại đây.
                   </p>
                 </div>
               </div>

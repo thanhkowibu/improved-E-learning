@@ -34,12 +34,14 @@ import type { EnrollmentStatus } from "@/hooks/useCourseDetail";
 interface EnrollButtonProps {
   courseId: string;
   enrollmentStatus: EnrollmentStatus;
+  isPrivate?: boolean;
   onStatusChange: () => void;
 }
 
 export default function EnrollButton({
   courseId,
   enrollmentStatus,
+  isPrivate = false,
   onStatusChange,
 }: EnrollButtonProps) {
   const api = useApi();
@@ -116,19 +118,21 @@ export default function EnrollButton({
               Tiếp tục học
             </Button>
           </Link>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsUnenrollDialogOpen(true)}
-            disabled={pending}
-            className="text-slate-200 border-slate-300 hover:text-red-600 hover:bg-red-50 rounded-xl text-sm"
-          >
-            {pending ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              "Hủy đăng ký"
-            )}
-          </Button>
+          {!isPrivate && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsUnenrollDialogOpen(true)}
+              disabled={pending}
+              className="text-slate-200 border-slate-300 hover:text-red-600 hover:bg-red-50 rounded-xl text-sm"
+            >
+              {pending ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                "Hủy đăng ký"
+              )}
+            </Button>
+          )}
         </div>
 
         <AlertDialog
@@ -189,6 +193,18 @@ export default function EnrollButton({
   }
 
   if (enrollmentStatus === "DROPPED") {
+    if (isPrivate) {
+      return (
+        <Button
+          id="enroll-btn"
+          disabled
+          className="bg-slate-200 text-slate-800 rounded-xl px-8 py-3 text-base font-semibold cursor-not-allowed"
+        >
+          Khóa học nội bộ
+        </Button>
+      );
+    }
+
     return (
       <Button
         onClick={handleEnroll}
@@ -201,6 +217,18 @@ export default function EnrollButton({
           <RotateCcw size={18} />
         )}
         Đăng ký lại
+      </Button>
+    );
+  }
+
+  if (isPrivate) {
+    return (
+      <Button
+        id="enroll-btn"
+        disabled
+        className="bg-slate-200 text-slate-600 rounded-xl px-8 py-3 text-base font-semibold cursor-not-allowed"
+      >
+        Khóa học nội bộ
       </Button>
     );
   }

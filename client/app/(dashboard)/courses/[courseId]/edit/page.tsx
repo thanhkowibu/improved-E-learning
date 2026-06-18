@@ -138,6 +138,7 @@ export default function EditCoursePage() {
       description: values.description?.trim() || null,
       thumbnailUrl: values.thumbnailUrl?.trim() || null,
       isPublished: values.isPublished,
+      isPrivate: values.isPrivate,
       aiEnabled: values.aiEnabled,
     };
 
@@ -153,6 +154,7 @@ export default function EditCoursePage() {
         description: values.description ?? "",
         thumbnailUrl: values.thumbnailUrl ?? "",
         isPublished: values.isPublished,
+        isPrivate: values.isPrivate,
         aiEnabled: values.aiEnabled,
       });
       await refetchCourse();
@@ -214,6 +216,7 @@ export default function EditCoursePage() {
     description: course.description ?? "",
     thumbnailUrl: course.thumbnailUrl ?? "",
     isPublished: course.isPublished,
+    isPrivate: course.isPrivate,
     aiEnabled: course.aiEnabled,
   };
 
