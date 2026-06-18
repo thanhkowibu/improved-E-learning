@@ -1,4 +1,4 @@
-# Architecture Decisions — LearnAI LMS
+# Architecture Decisions — RakuLearn LMS
 
 > This document records significant architectural and security decisions made
 > during development. Each entry captures the **context**, the **decision**, and
@@ -23,8 +23,8 @@ contained the following comment — and the corresponding logic:
 ```
 
 This delegated the access decision for the **module** endpoint to the
-**course** endpoint. The assumption was: *"If a user can reach the module
-list, they must have already passed the course visibility check."*
+**course** endpoint. The assumption was: _"If a user can reach the module
+list, they must have already passed the course visibility check."_
 
 This is a **Frontend-Driven Security** pattern — it assumes the client
 (browser or app) will always call the course endpoint before calling the
@@ -52,9 +52,9 @@ No endpoint assumes that a prior request validated authorization.
 The fix adds a **publication gate** directly to every module GET handler:
 
 ```ts
-const course = await fetchCourseGate(courseId);   // minimal 2-column SELECT
+const course = await fetchCourseGate(courseId); // minimal 2-column SELECT
 if (!course.isPublished) {
-  const caller = await getAuthUser(request);       // may throw AuthError
+  const caller = await getAuthUser(request); // may throw AuthError
   if (!isOwner && !isAdmin) {
     return notFound("Course not found or not yet published.");
   }
@@ -63,12 +63,12 @@ if (!course.isPublished) {
 
 The same pattern is applied consistently across the entire API surface:
 
-| Endpoint | Publication Gate | Auth Gate |
-|---|---|---|
-| `GET /api/courses/:id` | ✅ Independent | ✅ Independent |
-| `GET /api/courses/:id/modules` | ✅ Independent | ✅ Independent |
-| `GET /api/courses/:id/modules/:id` | ✅ Independent | ✅ Independent |
-| `GET /api/lessons/:id` | ✅ Independent | ✅ Independent |
+| Endpoint                           | Publication Gate | Auth Gate      |
+| ---------------------------------- | ---------------- | -------------- |
+| `GET /api/courses/:id`             | ✅ Independent   | ✅ Independent |
+| `GET /api/courses/:id/modules`     | ✅ Independent   | ✅ Independent |
+| `GET /api/courses/:id/modules/:id` | ✅ Independent   | ✅ Independent |
+| `GET /api/lessons/:id`             | ✅ Independent   | ✅ Independent |
 
 ### Prisma Query Optimisation
 
@@ -90,6 +90,7 @@ async function fetchCourseGate(courseId: string) {
 ```
 
 **Why this matters:**
+
 - The `description` and potential future `content` fields on a course can
   be large. Selecting only the gate fields keeps the check lightweight.
 - The Prisma `select` clause translates directly to a SQL column projection:
@@ -113,15 +114,15 @@ by non-owners. This is the same pattern used by platforms such as GitHub
 
 ### Key Design & Optimisation Decisions Summary
 
-| Property | Frontend-Driven Security (before) | Zero Trust (adopted) |
-|---|---|---|
-| Access decision location | Client call order assumed | Each route handler independently |
-| Failure mode | One bypass = full exposure | Each layer fails independently |
-| API testability | Only testable via browser flow | Each endpoint testable in isolation |
-| Audit surface | Implicit, distributed across call chain | Explicit, co-located with each route |
-| Prisma query cost per gate check | Full row fetch (all columns) | 2-column `SELECT` projection |
-| Response for non-owner on unpublished | `403 Forbidden` (leaks existence) | `404 Not Found` (prevents enumeration) |
-| Inter-endpoint dependency | High — modules trust course endpoint | None — each route is self-sufficient |
+| Property                              | Frontend-Driven Security (before)       | Zero Trust (adopted)                   |
+| ------------------------------------- | --------------------------------------- | -------------------------------------- |
+| Access decision location              | Client call order assumed               | Each route handler independently       |
+| Failure mode                          | One bypass = full exposure              | Each layer fails independently         |
+| API testability                       | Only testable via browser flow          | Each endpoint testable in isolation    |
+| Audit surface                         | Implicit, distributed across call chain | Explicit, co-located with each route   |
+| Prisma query cost per gate check      | Full row fetch (all columns)            | 2-column `SELECT` projection           |
+| Response for non-owner on unpublished | `403 Forbidden` (leaks existence)       | `404 Not Found` (prevents enumeration) |
+| Inter-endpoint dependency             | High — modules trust course endpoint    | None — each route is self-sufficient   |
 
 ---
 
@@ -138,12 +139,12 @@ JWTs can be stored in `localStorage` (accessible by JS) or HTTP-only cookies
 
 Each has trade-offs:
 
-| | localStorage | HTTP-only Cookie |
-|---|---|---|
-| XSS risk | **High** — JS can read it | **None** — browser protects it |
-| CSRF risk | None — not auto-sent | Mitigated by `SameSite=Lax` |
-| Works for API clients (curl, mobile) | ✅ Yes | ❌ No — not auto-sent |
-| Works for Next.js middleware (Edge) | ❌ No — no browser | ✅ Yes |
+|                                      | localStorage              | HTTP-only Cookie               |
+| ------------------------------------ | ------------------------- | ------------------------------ |
+| XSS risk                             | **High** — JS can read it | **None** — browser protects it |
+| CSRF risk                            | None — not auto-sent      | Mitigated by `SameSite=Lax`    |
+| Works for API clients (curl, mobile) | ✅ Yes                    | ❌ No — not auto-sent          |
+| Works for Next.js middleware (Edge)  | ❌ No — no browser        | ✅ Yes                         |
 
 ### Decision: Both
 
@@ -179,12 +180,12 @@ intentionally kept inline for auditability).
 
 ### Rationale
 
-| Concern | Without Service Layer | With Service Layer |
-|---|---|---|
-| Reuse | Prisma queries duplicated across routes | One source of truth per operation |
-| Testing | Must spin up HTTP server to test DB logic | Service functions are unit-testable |
-| Password leakage | Must remember `omit` in every route | `omit: { hashedPassword: true }` enforced once in service |
-| Ownership check | Duplicated `where: { id, teacherId }` across routes | Centralised in `check-ownership.ts` |
+| Concern          | Without Service Layer                               | With Service Layer                                        |
+| ---------------- | --------------------------------------------------- | --------------------------------------------------------- |
+| Reuse            | Prisma queries duplicated across routes             | One source of truth per operation                         |
+| Testing          | Must spin up HTTP server to test DB logic           | Service functions are unit-testable                       |
+| Password leakage | Must remember `omit` in every route                 | `omit: { hashedPassword: true }` enforced once in service |
+| Ownership check  | Duplicated `where: { id, teacherId }` across routes | Centralised in `check-ownership.ts`                       |
 
 ---
 
@@ -231,10 +232,10 @@ executed atomically via `prisma.$transaction`.
 The project uses Zod **v4.4.3**. Two breaking API changes from v3 affect
 all validation schemas and error handlers:
 
-| v3 API | v4 API | Location |
-|---|---|---|
-| `z.string({ required_error: "..." })` | `z.string({ error: "..." })` | All schema files |
-| `ZodError.errors` | `ZodError.issues` | All route handlers |
+| v3 API                                | v4 API                       | Location           |
+| ------------------------------------- | ---------------------------- | ------------------ |
+| `z.string({ required_error: "..." })` | `z.string({ error: "..." })` | All schema files   |
+| `ZodError.errors`                     | `ZodError.issues`            | All route handlers |
 
 All schemas and route handlers in this project use the v4 API exclusively.
 The `RegisterInput` / `RegisterOutput` split (using `z.input<>` vs `z.output<>`)
@@ -267,13 +268,13 @@ upload middleware is used.
 
 **Why:**
 
-| Concern | multer / next-connect | Native `request.formData()` |
-|---|---|---|
-| Compatibility | Designed for Express — requires wrappers in App Router | First-class in Next.js App Router |
-| Edge Runtime | Not compatible | Fully compatible |
-| Dependencies | +2 packages, CommonJS assumptions | Zero new dependencies |
-| Maintenance | Separate ecosystem from Next.js | Maintained by Next.js / WinterCG spec |
-| File object type | `multer.File` (Buffer, non-standard) | Web `File` object (WHATWG standard) |
+| Concern          | multer / next-connect                                  | Native `request.formData()`           |
+| ---------------- | ------------------------------------------------------ | ------------------------------------- |
+| Compatibility    | Designed for Express — requires wrappers in App Router | First-class in Next.js App Router     |
+| Edge Runtime     | Not compatible                                         | Fully compatible                      |
+| Dependencies     | +2 packages, CommonJS assumptions                      | Zero new dependencies                 |
+| Maintenance      | Separate ecosystem from Next.js                        | Maintained by Next.js / WinterCG spec |
+| File object type | `multer.File` (Buffer, non-standard)                   | Web `File` object (WHATWG standard)   |
 
 The `File` object from `formData.get("file")` exposes `.arrayBuffer()`, `.size`,
 `.name`, and `.type` — all the fields needed for validation and storage, with
@@ -306,19 +307,19 @@ export async function uploadFile(file: File, lessonId: string): Promise<UploadRe
 
 ### Key Design & Optimisation Decisions
 
-| Decision | Choice Made | Rationale |
-|---|---|---|
-| Upload parsing | `request.formData()` (Web API) | App Router native, Edge-compatible, zero new dependencies |
-| Middleware | None | multer / next-connect require Express-compatible wrappers |
-| Storage namespacing | `public/uploads/<lessonId>/` | Prevents filename collisions across lessons |
-| Filename safety | UUID prefix + non-ASCII sanitisation | Prevents path traversal and OS-unsafe character vulnerabilities |
-| File size check | `file.size` before write | Fails fast — no partial disk I/O for oversized files |
-| MIME type validation | `ALLOWED_MIME_TYPES` allowlist before write | Prevents upload of executables (`.sh`, `.exe`, `.php`) |
-| DB-write failure | Orphan file deleted (compensation transaction) | Keeps storage and DB consistent on any failure path |
-| Deletion order | Physical file first, then DB record | Orphan DB record is recoverable; a missing file with a live record is not |
-| Download route | API route (`/api/materials/.../download`) | Enables auth gating, audit logging, and future presigned URL swap |
-| Path traversal guard | `absolutePath.startsWith(UPLOADS_ROOT)` | Prevents `../../etc/passwd`-style attacks on resolveFilePath and deleteFile |
-| Future storage swap scope | Only `storage.service.ts` | Route handlers, services, validation, and tests require no changes |
+| Decision                  | Choice Made                                    | Rationale                                                                   |
+| ------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------- |
+| Upload parsing            | `request.formData()` (Web API)                 | App Router native, Edge-compatible, zero new dependencies                   |
+| Middleware                | None                                           | multer / next-connect require Express-compatible wrappers                   |
+| Storage namespacing       | `public/uploads/<lessonId>/`                   | Prevents filename collisions across lessons                                 |
+| Filename safety           | UUID prefix + non-ASCII sanitisation           | Prevents path traversal and OS-unsafe character vulnerabilities             |
+| File size check           | `file.size` before write                       | Fails fast — no partial disk I/O for oversized files                        |
+| MIME type validation      | `ALLOWED_MIME_TYPES` allowlist before write    | Prevents upload of executables (`.sh`, `.exe`, `.php`)                      |
+| DB-write failure          | Orphan file deleted (compensation transaction) | Keeps storage and DB consistent on any failure path                         |
+| Deletion order            | Physical file first, then DB record            | Orphan DB record is recoverable; a missing file with a live record is not   |
+| Download route            | API route (`/api/materials/.../download`)      | Enables auth gating, audit logging, and future presigned URL swap           |
+| Path traversal guard      | `absolutePath.startsWith(UPLOADS_ROOT)`        | Prevents `../../etc/passwd`-style attacks on resolveFilePath and deleteFile |
+| Future storage swap scope | Only `storage.service.ts`                      | Route handlers, services, validation, and tests require no changes          |
 
 ---
 
@@ -342,7 +343,7 @@ TypeError: Do not know how to serialize a BigInt
 1. **The JSON specification (RFC 8259)** defines numbers as IEEE 754 double-precision
    floats. The maximum safe integer representable is `2^53 − 1 ≈ 9×10¹⁵`.
 2. **BigInt** was introduced in ES2020 to represent arbitrarily large integers —
-   values that *cannot* be safely round-tripped through a JSON number.
+   values that _cannot_ be safely round-tripped through a JSON number.
 3. **V8 (Node.js engine) deliberately omits a default** `.toJSON()` on BigInt
    to force developers to consciously decide on a serialization strategy, rather
    than silently losing precision.
@@ -356,7 +357,7 @@ in `schema.prisma` because file sizes can theoretically exceed `2^31` bytes
 
 ### The Fix: `BigInt.prototype.toJSON`
 
-`JSON.stringify` calls `.toJSON()` on a value *before* serializing it, if the
+`JSON.stringify` calls `.toJSON()` on a value _before_ serializing it, if the
 method exists. By patching the prototype once, every BigInt in every response
 is handled automatically:
 
@@ -379,12 +380,12 @@ arithmetic is needed.
 
 Three alternative approaches were considered:
 
-| Approach | Example | Assessment |
-|---|---|---|
-| **Per-route casting** | `Number(material.fileSizeBytes)` | Precision loss for large files; must be applied in every single route handler — fragile, easy to forget |
-| **Service-layer transform** | Map `BigInt` → `string` in every service return | Requires custom transform types; breaks Prisma's auto-generated types |
-| **Custom JSON replacer** | `JSON.stringify(data, (_, v) => typeof v === 'bigint' ? v.toString() : v)` | Must be threaded through every `NextResponse.json()` call — not compatible with the existing `ok/created/...` response helpers |
-| **Global `BigInt.prototype.toJSON` patch** ✅ | Applied once in `lib/prisma.ts` | Zero per-route code, works with all existing response helpers, self-documenting, TypeScript-safe via `declare global` |
+| Approach                                      | Example                                                                    | Assessment                                                                                                                     |
+| --------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Per-route casting**                         | `Number(material.fileSizeBytes)`                                           | Precision loss for large files; must be applied in every single route handler — fragile, easy to forget                        |
+| **Service-layer transform**                   | Map `BigInt` → `string` in every service return                            | Requires custom transform types; breaks Prisma's auto-generated types                                                          |
+| **Custom JSON replacer**                      | `JSON.stringify(data, (_, v) => typeof v === 'bigint' ? v.toString() : v)` | Must be threaded through every `NextResponse.json()` call — not compatible with the existing `ok/created/...` response helpers |
+| **Global `BigInt.prototype.toJSON` patch** ✅ | Applied once in `lib/prisma.ts`                                            | Zero per-route code, works with all existing response helpers, self-documenting, TypeScript-safe via `declare global`          |
 
 ### Placement Decision
 
@@ -401,14 +402,14 @@ custom `_app.tsx` for two reasons:
 
 ### Key Design & Optimisation Decisions
 
-| Decision | Choice | Rationale |
-|---|---|---|
-| Serialization format | `BigInt` → `string` | Prevents IEEE 754 precision loss for values > 2^53 |
-| Patch location | `lib/prisma.ts` (module-level, runs once) | Guaranteed execution before any response; co-located with root cause |
-| Patch mechanism | `BigInt.prototype.toJSON` | Hooks into `JSON.stringify`'s built-in `.toJSON()` protocol — zero changes to callers |
-| TypeScript support | `declare global { interface BigInt { toJSON(): string } }` | Eliminates TS2339 "property does not exist" error on the prototype assignment |
-| Scope | Process-global, applies to all BigInt values | One fix covers all current and future Prisma models with BigInt columns |
-| Alternative rejected | Per-route `Number()` cast | Silent precision loss for large values; repeated boilerplate in every route |
+| Decision             | Choice                                                     | Rationale                                                                             |
+| -------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Serialization format | `BigInt` → `string`                                        | Prevents IEEE 754 precision loss for values > 2^53                                    |
+| Patch location       | `lib/prisma.ts` (module-level, runs once)                  | Guaranteed execution before any response; co-located with root cause                  |
+| Patch mechanism      | `BigInt.prototype.toJSON`                                  | Hooks into `JSON.stringify`'s built-in `.toJSON()` protocol — zero changes to callers |
+| TypeScript support   | `declare global { interface BigInt { toJSON(): string } }` | Eliminates TS2339 "property does not exist" error on the prototype assignment         |
+| Scope                | Process-global, applies to all BigInt values               | One fix covers all current and future Prisma models with BigInt columns               |
+| Alternative rejected | Per-route `Number()` cast                                  | Silent precision loss for large values; repeated boilerplate in every route           |
 
 ---
 
@@ -423,9 +424,11 @@ custom `_app.tsx` for two reasons:
 Two independent problems needed to be solved simultaneously when building the Curriculum Editor:
 
 1. **The SSR Problem** — `@uiw/react-md-editor` reads `window` at import-time to detect the browser environment. In Next.js App Router, component modules are evaluated during server-side rendering (SSR). This causes an immediate crash:
+
    ```
    ReferenceError: window is not defined
    ```
+
    This is a well-known class of problem with any rich-text editor (CodeMirror, Quill, TipTap, etc.).
 
 2. **The State Coupling Problem** — The Edit Course page already contains a `<CourseForm>` wrapped in `react-hook-form`. If the `CurriculumEditor` were embedded inside the same form's state tree (e.g., as additional fields), every lesson content keystroke would trigger `react-hook-form`'s internal re-render cycle, degrading editor performance and risking form state corruption.
@@ -437,7 +440,7 @@ Two independent problems needed to be solved simultaneously when building the Cu
 
 const MDEditor = dynamic(
   () => import("@uiw/react-md-editor").then((m) => m.default),
-  { ssr: false }   // ← never evaluated on the server
+  { ssr: false }, // ← never evaluated on the server
 );
 ```
 
@@ -452,29 +455,31 @@ The editor is also wrapped in `data-color-mode="light"` to force a consistent ap
 ### Decision B: State Decoupled from `CourseForm`
 
 `CurriculumEditor` is a **self-contained component** that:
+
 - Fetches its own data via `GET /api/courses/:courseId/modules`
 - Maintains its own `modules: Module[]` state
 - Is rendered as a sibling of `CourseForm` in the page layout — **not** a child of `CourseForm`'s `<form>` element
 
 This means:
+
 - Changes to lessons (typing in the Markdown editor) do **not** trigger CourseForm's re-render cycle
 - Saving a lesson (`PATCH /api/lessons/:lessonId`) does **not** interact with the course form's `isDirty` state
 - The two editors are independently focusable and independently submittable
 
 ### Key Design & Optimization Decisions
 
-| Decision | Choice Made | Rationale |
-|---|---|---|
-| SSR fix for MD editor | `next/dynamic({ ssr: false })` | Prevents `window is not defined` at import time; excluded from server bundle entirely |
-| State location | `CurriculumEditor` owns its own `useState<Module[]>` | Decouples from CourseForm's `react-hook-form` state; prevents cross-component re-renders |
-| Lesson reorder UX | Up/Down arrow buttons (not DND) | Avoids nested `DndContext` which crashes with conflicting pointer sensors and event propagation |
-| Module reorder UX | `@dnd-kit/sortable` with `PointerSensor` | DND only at the module level; `activationConstraint: { distance: 6 }` prevents accidental drags on button clicks |
-| Optimistic UI | Module/lesson order updated before API confirms | Instant visual feedback; original order restored on API failure |
-| Markdown editor import | `.then((m) => m.default)` in dynamic | Required when the module uses a default export — resolves the ESM interop correctly |
-| `data-color-mode="light"` wrapper | Always use light mode | Prevents jarring dark-mode appearance mismatch when OS is in dark mode but site is light-only |
-| Module reorder HTTP verb | `PUT /api/courses/:courseId/modules` | Consistent with the server-side `reorderModules` service (idempotent bulk-replace semantics) |
-| Lesson edit URL | `PATCH /api/lessons/:lessonId` (not `/modules/:id/lessons/:id`) | The lesson route is directly addressable; no need to include moduleId in the URL — server resolves it from the lesson record |
-| `useApi.put` addition | Added `put` method to `useApi` hook | Mirrors `patch`/`del` — keeps all authenticated fetch calls through one consistent helper with token injection |
+| Decision                          | Choice Made                                                     | Rationale                                                                                                                    |
+| --------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| SSR fix for MD editor             | `next/dynamic({ ssr: false })`                                  | Prevents `window is not defined` at import time; excluded from server bundle entirely                                        |
+| State location                    | `CurriculumEditor` owns its own `useState<Module[]>`            | Decouples from CourseForm's `react-hook-form` state; prevents cross-component re-renders                                     |
+| Lesson reorder UX                 | Up/Down arrow buttons (not DND)                                 | Avoids nested `DndContext` which crashes with conflicting pointer sensors and event propagation                              |
+| Module reorder UX                 | `@dnd-kit/sortable` with `PointerSensor`                        | DND only at the module level; `activationConstraint: { distance: 6 }` prevents accidental drags on button clicks             |
+| Optimistic UI                     | Module/lesson order updated before API confirms                 | Instant visual feedback; original order restored on API failure                                                              |
+| Markdown editor import            | `.then((m) => m.default)` in dynamic                            | Required when the module uses a default export — resolves the ESM interop correctly                                          |
+| `data-color-mode="light"` wrapper | Always use light mode                                           | Prevents jarring dark-mode appearance mismatch when OS is in dark mode but site is light-only                                |
+| Module reorder HTTP verb          | `PUT /api/courses/:courseId/modules`                            | Consistent with the server-side `reorderModules` service (idempotent bulk-replace semantics)                                 |
+| Lesson edit URL                   | `PATCH /api/lessons/:lessonId` (not `/modules/:id/lessons/:id`) | The lesson route is directly addressable; no need to include moduleId in the URL — server resolves it from the lesson record |
+| `useApi.put` addition             | Added `put` method to `useApi` hook                             | Mirrors `patch`/`del` — keeps all authenticated fetch calls through one consistent helper with token injection               |
 
 ---
 
@@ -493,7 +498,7 @@ The Material upload UI requires a real-time progress bar so the teacher can see 
 
 ### The Gap in the Fetch API
 
-The Fetch API does not expose upload progress. Its `Response` object provides a `body` `ReadableStream` for *download* progress (reading the server response), but there is no equivalent interface for *upload* progress — how many bytes of the request body have been sent to the server.
+The Fetch API does not expose upload progress. Its `Response` object provides a `body` `ReadableStream` for _download_ progress (reading the server response), but there is no equivalent interface for _upload_ progress — how many bytes of the request body have been sent to the server.
 
 This is a known, documented limitation. The [WHATWG Fetch specification](https://fetch.spec.whatwg.org/) does not include upload progress. A `fetch`-based progress bar would require a polyfill or a third-party streaming library (e.g., `axios`), adding a dependency.
 
@@ -517,13 +522,13 @@ This is called repeatedly as bytes are transmitted, with `e.loaded` (bytes sent 
 
 ### Key Design & Optimization Decisions
 
-| Decision | Choice Made | Rationale |
-|---|---|---|
-| Upload API | `XMLHttpRequest` | Only browser API with native `xhr.upload.onprogress` — no extra dependency |
-| Auth header | Manually read `lms_auth_token` from `localStorage` and set via `xhr.setRequestHeader` | `useApi` is a hook and cannot be called inside an XHR callback; direct `localStorage` read is the correct pattern |
-| Body format | `FormData` with `formData.append("file", file)` | Matches `request.formData()` on the server — browser sets correct `multipart/form-data` boundary automatically |
-| Fetch alternative rejected | `fetch()` | No upload progress event in the Fetch specification |
-| Axios rejected | Not added | ~13 KB dependency for a single feature; XHR achieves the same result natively |
+| Decision                   | Choice Made                                                                           | Rationale                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Upload API                 | `XMLHttpRequest`                                                                      | Only browser API with native `xhr.upload.onprogress` — no extra dependency                                        |
+| Auth header                | Manually read `lms_auth_token` from `localStorage` and set via `xhr.setRequestHeader` | `useApi` is a hook and cannot be called inside an XHR callback; direct `localStorage` read is the correct pattern |
+| Body format                | `FormData` with `formData.append("file", file)`                                       | Matches `request.formData()` on the server — browser sets correct `multipart/form-data` boundary automatically    |
+| Fetch alternative rejected | `fetch()`                                                                             | No upload progress event in the Fetch specification                                                               |
+| Axios rejected             | Not added                                                                             | ~13 KB dependency for a single feature; XHR achieves the same result natively                                     |
 
 ---
 
@@ -561,11 +566,13 @@ model LessonProgress {
 ```
 
 **Key design decisions:**
+
 - `@@unique([studentId, lessonId])` — enforces one progress record per student-lesson pair; `upsert` is used for idempotent toggling.
 - `isCompleted` boolean (not an enum) — sufficient for the current requirement; expandable to a status enum later if needed.
 - Cascade deletes on both `User` and `Lesson` FKs — cleaning up orphan records automatically.
 
 Two API routes were added:
+
 - `GET /api/lessons/[lessonId]/progress` — reads the current student's completion status.
 - `POST /api/lessons/[lessonId]/progress` — upserts the completion status (toggle).
 
@@ -573,14 +580,15 @@ Two API routes were added:
 
 The dashboards use two different strategies depending on their interactivity needs:
 
-| Component | Strategy | Why |
-|---|---|---|
-| `dashboard/page.tsx` → `AdminDashboard` / `TeacherDashboard` / `StudentDashboard` | Client component (`"use client"`) with `useApi` hooks | Interactive dashboards with role-based conditional rendering; `useAuth` provides the role at runtime |
-| `admin/analytics/page.tsx` | Server Component with direct Prisma queries | Read-only analytics page; no interactivity needed; avoids creating a dedicated `/api/admin/stats` endpoint |
+| Component                                                                         | Strategy                                              | Why                                                                                                        |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `dashboard/page.tsx` → `AdminDashboard` / `TeacherDashboard` / `StudentDashboard` | Client component (`"use client"`) with `useApi` hooks | Interactive dashboards with role-based conditional rendering; `useAuth` provides the role at runtime       |
+| `admin/analytics/page.tsx`                                                        | Server Component with direct Prisma queries           | Read-only analytics page; no interactivity needed; avoids creating a dedicated `/api/admin/stats` endpoint |
 
 **Why no `GET /api/admin/stats` endpoint?**
 
 The analytics page only needs to aggregate data for display. A dedicated stats endpoint would add:
+
 1. A route handler that just wraps Prisma queries with no mutation logic.
 2. An additional auth + role check layer (already handled by `getAuthUser()` in the Server Component).
 3. Client-side fetch + loading states for data that is available server-side.
@@ -608,10 +616,10 @@ A single-page approach would force the student to navigate away from the lesson,
 
 Build reusable chat components in `components/chat/` and compose them into **two layouts**:
 
-| Layout | Route / Location | UX Pattern |
-|---|---|---|
-| **Standalone Chat Page** | `app/(dashboard)/courses/[courseId]/chat/page.tsx` | Full-page layout with `<ThreadSidebar>` + `<MessageList>` + `<ChatInput>` — for focused, multi-thread conversations |
-| **Lesson View Sheet** | `app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx` | Shadcn `<Sheet side="right">` containing `<ChatWidget>` — slide-out panel so the student can read the lesson and chat simultaneously (NotebookLM-style) |
+| Layout                   | Route / Location                                                 | UX Pattern                                                                                                                                              |
+| ------------------------ | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Standalone Chat Page** | `app/(dashboard)/courses/[courseId]/chat/page.tsx`               | Full-page layout with `<ThreadSidebar>` + `<MessageList>` + `<ChatInput>` — for focused, multi-thread conversations                                     |
+| **Lesson View Sheet**    | `app/(dashboard)/courses/[courseId]/lessons/[lessonId]/page.tsx` | Shadcn `<Sheet side="right">` containing `<ChatWidget>` — slide-out panel so the student can read the lesson and chat simultaneously (NotebookLM-style) |
 
 Both layouts render the same `<ChatWidget>` component, which internally manages thread selection, message fetching, and message sending.
 
@@ -627,25 +635,25 @@ components/chat/
 
 ### Why Shadcn `<Sheet>` for the Lesson View
 
-| Concern | Modal / Dialog | Shadcn Sheet | Separate Page |
-|---|---|---|---|
-| Co-visibility with lesson content | ❌ Blocks lesson | ✅ Side-by-side | ❌ Navigates away |
-| Implementation cost | Low | Low (Shadcn primitive) | Low |
-| Mobile adaptation | Awkward | `side="bottom"` or full-screen | Full-screen |
-| State preservation | Lesson state preserved | Lesson state preserved | Lesson state lost |
-| Consistent with NotebookLM UX | No | ✅ Yes | No |
+| Concern                           | Modal / Dialog         | Shadcn Sheet                   | Separate Page     |
+| --------------------------------- | ---------------------- | ------------------------------ | ----------------- |
+| Co-visibility with lesson content | ❌ Blocks lesson       | ✅ Side-by-side                | ❌ Navigates away |
+| Implementation cost               | Low                    | Low (Shadcn primitive)         | Low               |
+| Mobile adaptation                 | Awkward                | `side="bottom"` or full-screen | Full-screen       |
+| State preservation                | Lesson state preserved | Lesson state preserved         | Lesson state lost |
+| Consistent with NotebookLM UX     | No                     | ✅ Yes                         | No                |
 
 The `<Sheet>` component is already available via Shadcn UI and renders as a slide-out overlay that does not unmount the underlying page content. This preserves the student's scroll position and reading context while they interact with the AI Tutor.
 
 ### Key Design Decisions
 
-| Decision | Choice Made | Rationale |
-|---|---|---|
-| Component location | `components/chat/` (reusable library) | Same components used in both standalone page and Sheet panel — zero duplication |
-| Sheet trigger | "Ask AI Tutor" button on lesson page | Discoverable but non-intrusive; only visible when `aiEnabled === true` |
-| Sheet side | `right` (desktop), `bottom` or full-screen (mobile) | Right panel preserves lesson reading flow on wide screens |
-| Markdown rendering | `react-markdown` + `remark-gfm` + `remark-math` + `rehype-katex` | Supports code blocks, tables, LaTeX math — essential for educational Q&A |
-| Thread management in Sheet | Simplified — single active thread, thread list collapsed | Sheet has limited width; full thread management available on standalone page |
+| Decision                   | Choice Made                                                      | Rationale                                                                       |
+| -------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Component location         | `components/chat/` (reusable library)                            | Same components used in both standalone page and Sheet panel — zero duplication |
+| Sheet trigger              | "Ask AI Tutor" button on lesson page                             | Discoverable but non-intrusive; only visible when `aiEnabled === true`          |
+| Sheet side                 | `right` (desktop), `bottom` or full-screen (mobile)              | Right panel preserves lesson reading flow on wide screens                       |
+| Markdown rendering         | `react-markdown` + `remark-gfm` + `remark-math` + `rehype-katex` | Supports code blocks, tables, LaTeX math — essential for educational Q&A        |
+| Thread management in Sheet | Simplified — single active thread, thread list collapsed         | Sheet has limited width; full thread management available on standalone page    |
 
 ---
 

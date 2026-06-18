@@ -1,4 +1,4 @@
-# AGENTS.md — LearnAI LMS (Codex System Prompt)
+# AGENTS.md — RakuLearn LMS (Codex System Prompt)
 
 > **Last Updated:** 2026-06-04
 > **Purpose:** Master context file for AI coding assistants working on this project.
@@ -7,20 +7,20 @@
 
 ## 1. Project Overview
 
-**LearnAI** is a minimalist Learning Management System (LMS) web application similar to Coursera, with an integrated AI Tutor powered by Google Gemini. Students can browse courses, enroll, study lesson content, download materials, and ask an AI assistant questions grounded in the course's uploaded PDF documents.
+**RakuLearn** is a minimalist Learning Management System (LMS) web application similar to Coursera, with an integrated AI Tutor powered by Google Gemini. Students can browse courses, enroll, study lesson content, download materials, and ask an AI assistant questions grounded in the course's uploaded PDF documents.
 
 ### Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Framework** | Next.js 15 (App Router, TypeScript) — fullstack monolith |
-| **Database** | PostgreSQL 16 |
-| **ORM** | Prisma ORM (`prisma/schema.prisma`) |
-| **Styling** | Tailwind CSS + Shadcn UI |
+| Layer              | Technology                                                                          |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| **Framework**      | Next.js 15 (App Router, TypeScript) — fullstack monolith                            |
+| **Database**       | PostgreSQL 16                                                                       |
+| **ORM**            | Prisma ORM (`prisma/schema.prisma`)                                                 |
+| **Styling**        | Tailwind CSS + Shadcn UI                                                            |
 | **Authentication** | Custom JWT (`jose` + `bcryptjs`) — dual-delivery: HTTP-only cookie + `localStorage` |
-| **AI Integration** | Google Gemini Node.js SDK (`@google/genai`) — **Phase 4, not yet started** |
-| **Validation** | Zod v4 (shared between API routes and frontend forms) |
-| **File Uploads** | Native `request.formData()` Web API + local filesystem storage adapter |
+| **AI Integration** | Google Gemini Node.js SDK (`@google/genai`) — **Phase 4, not yet started**          |
+| **Validation**     | Zod v4 (shared between API routes and frontend forms)                               |
+| **File Uploads**   | Native `request.formData()` Web API + local filesystem storage adapter              |
 
 ### Architecture
 
@@ -32,11 +32,11 @@ This is a **100% Next.js fullstack monolith**. There is no separate backend serv
 
 ### Completed Phases (100%)
 
-| Phase | Description | Status |
-|---|---|---|
-| **Phase 0** | Project Foundation & DevOps (Next.js init, Prisma init, Docker, layouts) | ✅ Complete |
-| **Phase 1** | Database Schema & Auth System (Prisma models, JWT auth, auth UI) | ✅ Complete |
-| **Phase 2** | Core LMS APIs (User, Course, Module, Lesson, Material, Enrollment CRUD) | ✅ Complete |
+| Phase       | Description                                                                | Status      |
+| ----------- | -------------------------------------------------------------------------- | ----------- |
+| **Phase 0** | Project Foundation & DevOps (Next.js init, Prisma init, Docker, layouts)   | ✅ Complete |
+| **Phase 1** | Database Schema & Auth System (Prisma models, JWT auth, auth UI)           | ✅ Complete |
+| **Phase 2** | Core LMS APIs (User, Course, Module, Lesson, Material, Enrollment CRUD)    | ✅ Complete |
 | **Phase 3** | Frontend LMS UI (all pages, dashboards, lesson views, material management) | ✅ Complete |
 
 ### Current Phase
@@ -45,10 +45,10 @@ This is a **100% Next.js fullstack monolith**. There is no separate backend serv
 
 ### Upcoming Phases
 
-| Phase | Description |
-|---|---|
+| Phase       | Description                                             |
+| ----------- | ------------------------------------------------------- |
 | **Phase 5** | AI Tutor Chat UI (Frontend chat interface for students) |
-| **Phase 6** | Testing, Polish & Deployment |
+| **Phase 6** | Testing, Polish & Deployment                            |
 
 ---
 
@@ -58,17 +58,17 @@ The full schema is defined in `prisma/schema.prisma` and documented in `docs/01-
 
 ### Models (10 total)
 
-| Model | Table | Purpose |
-|---|---|---|
-| `User` | `users` | All platform users (ADMIN, TEACHER, STUDENT) |
-| `Course` | `courses` | Courses owned by teachers; `aiEnabled` flag for Gemini integration |
-| `Module` | `modules` | Logical groupings within a course (ordered by `orderIndex`) |
-| `Lesson` | `lessons` | Individual learning units within a module (ordered by `orderIndex`) |
-| `Material` | `materials` | Uploaded files (PDFs); `geminiFileUri` stores the Gemini File API URI |
-| `Enrollment` | `enrollments` | Student ↔ Course join table (ACTIVE / COMPLETED / DROPPED) |
-| `ChatThread` | `chat_threads` | Per student×course chat thread for AI Tutor |
-| `ChatMessage` | `chat_messages` | Individual messages in a thread (`role`: "user" or "model") |
-| `LessonProgress` | `lesson_progress` | Tracks lesson completion per student (`isCompleted` boolean) |
+| Model            | Table             | Purpose                                                               |
+| ---------------- | ----------------- | --------------------------------------------------------------------- |
+| `User`           | `users`           | All platform users (ADMIN, TEACHER, STUDENT)                          |
+| `Course`         | `courses`         | Courses owned by teachers; `aiEnabled` flag for Gemini integration    |
+| `Module`         | `modules`         | Logical groupings within a course (ordered by `orderIndex`)           |
+| `Lesson`         | `lessons`         | Individual learning units within a module (ordered by `orderIndex`)   |
+| `Material`       | `materials`       | Uploaded files (PDFs); `geminiFileUri` stores the Gemini File API URI |
+| `Enrollment`     | `enrollments`     | Student ↔ Course join table (ACTIVE / COMPLETED / DROPPED)            |
+| `ChatThread`     | `chat_threads`    | Per student×course chat thread for AI Tutor                           |
+| `ChatMessage`    | `chat_messages`   | Individual messages in a thread (`role`: "user" or "model")           |
+| `LessonProgress` | `lesson_progress` | Tracks lesson completion per student (`isCompleted` boolean)          |
 
 ### Key Relations
 
@@ -170,12 +170,15 @@ Follow the existing ADR format:
 **Status:** Adopted
 
 ### Context
+
 [Why was this decision needed?]
 
 ### Decision
+
 [What was decided and how is it implemented?]
 
 ### Rationale
+
 [Why this approach over alternatives?]
 ```
 
@@ -234,13 +237,13 @@ Phase 4 introduces the Google Gemini AI backend integration. The full task break
 
 ### Summary of Sub-Phases
 
-| Sub-Phase | Focus |
-|---|---|
-| **4A** | Gemini Service Layer — install `@google/genai`, create client, configure model selection |
-| **4B** | Gemini File API — upload/get/delete/list files, handle processing states |
-| **4C** | Course AI Setup — `POST /api/courses/[courseId]/setup-ai`, auto-sync materials |
-| **4D** | Chat Session — system prompt, content assembly (files + history), `generateContent` call |
-| **4E** | Chat CRUD Endpoints — thread/message CRUD, enrollment validation, AI readiness checks |
+| Sub-Phase | Focus                                                                                    |
+| --------- | ---------------------------------------------------------------------------------------- |
+| **4A**    | Gemini Service Layer — install `@google/genai`, create client, configure model selection |
+| **4B**    | Gemini File API — upload/get/delete/list files, handle processing states                 |
+| **4C**    | Course AI Setup — `POST /api/courses/[courseId]/setup-ai`, auto-sync materials           |
+| **4D**    | Chat Session — system prompt, content assembly (files + history), `generateContent` call |
+| **4E**    | Chat CRUD Endpoints — thread/message CRUD, enrollment validation, AI readiness checks    |
 
 ### Key Technical Notes for Gemini Integration
 
@@ -255,14 +258,14 @@ Phase 4 introduces the Google Gemini AI backend integration. The full task break
 
 ## 8. Reference Documents
 
-| Document | Path | Description |
-|---|---|---|
-| Project Instructions | `docs/00-instructions.md` | Persona, objective, scope, tech stack, design principles |
-| Database Schema | `docs/01-database-schema.md` | All 9 tables with columns, types, constraints, SQL DDL |
-| API Contracts | `docs/02-api-contracts.md` | REST API endpoints with request/response examples |
-| Implementation Plan | `docs/03-implementation-plan.md` | Full phased task breakdown with completion status |
-| Architecture Decisions | `docs/04-architecture-decisions.md` | ADR log (ADR-001 through ADR-010) |
-| Prisma Schema | `prisma/schema.prisma` | Source of truth for database models |
+| Document               | Path                                | Description                                              |
+| ---------------------- | ----------------------------------- | -------------------------------------------------------- |
+| Project Instructions   | `docs/00-instructions.md`           | Persona, objective, scope, tech stack, design principles |
+| Database Schema        | `docs/01-database-schema.md`        | All 9 tables with columns, types, constraints, SQL DDL   |
+| API Contracts          | `docs/02-api-contracts.md`          | REST API endpoints with request/response examples        |
+| Implementation Plan    | `docs/03-implementation-plan.md`    | Full phased task breakdown with completion status        |
+| Architecture Decisions | `docs/04-architecture-decisions.md` | ADR log (ADR-001 through ADR-010)                        |
+| Prisma Schema          | `prisma/schema.prisma`              | Source of truth for database models                      |
 
 ---
 

@@ -57,7 +57,8 @@ function roleLabel(role: PublicProfile["role"]) {
 }
 
 function roleBadgeClass(role: PublicProfile["role"]) {
-  if (role === "TEACHER") return "border-indigo-200 bg-indigo-50 text-indigo-700";
+  if (role === "TEACHER")
+    return "border-indigo-200 bg-indigo-50 text-indigo-700";
   if (role === "ADMIN") return "border-amber-200 bg-amber-50 text-amber-700";
   return "border-sky-200 bg-sky-50 text-sky-700";
 }
@@ -195,7 +196,8 @@ export default function PublicProfilePage() {
           Hồ sơ cá nhân
         </h1>
         <p className="mt-1 text-base text-slate-500">
-          Thông tin công khai, học vấn và các chứng chỉ đã hoàn thành trên LearnAI.
+          Thông tin công khai, học vấn và các chứng chỉ đã hoàn thành trên
+          RakuLearn.
         </p>
       </div>
 
@@ -282,7 +284,8 @@ export default function PublicProfilePage() {
                 Chứng chỉ & Khóa học đã hoàn thành
               </h2>
               <p className="mt-2 text-base text-slate-500">
-                Các khóa học người dùng đã hoàn thành và có thể đưa vào hồ sơ học tập.
+                Các khóa học người dùng đã hoàn thành và có thể đưa vào hồ sơ
+                học tập.
               </p>
             </div>
 
@@ -295,7 +298,8 @@ export default function PublicProfilePage() {
                   Chưa có chứng chỉ nào.
                 </p>
                 <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
-                  Khi người dùng hoàn thành khóa học, chứng chỉ sẽ được hiển thị tại đây.
+                  Khi người dùng hoàn thành khóa học, chứng chỉ sẽ được hiển thị
+                  tại đây.
                 </p>
               </div>
             ) : (
@@ -322,7 +326,8 @@ export default function PublicProfilePage() {
                       </h3>
                       <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
                         <CalendarCheck2 size={14} />
-                        Hoàn thành vào: {formatCompletionDate(course.completedAt)}
+                        Hoàn thành vào:{" "}
+                        {formatCompletionDate(course.completedAt)}
                       </div>
                     </div>
                   </article>

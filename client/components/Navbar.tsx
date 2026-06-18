@@ -163,7 +163,10 @@ export default function Navbar() {
               <GraduationCap size={18} className="text-white" />
             </div>
             <span className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">
-              Learn<span className="text-sky-500">AI</span>
+              <span className="font-handwriting text-3xl -rotate-2 pr-1 text-slate-800">
+                Raku
+              </span>
+              <span className="text-sky-500">Learn</span>
             </span>
           </Link>
 

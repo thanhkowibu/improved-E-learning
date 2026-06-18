@@ -4,6 +4,7 @@ import {
   Geist,
   Space_Grotesk,
   Plus_Jakarta_Sans,
+  Satisfy,
 } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -24,8 +25,15 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
 });
 
+const satisfy = Satisfy({
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-handwriting",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "LearnAI — LMS thông minh",
+  title: "RakuLearn — LMS thông minh",
   description:
     "Hệ thống quản lý học tập tối giản với trợ giảng AI dùng Google Gemini.",
 };
@@ -43,6 +51,7 @@ export default function RootLayout({
         geist.variable,
         space_grotesk.variable,
         plusJakartaSans.variable,
+        satisfy.variable,
       )}
     >
       <body
