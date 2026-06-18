@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
@@ -9,6 +9,7 @@ import remarkMath from "remark-math";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export interface ChatMessage {
@@ -55,23 +56,26 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
               key={message.id}
               className={cn(
                 "flex w-full",
-                isUser ? "justify-end" : "justify-start"
+                isUser ? "justify-end" : "justify-start",
               )}
             >
               <div
                 className={cn(
                   "max-w-[min(80%,42rem)] rounded-lg px-4 py-3 text-sm leading-6 shadow-sm",
-                  "break-words",
+                  "wrap-break-word",
                   isUser
                     ? "bg-blue-600 text-white"
-                    : "bg-muted/50 text-foreground"
+                    : "bg-muted/50 text-foreground",
                 )}
               >
                 {isWarning ? (
-                  <Alert variant="destructive" className="border-red-200 bg-red-50/80">
+                  <Alert
+                    variant="destructive"
+                    className="border-red-200 bg-red-50/80"
+                  >
                     <AlertTriangle className="size-4" />
                     <AlertTitle>Gemini safety warning</AlertTitle>
-                    <AlertDescription className="break-words">
+                    <AlertDescription className="wrap-break-word">
                       {message.text}
                     </AlertDescription>
                   </Alert>
@@ -94,9 +98,12 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
 
         {isLoading ? (
           <div className="flex w-full justify-start">
-            <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-3 text-sm text-muted-foreground shadow-sm">
-              <Loader2 className="size-4 animate-spin text-blue-600" />
-              <span>Thinking</span>
+            <div className="w-full max-w-[min(80%,42rem)] rounded-lg bg-muted/50 px-4 py-3 shadow-sm">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-3/4 rounded-full" />
+                <Skeleton className="h-4 w-full rounded-full" />
+                <Skeleton className="h-4 w-2/3 rounded-full" />
+              </div>
             </div>
           </div>
         ) : null}
