@@ -54,20 +54,6 @@ interface CourseCardProps {
 
 // ─── Thumbnail placeholder colours (deterministic by id) ─────────────────────
 
-const THUMB_GRADIENTS = [
-  "from-sky-400 to-sky-600",
-  "from-violet-400 to-violet-600",
-  "from-emerald-400 to-emerald-600",
-  "from-amber-400 to-amber-500",
-  "from-rose-400 to-rose-600",
-  "from-indigo-400 to-indigo-600",
-];
-
-function getGradient(id: string): string {
-  const idx = id.charCodeAt(0) % THUMB_GRADIENTS.length;
-  return THUMB_GRADIENTS[idx];
-}
-
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
 function StatusBadge({
@@ -164,13 +150,12 @@ export default function CourseCard({
   variant = "catalog",
   className,
 }: CourseCardProps) {
-  const gradient = getGradient(course.id);
   const progress = course.progress ?? 0;
 
   return (
     <Card
       className={cn(
-        "group border border-slate-200/80 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 rounded-2xl overflow-hidden bg-white",
+        "group overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl",
         className,
       )}
     >
@@ -186,13 +171,8 @@ export default function CourseCard({
             className="h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
           />
         ) : (
-          <div
-            className={cn(
-              "h-full w-full bg-linear-to-br flex items-center justify-center",
-              gradient,
-            )}
-          >
-            <BookOpen size={36} className="text-white/80" />
+          <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400">
+            <BookOpen size={36} className="text-white drop-shadow-sm" />
           </div>
         )}
 

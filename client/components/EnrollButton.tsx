@@ -109,7 +109,7 @@ export default function EnrollButton({
   if (enrollmentStatus === "ACTIVE") {
     return (
       <>
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-6 flex-wrap">
           <Link href={`/courses/${courseId}/learn`}>
             <Button className="bg-sky-500 hover:bg-sky-600 text-white rounded-xl px-8 py-3 text-base font-semibold gap-2 shadow-md">
               <BookOpen size={18} />
@@ -121,7 +121,7 @@ export default function EnrollButton({
             size="sm"
             onClick={() => setIsUnenrollDialogOpen(true)}
             disabled={pending}
-            className="text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl text-sm"
+            className="text-slate-200 border-slate-300 hover:text-red-600 hover:bg-red-50 rounded-xl text-sm"
           >
             {pending ? (
               <Loader2 size={14} className="animate-spin" />

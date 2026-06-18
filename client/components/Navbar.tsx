@@ -7,7 +7,7 @@
  * (role-aware) states in a single sticky header.
  *
  * Layout (desktop):
- *   [Logo]  [Nav links — role-aware]        [Bell | Avatar dropdown]
+ *   [Logo]  [Nav links — role-aware]        [Avatar dropdown]
  *
  * Role nav sets:
  *   Guest    → Courses
@@ -27,7 +27,6 @@ import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePathname } from "next/navigation";
 import {
-  Bell,
   ChevronDown,
   GraduationCap,
   LogOut,
@@ -160,7 +159,7 @@ export default function Navbar() {
         <div className="flex h-16 items-center gap-8">
           {/* ── Logo ── */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="h-8 w-8 rounded-lg bg-sky-500 flex items-center justify-center shadow-sm group-hover:bg-sky-600 transition-colors">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 shadow-sm transition-all group-hover:brightness-105">
               <GraduationCap size={18} className="text-white" />
             </div>
             <span className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">
@@ -216,15 +215,6 @@ export default function Navbar() {
               <div className="h-9 w-28 rounded-xl bg-slate-100 animate-pulse" />
             ) : isAuthenticated && user ? (
               <>
-                {/* Notification bell */}
-                <button
-                  className="relative h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
-                  aria-label="Thông báo"
-                >
-                  <Bell size={18} />
-                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-sky-500 ring-2 ring-white" />
-                </button>
-
                 {/* Avatar dropdown */}
                 <div className="relative" ref={dropdownRef}>
                   <button
@@ -237,7 +227,7 @@ export default function Navbar() {
                     {/* Avatar */}
                     <Avatar className="h-8 w-8 shrink-0 shadow-sm">
                       <AvatarImage src={user.avatarUrl ?? undefined} />
-                      <AvatarFallback className="bg-linear-to-br from-sky-400 to-sky-600 text-xs font-bold text-white">
+                      <AvatarFallback className="bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 text-xs font-bold text-white">
                         {getInitials(user.fullName)}
                       </AvatarFallback>
                     </Avatar>

@@ -553,6 +553,7 @@ export default function QuizAnalyticsDetailPage() {
                     </div>
                     <Progress
                       value={question.errorRatePercentage}
+                      variant="red"
                       className="mt-4"
                     />
                   </article>

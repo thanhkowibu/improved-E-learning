@@ -54,6 +54,7 @@ export function QuizTaker({
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const questions = useMemo(() => sortQuestions(quiz), [quiz]);
   const answeredCount = Object.keys(selectedAnswers).length;
@@ -62,6 +63,27 @@ export function QuizTaker({
     questions.length > 0
       ? Math.round((answeredCount / questions.length) * 100)
       : 0;
+
+  function handleOptionSelect(questionId: string, optionId: string) {
+    setSelectedAnswers((current) => {
+      if (current[questionId] === optionId) {
+        const { [questionId]: _removedAnswer, ...nextAnswers } = current;
+        return nextAnswers;
+      }
+
+      return {
+        ...current,
+        [questionId]: optionId,
+      };
+    });
+  }
+
+  function scrollToQuestion(index: number) {
+    setCurrentQuestionIndex(index);
+    document
+      .getElementById(`question-${index}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   async function submitQuiz() {
     if (!isComplete) {
@@ -96,7 +118,7 @@ export function QuizTaker({
 
   return (
     <>
-      <Card className="overflow-hidden border-slate-200 bg-white shadow-sm">
+      <Card className="overflow-visible border-slate-200 bg-white shadow-sm">
         <CardHeader className="border-b border-slate-100 bg-slate-50/70">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
@@ -117,20 +139,50 @@ export function QuizTaker({
               </Badge>
             )}
           </div>
-          <div className="mt-4 space-y-2">
-            <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>
-                Đã trả lời {answeredCount}/{questions.length}
-              </span>
-              <span>{progressValue}%</span>
-            </div>
-            <Progress value={progressValue} className="h-2" />
-          </div>
         </CardHeader>
+        <div className="sticky top-14 z-40 space-y-2 border-b border-slate-200 bg-background/95 px-5 py-4 shadow-sm backdrop-blur">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span>
+              Đã trả lời {answeredCount}/{questions.length}
+            </span>
+            <span>{progressValue}%</span>
+          </div>
+          <Progress value={progressValue} variant="green" className="h-2" />
+          <div className="flex flex-wrap gap-2 py-3 pb-0">
+            {questions.map((question, index) => {
+              const isAnswered = Boolean(selectedAnswers[question.id]);
+              const isCurrent = currentQuestionIndex === index;
+
+              return (
+                <Button
+                  key={question.id}
+                  type="button"
+                  onClick={() => scrollToQuestion(index)}
+                  className={cn(
+                    "flex size-8 items-center justify-center rounded-xl text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400",
+                    isAnswered
+                      ? "bg-sky-500 text-primary-foreground hover:bg-sky-600/90 transition"
+                      : "bg-secondary text-secondary-foreground hover:bg-slate-200 transition",
+                    isCurrent && "ring-2 ring-sky-300 ring-offset-2",
+                  )}
+                  aria-label={`Chuyển đến câu ${index + 1}`}
+                >
+                  {index + 1}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
 
         <CardContent className="space-y-5 p-5">
           {questions.map((question, questionIndex) => (
-            <Card key={question.id} className="border-slate-200 shadow-none">
+            <Card
+              key={question.id}
+              id={`question-${questionIndex}`}
+              onFocusCapture={() => setCurrentQuestionIndex(questionIndex)}
+              onMouseEnter={() => setCurrentQuestionIndex(questionIndex)}
+              className="scroll-mt-42 border-slate-200 shadow-none"
+            >
               <CardHeader className="pb-3">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <CardTitle className="text-base text-slate-900">
@@ -148,10 +200,7 @@ export function QuizTaker({
                 <RadioGroup
                   value={selectedAnswers[question.id] ?? ""}
                   onValueChange={(optionId) =>
-                    setSelectedAnswers((current) => ({
-                      ...current,
-                      [question.id]: optionId,
-                    }))
+                    handleOptionSelect(question.id, optionId)
                   }
                   className="gap-2"
                 >
@@ -162,6 +211,11 @@ export function QuizTaker({
                     return (
                       <Label
                         key={option.id}
+                        onClick={(event) => {
+                          if (!isSelected) return;
+                          event.preventDefault();
+                          handleOptionSelect(question.id, option.id);
+                        }}
                         className={cn(
                           "flex cursor-pointer items-start gap-3 rounded-lg border bg-white p-3 text-sm text-slate-700 transition-colors hover:border-sky-200 hover:bg-sky-50/50",
                           isSelected
@@ -184,7 +238,7 @@ export function QuizTaker({
               type="button"
               disabled={!isComplete || isSubmitting}
               onClick={() => setIsConfirmOpen(true)}
-              className="gap-2 bg-sky-500 text-white hover:bg-sky-600"
+              className="gap-2 bg-sky-500 text-white font-bold hover:bg-sky-600"
             >
               {isSubmitting ? (
                 <Loader2 size={15} className="animate-spin" />

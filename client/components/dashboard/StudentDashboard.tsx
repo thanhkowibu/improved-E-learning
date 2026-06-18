@@ -32,6 +32,7 @@ import {
   PlayCircle,
   Award,
   Flame,
+  Hand,
   Layers,
 } from "lucide-react";
 
@@ -106,7 +107,7 @@ function LearningCard({ enrollment }: { enrollment: EnrollmentItem }) {
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
           {/* Thumbnail */}
-          <div className="h-14 w-18 rounded-xl bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="h-14 w-18 rounded-xl bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 flex items-center justify-center shrink-0 overflow-hidden">
             {enrollment.course.thumbnailUrl ? (
               <img
                 src={enrollment.course.thumbnailUrl}
@@ -206,10 +207,10 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
         ) : (
           <>
             {/* ── Welcome hero ── */}
-            <div className="rounded-2xl bg-linear-to-br from-sky-500 via-sky-500 to-sky-600 p-6 text-white shadow-lg overflow-hidden relative">
+            <div className="rounded-2xl bg-linear-to-br from-blue-500 via-sky-400 to-cyan-400 p-6 text-white shadow-lg overflow-hidden relative animate-bg-pan">
               {/* Decorative circle */}
-              <div className="absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/10" />
-              <div className="absolute -right-2 -bottom-6 h-24 w-24 rounded-full bg-white/8" />
+              <div className="absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/10 animate-blob-br" />
+              <div className="absolute -right-2 -bottom-6 h-24 w-24 rounded-full bg-white/8 animate-blob-tl" />
 
               <div className="relative flex items-center justify-between">
                 <div>
@@ -217,8 +218,9 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
                     <Flame size={13} className="text-amber-300" />
                     Chào mừng bạn trở lại,
                   </p>
-                  <h2 className="mt-1 text-2xl md:text-3xl font-bold">
-                    {firstName}! 👋
+                  <h2 className="mt-1 flex items-center text-2xl font-bold md:text-3xl">
+                    {firstName}!
+                    <Hand className="ml-2 inline-block h-5 w-5 text-yellow-300" />
                   </h2>
                   <p className="mt-1.5 text-sky-100 text-sm max-w-sm">
                     {active.length === 0

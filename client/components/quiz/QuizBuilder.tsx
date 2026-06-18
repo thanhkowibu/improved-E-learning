@@ -729,7 +729,7 @@ export function QuizBuilder({ lessonId }: QuizBuilderProps) {
                   type="button"
                   size="sm"
                   disabled={isGenerating}
-                  className="gap-1.5 rounded-lg bg-gradient-to-r from-violet-600 via-indigo-500 to-sky-500 text-white shadow-sm shadow-indigo-200 hover:from-violet-700 hover:via-indigo-600 hover:to-sky-600"
+                  className="gap-1.5 rounded-lg bg-linear-to-r from-violet-600 via-indigo-500 to-sky-500 text-white shadow-sm shadow-indigo-200 hover:from-violet-700 hover:via-indigo-600 hover:to-sky-600"
                 />
               }
             >

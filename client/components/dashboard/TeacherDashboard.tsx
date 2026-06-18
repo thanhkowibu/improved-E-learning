@@ -93,7 +93,7 @@ function CourseRow({ course }: { course: CourseItem }) {
   return (
     <div className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50/60 transition-colors group">
       {/* Thumbnail */}
-      <div className="h-11 w-16 rounded-xl bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="h-11 w-16 rounded-xl bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 flex items-center justify-center shrink-0 overflow-hidden">
         {course.thumbnailUrl ? (
           <img
             src={course.thumbnailUrl}

@@ -79,7 +79,7 @@ function LearnSkeleton() {
   return (
     <div>
       {/* Hero skeleton */}
-      <div className="h-52 w-full bg-linear-to-br from-sky-600 via-sky-500 to-sky-400 animate-pulse" />
+      <div className="h-52 w-full bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 animate-pulse" />
       <div className={`${CONTENT_CLS} py-8`}>
         <div className="flex gap-8">
           <div className="flex-1 space-y-4">
@@ -339,7 +339,7 @@ function CourseSidebar({
             className="w-full aspect-video object-cover"
           />
         ) : (
-          <div className="w-full aspect-video bg-linear-to-br from-sky-300 to-sky-500 flex items-center justify-center">
+          <div className="w-full aspect-video bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 flex items-center justify-center animate-bg-pan">
             <BookOpen size={40} className="text-white/80" />
           </div>
         )}
@@ -347,7 +347,7 @@ function CourseSidebar({
         <div className="p-4 space-y-4">
           {/* Teacher */}
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+            <div className="h-9 w-9 rounded-full bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 flex items-center justify-center text-white text-xs font-bold shrink-0">
               {course.teacher.fullName
                 .split(" ")
                 .map((n) => n[0])
@@ -661,13 +661,23 @@ export default function CourseLearningPage() {
       {/* ══════════════════════════════════════════════════════════════
           HERO STRIP — sky gradient with course title & progress
       ══════════════════════════════════════════════════════════════ */}
-      <div className="relative w-full bg-linear-to-br from-sky-700 via-sky-500 to-sky-400 overflow-hidden">
-        {/* Blurred thumbnail overlay for depth */}
+      <div
+        className={cn(
+          "relative w-full overflow-hidden animate-bg-pan",
+          course.thumbnailUrl
+            ? "bg-slate-950"
+            : "bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400",
+        )}
+      >
+        {/* Thumbnail backdrop for depth */}
         {course.thumbnailUrl && (
-          <div
-            className="absolute inset-0 opacity-10 bg-cover bg-center blur-lg scale-105 pointer-events-none"
-            style={{ backgroundImage: `url(${course.thumbnailUrl})` }}
-          />
+          <>
+            <div
+              className="pointer-events-none absolute inset-0 scale-105 bg-cover bg-center brightness-50"
+              style={{ backgroundImage: `url(${course.thumbnailUrl})` }}
+            />
+            <div className="pointer-events-none absolute inset-0 bg-slate-950/45" />
+          </>
         )}
 
         <div className={`relative ${CONTENT_CLS} py-10`}>

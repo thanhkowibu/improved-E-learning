@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useCourseDetail } from "@/hooks/useCourseDetail";
 import { useAuth } from "@/hooks/useAuth";
@@ -182,13 +183,23 @@ export default function CourseDetailPage() {
       {/* ══════════════════════════════════════════
           HERO — full-width background
       ══════════════════════════════════════════ */}
-      <div className="relative w-full bg-linear-to-br from-sky-600 via-sky-500 to-sky-400 overflow-hidden">
-        {/* Blurred thumbnail overlay */}
+      <div
+        className={cn(
+          "relative w-full overflow-hidden animate-bg-pan",
+          course.thumbnailUrl
+            ? "bg-slate-950"
+            : "bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400",
+        )}
+      >
+        {/* Thumbnail backdrop */}
         {course.thumbnailUrl && (
-          <div
-            className="absolute inset-0 opacity-10 bg-cover bg-center blur-md scale-105"
-            style={{ backgroundImage: `url(${course.thumbnailUrl})` }}
-          />
+          <>
+            <div
+              className="pointer-events-none absolute inset-0 scale-105 bg-cover bg-center brightness-50"
+              style={{ backgroundImage: `url(${course.thumbnailUrl})` }}
+            />
+            <div className="pointer-events-none absolute inset-0 bg-slate-950/45" />
+          </>
         )}
 
         {/* Content — same padding as Navbar */}
@@ -261,7 +272,7 @@ export default function CourseDetailPage() {
                     className="w-full aspect-video object-cover"
                   />
                 ) : (
-                  <div className="w-full aspect-video bg-linear-to-br from-sky-300 to-sky-500 flex items-center justify-center">
+                  <div className="w-full aspect-video bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 flex items-center justify-center animate-bg-pan">
                     <BookOpen size={40} className="text-white/80" />
                   </div>
                 )}
@@ -273,14 +284,20 @@ export default function CourseDetailPage() {
                     href={`/profile/${course.teacher.id}`}
                     className="flex items-center gap-3 rounded-xl transition-colors hover:text-sky-600 hover:underline"
                   >
-                    <div className="h-9 w-9 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                      {course.teacher.fullName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .slice(0, 2)
-                        .join("")
-                        .toUpperCase()}
-                    </div>
+                    <Avatar className="h-9 w-9 shrink-0 shadow-sm">
+                      <AvatarImage
+                        src={course.teacher.avatarUrl ?? undefined}
+                        alt={course.teacher.fullName}
+                      />
+                      <AvatarFallback className="bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 text-xs font-bold text-white">
+                        {course.teacher.fullName
+                          .split(" ")
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
                       <p className="text-sm font-semibold text-slate-900">
                         {course.teacher.fullName}
@@ -399,14 +416,20 @@ export default function CourseDetailPage() {
               href={`/profile/${course.teacher.id}`}
               className="flex items-center gap-5 rounded-2xl border border-slate-200 bg-white p-6 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
             >
-              <div className="h-16 w-16 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xl font-bold shrink-0 shadow-md">
-                {course.teacher.fullName
-                  .split(" ")
-                  .map((n) => n[0])
-                  .slice(0, 2)
-                  .join("")
-                  .toUpperCase()}
-              </div>
+              <Avatar className="h-16 w-16 shrink-0 shadow-md">
+                <AvatarImage
+                  src={course.teacher.avatarUrl ?? undefined}
+                  alt={course.teacher.fullName}
+                />
+                <AvatarFallback className="bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 text-xl font-bold text-white">
+                  {course.teacher.fullName
+                    .split(" ")
+                    .map((n) => n[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <p className="text-lg font-bold text-slate-900">
                   {course.teacher.fullName}

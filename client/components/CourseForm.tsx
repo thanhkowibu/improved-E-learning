@@ -20,7 +20,7 @@ import { useEffect, useImperativeHandle, forwardRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, BookOpen, Image, FileText, Globe } from "lucide-react";
+import { Loader2, BookOpen, Image, FileText, Globe, Bot } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -254,7 +254,7 @@ const CourseForm = forwardRef<CourseFormHandle, CourseFormProps>(
 
             <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50">
               <div className="flex items-start gap-3">
-                <span className="text-lg leading-none mt-0.5">🤖</span>
+                <Bot className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
                     Trợ giảng AI

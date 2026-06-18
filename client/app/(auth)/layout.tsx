@@ -14,12 +14,12 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen bg-linear-to-br from-sky-50 via-white to-indigo-50 bg-size-[220%_220%] animate-bg-pan">
       {/* ── Left branding panel (hidden on mobile) ── */}
-      <div className="hidden lg:flex lg:w-[45%] xl:w-1/2 flex-col justify-between bg-sky-500 text-white p-12 relative overflow-hidden">
+      <div className="relative hidden overflow-hidden bg-linear-to-br from-sky-600 via-sky-500 to-indigo-500 p-12 text-white bg-size-[180%_180%] animate-bg-pan lg:flex lg:w-[45%] lg:flex-col lg:justify-between xl:w-1/2">
         {/* Background decorative circles */}
-        <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-400 opacity-40" />
-        <div className="absolute -bottom-32 -right-32 h-112 w-md rounded-full bg-sky-600 opacity-30" />
+        <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-sky-400 opacity-40 animate-blob-tl" />
+        <div className="absolute -bottom-32 -right-32 h-112 w-md rounded-full bg-sky-600 opacity-30 animate-blob-br" />
 
         {/* Logo */}
         <div className="relative z-10 flex items-center gap-3">
@@ -68,7 +68,7 @@ export default function AuthLayout({
       </div>
 
       {/* ── Right: form area ── */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white">
+      <div className="flex flex-1 flex-col items-center justify-center bg-white/90 px-6 py-12 backdrop-blur-sm">
         {/* Mobile logo (only shown on small screens) */}
         <div className="lg:hidden mb-8 flex items-center gap-2 text-slate-900">
           <svg

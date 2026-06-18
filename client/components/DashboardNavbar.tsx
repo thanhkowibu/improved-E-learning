@@ -15,7 +15,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { Bell, LogOut, User, ChevronDown } from "lucide-react";
+import { LogOut, User, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function getInitials(name: string): string {
@@ -61,16 +61,6 @@ export default function DashboardNavbar({
 
       {/* Right: actions */}
       <div className="flex items-center gap-2">
-        {/* Notification bell */}
-        <button
-          className="relative h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
-          aria-label="Thông báo"
-        >
-          <Bell size={18} />
-          {/* Unread dot */}
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-sky-500 ring-2 ring-white" />
-        </button>
-
         {/* Avatar dropdown */}
         {isLoading ? (
           <div className="h-9 w-32 rounded-xl bg-slate-100 animate-pulse" />
@@ -83,7 +73,7 @@ export default function DashboardNavbar({
               aria-haspopup="true"
               aria-expanded={open}
             >
-              <div className="h-8 w-8 rounded-full bg-linear-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-sky-500 via-25% via-sky-400 to-cyan-400 text-xs font-bold text-white shadow-sm">
                 {getInitials(user.fullName)}
               </div>
               <div className="hidden sm:block text-left">
