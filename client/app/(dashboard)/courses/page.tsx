@@ -7,11 +7,11 @@
  */
 
 import { useState } from "react";
-import { Search, BookOpen, AlertCircle } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { BookOpen, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import CourseCard from "@/components/CourseCard";
+import { CourseSearchBar } from "@/components/courses/CourseSearchBar";
 import { useCourses } from "@/hooks/useCourses";
 
 function CourseGridSkeleton() {
@@ -47,31 +47,12 @@ export default function CourseCatalogPage() {
         </p>
       </div>
 
-      <div className="mb-8 flex max-w-xl flex-col gap-3 sm:flex-row">
-        <div className="relative min-w-0 flex-1">
-          <Search
-            size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-          />
-          <Input
-            id="catalog-search"
-            type="text"
-            placeholder="Tìm khóa học theo tiêu đề..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 rounded-xl border-slate-200 bg-white shadow-sm focus-visible:ring-sky-400 text-sm h-11"
-          />
-        </div>
-        {search && (
-          <Button
-            variant="ghost"
-            onClick={() => setSearch("")}
-            className="shrink-0 text-slate-500 hover:text-slate-700"
-          >
-            Xóa
-          </Button>
-        )}
-      </div>
+      <CourseSearchBar
+        id="catalog-search"
+        value={search}
+        onChange={setSearch}
+        className="mb-8"
+      />
 
       {!isLoading && !error && (
         <p className="mb-5 text-sm text-slate-500">

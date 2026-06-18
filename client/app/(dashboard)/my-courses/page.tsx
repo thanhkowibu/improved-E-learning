@@ -14,10 +14,12 @@
  */
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import { PlusCircle, BookMarked, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import CourseCard from "@/components/CourseCard";
+import { CourseSearchBar } from "@/components/courses/CourseSearchBar";
 import { useMyCourses } from "@/hooks/useMyCourses";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -76,8 +78,16 @@ function MyCourseSkeleton() {
 
 export default function MyCoursesPage() {
   const { user } = useAuth();
+  const [search, setSearch] = useState("");
   const { courses, variant, isLoading, error, refetch } = useMyCourses();
   const meta = usePageMeta(user?.role);
+  const filteredCourses = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return courses;
+    return courses.filter((course) =>
+      course.title.toLowerCase().includes(query),
+    );
+  }, [courses, search]);
 
   return (
     <div className="container mx-auto px-6 md:px-24 py-8 max-w-7xl">
@@ -102,9 +112,21 @@ export default function MyCoursesPage() {
         )}
       </div>
 
+      <CourseSearchBar
+        id="my-courses-search"
+        value={search}
+        onChange={setSearch}
+        className="mb-8"
+      />
+
       {/* ── Count ── */}
       {!isLoading && !error && courses.length > 0 && (
-        <p className="mb-5 text-sm text-slate-500">{courses.length} khóa học</p>
+        <p className="mb-5 text-sm text-slate-500">
+          {filteredCourses.length === 0
+            ? "Không tìm thấy khóa học."
+            : `Tìm thấy ${filteredCourses.length} khóa học`}
+          {search && ` cho "${search}"`}
+        </p>
       )}
 
       {/* ── Loading ── */}
@@ -131,20 +153,33 @@ export default function MyCoursesPage() {
       )}
 
       {/* ── Empty ── */}
-      {!isLoading && !error && courses.length === 0 && (
+      {!isLoading && !error && filteredCourses.length === 0 && (
         <div className="flex flex-col items-center gap-5 py-24 text-center">
           <div className="h-16 w-16 rounded-2xl bg-sky-50 flex items-center justify-center">
             <BookMarked size={32} className="text-sky-300" />
           </div>
           <div>
-            <p className="font-semibold text-slate-800">{meta.emptyMsg}</p>
-            {user?.role === "STUDENT" && (
+            <p className="font-semibold text-slate-800">
+              {search
+                ? `Không có khóa học nào khớp với "${search}".`
+                : meta.emptyMsg}
+            </p>
+            {!search && user?.role === "STUDENT" && (
               <p className="text-sm text-slate-500 mt-1">
                 Duyệt danh mục và đăng ký một khóa học để bắt đầu.
               </p>
             )}
           </div>
-          {user?.role === "STUDENT" ? (
+          {search ? (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setSearch("")}
+              className="text-sky-600 hover:text-sky-700"
+            >
+              Xóa tìm kiếm
+            </Button>
+          ) : user?.role === "STUDENT" ? (
             <Link href="/courses">
               <Button className="bg-sky-500 hover:bg-sky-600 text-white rounded-xl">
                 Duyệt khóa học
@@ -162,9 +197,9 @@ export default function MyCoursesPage() {
       )}
 
       {/* ── Grid ── */}
-      {!isLoading && !error && courses.length > 0 && (
+      {!isLoading && !error && filteredCourses.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course) => (
+          {filteredCourses.map((course) => (
             <CourseCard key={course.id} course={course} variant={variant} />
           ))}
         </div>
