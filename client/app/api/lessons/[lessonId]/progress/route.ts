@@ -16,6 +16,7 @@
 import { type NextRequest } from "next/server";
 import { getAuthUser, AuthError } from "@/lib/auth/get-auth-user";
 import prisma from "@/lib/prisma";
+import { synchronizeEnrollmentCompletionStatus } from "@/lib/services/enrollment.service";
 import {
   ok,
   unauthorized,
@@ -71,7 +72,10 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     // Verify the lesson exists before upserting.
     const lesson = await prisma.lesson.findUnique({
       where: { id: lessonId },
-      select: { id: true },
+      select: {
+        id: true,
+        module: { select: { courseId: true } },
+      },
     });
     if (!lesson) return notFound("Lesson not found.");
 
@@ -93,6 +97,11 @@ export async function PUT(request: NextRequest, context: RouteContext) {
         updatedAt: true,
       },
     });
+
+    await synchronizeEnrollmentCompletionStatus(
+      caller.id,
+      lesson.module.courseId,
+    );
 
     return ok(progress, body.isCompleted ? "Lesson marked as complete!" : "Lesson marked as incomplete.");
   } catch (err) {

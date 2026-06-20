@@ -34,7 +34,7 @@ export default function NewCoursePage() {
 
   async function handleSubmit(values: CourseFormValues) {
     setIsSubmitting(true);
-    const toastId = toast.loading("Creating your course…");
+    const toastId = toast.loading("Đang tạo khóa học…");
 
     // Filter out fields that isn't needed for course creation
     const { aiEnabled, isPublished, isPrivate, ...submitData } = values;

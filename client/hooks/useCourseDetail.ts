@@ -55,6 +55,19 @@ export interface CourseDetail {
 
 export type EnrollmentStatus = "ACTIVE" | "COMPLETED" | "DROPPED" | null;
 
+interface EnrollmentSummary {
+  status: string;
+  course: { id: string };
+}
+
+interface PaginatedEnrollments {
+  items: EnrollmentSummary[];
+  total: number;
+  page: number;
+  limit: number;
+  pages?: number;
+}
+
 interface UseCourseDetailReturn {
   course: CourseDetail | null;
   enrollmentStatus: EnrollmentStatus;
@@ -102,12 +115,14 @@ export function useCourseDetail(courseId: string): UseCourseDetailReturn {
   // Check enrollment status for students
   const fetchEnrollment = useCallback(async () => {
     if (!user || user.role !== "STUDENT") return;
-    const res = await api.get<Array<{ status: string; course: { id: string } }>>(
-      "/api/enrollments/my"
-    );
+    const res = await api.get<PaginatedEnrollments>("/api/enrollments/my");
     if (res.success && res.data) {
-      const match = res.data.find((e) => e.course.id === courseId);
+      const match = res.data.items?.find(
+        (enrollment) => enrollment.course.id === courseId,
+      );
       setEnrollmentStatus((match?.status as EnrollmentStatus) ?? null);
+    } else {
+      setEnrollmentStatus(null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, user?.id]);

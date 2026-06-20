@@ -22,6 +22,67 @@ import {
   getCourseProgressPercentage,
 } from "@/lib/services/progress.service";
 
+/**
+ * Keeps the persisted enrollment status aligned with lesson completion.
+ * DROPPED is an explicit user action and must never be overwritten by progress.
+ */
+export async function synchronizeEnrollmentCompletionStatus(
+  studentId: string,
+  courseId: string,
+): Promise<EnrollmentStatus | null> {
+  const enrollment = await prisma.enrollment.findUnique({
+    where: { studentId_courseId: { studentId, courseId } },
+    select: { status: true },
+  });
+
+  if (!enrollment || enrollment.status === EnrollmentStatus.DROPPED) {
+    return enrollment?.status ?? null;
+  }
+
+  const [totalLessons, completedLessons] = await Promise.all([
+    prisma.lesson.count({
+      where: { module: { courseId } },
+    }),
+    prisma.lessonProgress.count({
+      where: {
+        studentId,
+        isCompleted: true,
+        lesson: { module: { courseId } },
+      },
+    }),
+  ]);
+
+  const nextStatus =
+    totalLessons > 0 && completedLessons >= totalLessons
+      ? EnrollmentStatus.COMPLETED
+      : EnrollmentStatus.ACTIVE;
+
+  if (enrollment.status !== nextStatus) {
+    await prisma.enrollment.update({
+      where: { studentId_courseId: { studentId, courseId } },
+      data: { status: nextStatus },
+    });
+  }
+
+  return nextStatus;
+}
+
+async function reconcileEnrollmentCompletionStatuses(studentId: string) {
+  const enrollments = await prisma.enrollment.findMany({
+    where: {
+      studentId,
+      status: { not: EnrollmentStatus.DROPPED },
+    },
+    select: { courseId: true },
+  });
+
+  await Promise.all(
+    enrollments.map((enrollment) =>
+      synchronizeEnrollmentCompletionStatus(studentId, enrollment.courseId),
+    ),
+  );
+}
+
 // ─── enrollStudent ────────────────────────────────────────────────────────────
 
 /**
@@ -122,45 +183,75 @@ export async function dropEnrollment(studentId: string, courseId: string) {
 export async function getMyEnrollments(
   studentId: string,
   statusFilter?: EnrollmentStatus,
+  options: {
+    search?: string;
+    page?: number;
+    limit?: number;
+  } = {},
 ) {
-  const where: Prisma.EnrollmentWhereInput = { studentId };
-  if (statusFilter) {
-    where.status = statusFilter;
-  }
+  const page = Math.max(1, options.page ?? 1);
+  const limit = Math.min(100, Math.max(1, options.limit ?? 20));
+  const skip = (page - 1) * limit;
+  const search = options.search?.trim();
 
-  const enrollments = await prisma.enrollment.findMany({
-    where,
-    orderBy: { enrolledAt: "desc" },
-    include: {
-      course: {
-        include: {
-          teacher: {
-            select: {
-              id: true,
-              fullName: true,
-              avatarUrl: true,
+  // Backfill historical ACTIVE records that reached 100% before completion
+  // status synchronization was introduced. This runs before filtering so the
+  // COMPLETED tab is accurate immediately.
+  await reconcileEnrollmentCompletionStatuses(studentId);
+
+  const where: Prisma.EnrollmentWhereInput = {
+    studentId,
+    ...(statusFilter ? { status: statusFilter } : {}),
+    ...(search
+      ? {
+          course: {
+            title: {
+              contains: search,
+              mode: "insensitive",
             },
           },
-          modules: {
-            orderBy: { orderIndex: "asc" },
-            select: {
-              lessons: {
-                orderBy: { orderIndex: "asc" },
-                select: {
-                  id: true,
+        }
+      : {}),
+  };
+
+  const [enrollments, total] = await prisma.$transaction([
+    prisma.enrollment.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { enrolledAt: "desc" },
+      include: {
+        course: {
+          include: {
+            teacher: {
+              select: {
+                id: true,
+                fullName: true,
+                avatarUrl: true,
+              },
+            },
+            modules: {
+              orderBy: { orderIndex: "asc" },
+              select: {
+                lessons: {
+                  orderBy: { orderIndex: "asc" },
+                  select: {
+                    id: true,
+                  },
                 },
               },
             },
-          },
-          _count: {
-            select: { modules: true, enrollments: true },
+            _count: {
+              select: { modules: true, enrollments: true },
+            },
           },
         },
       },
-    },
-  });
+    }),
+    prisma.enrollment.count({ where }),
+  ]);
 
-  return Promise.all(
+  const items = await Promise.all(
     enrollments.map(async (e) => {
       const [progress, completedLessonIds] = await Promise.all([
         getCourseProgressPercentage(studentId, e.courseId),
@@ -204,6 +295,14 @@ export async function getMyEnrollments(
       };
     }),
   );
+
+  return {
+    items,
+    total,
+    page,
+    limit,
+    pages: Math.ceil(total / limit),
+  };
 }
 
 // ─── getCourseStudents ────────────────────────────────────────────────────────

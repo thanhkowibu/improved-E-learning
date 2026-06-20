@@ -1,40 +1,52 @@
-"use client";
-
-/**
- * app/(dashboard)/courses/page.tsx
- *
- * Course Catalog - public grid of published courses.
- */
-
-import { useState } from "react";
-import { BookOpen, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import CourseCard from "@/components/CourseCard";
+import { BookOpen } from "lucide-react";
+import CourseCard, { type CourseCardData } from "@/components/CourseCard";
+import { CoursePagination } from "@/components/courses/CoursePagination";
 import { CourseSearchBar } from "@/components/courses/CourseSearchBar";
-import { useCourses } from "@/hooks/useCourses";
+import { getAuthUser } from "@/lib/auth/get-auth-user";
+import { getCourses } from "@/lib/services/course.service";
 
-function CourseGridSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="rounded-2xl overflow-hidden border border-slate-200 bg-white">
-          <Skeleton className="aspect-video w-full" />
-          <div className="p-4 space-y-3">
-            <Skeleton className="h-5 w-3/4 rounded-lg" />
-            <Skeleton className="h-4 w-1/2 rounded-lg" />
-            <Skeleton className="h-4 w-1/3 rounded-lg" />
-            <Skeleton className="h-10 w-full rounded-xl mt-4" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+const PAGE_SIZE = 9;
+
+type SearchParams = Promise<{
+  search?: string | string[];
+  page?: string | string[];
+}>;
+
+function getParam(value: string | string[] | undefined) {
+  return typeof value === "string" ? value : "";
 }
 
-export default function CourseCatalogPage() {
-  const [search, setSearch] = useState("");
-  const { courses, isLoading, error, refetch } = useCourses({ search });
+function getPage(value: string | string[] | undefined) {
+  const page = Number.parseInt(getParam(value), 10);
+  return Number.isFinite(page) && page > 0 ? page : 1;
+}
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  const search = getParam(params.search).trim();
+  const requestedPage = getPage(params.page);
+  const user = await getAuthUser().catch(() => null);
+  const result = await getCourses({
+    search: search || undefined,
+    page: requestedPage,
+    limit: PAGE_SIZE,
+    callerRole: user?.role,
+    callerId: user?.id,
+  });
+  const page = result.pages > 0 ? Math.min(requestedPage, result.pages) : 1;
+  const courses: CourseCardData[] = result.items.map((course) => ({
+    id: course.id,
+    title: course.title,
+    description: course.description,
+    thumbnailUrl: course.thumbnailUrl,
+    isPublished: course.isPublished,
+    teacher: course.teacher,
+    _count: course._count,
+  }));
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-12 lg:px-24">
@@ -42,80 +54,50 @@ export default function CourseCatalogPage() {
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
           Danh mục khóa học
         </h1>
-        <p className="mt-1 text-slate-500 text-base">
+        <p className="mt-1 text-base text-slate-500">
           Khám phá các khóa học hiện có và bắt đầu học ngay hôm nay.
         </p>
       </div>
 
       <CourseSearchBar
         id="catalog-search"
-        value={search}
-        onChange={setSearch}
+        initialSearch={search}
+        placeholder="Tìm khóa học theo tiêu đề..."
         className="mb-8"
       />
 
-      {!isLoading && !error && (
-        <p className="mb-5 text-sm text-slate-500">
-          {courses.length === 0
-            ? "Không tìm thấy khóa học."
-            : `Tìm thấy ${courses.length} khóa học`}
-          {search && ` cho "${search}"`}
-        </p>
-      )}
+      <p className="mb-5 text-sm text-slate-500">
+        {result.total === 0
+          ? "Không tìm thấy khóa học."
+          : `Tìm thấy ${result.total} khóa học`}
+        {search && ` cho “${search}”`}
+      </p>
 
-      {isLoading && <CourseGridSkeleton />}
-
-      {!isLoading && error && (
-        <div className="flex flex-col items-center gap-4 py-20 text-center">
-          <div className="h-14 w-14 rounded-2xl bg-red-50 flex items-center justify-center">
-            <AlertCircle size={28} className="text-red-400" />
-          </div>
-          <div>
-            <p className="font-semibold text-slate-800">Đã xảy ra lỗi</p>
-            <p className="text-sm text-slate-500 mt-1">{error}</p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={refetch}
-            className="rounded-xl border-sky-300 text-sky-600 hover:bg-sky-50"
-          >
-            Thử lại
-          </Button>
-        </div>
-      )}
-
-      {!isLoading && !error && courses.length === 0 && (
+      {courses.length === 0 ? (
         <div className="flex flex-col items-center gap-4 py-24 text-center">
-          <div className="h-16 w-16 rounded-2xl bg-slate-100 flex items-center justify-center">
+          <div className="flex size-16 items-center justify-center rounded-2xl bg-slate-100">
             <BookOpen size={32} className="text-slate-300" />
           </div>
           <div>
-            <p className="font-semibold text-slate-800">Không tìm thấy khóa học</p>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="font-semibold text-slate-800">
+              Không tìm thấy khóa học
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
               {search
-                ? `Không có khóa học nào khớp với "${search}". Hãy thử từ khóa khác.`
-                : "Chưa có khóa học đã xuất bản."}
+                ? `Không có khóa học nào khớp với “${search}”.`
+                : "Chưa có khóa học được xuất bản."}
             </p>
           </div>
-          {search && (
-            <Button
-              variant="ghost"
-              onClick={() => setSearch("")}
-              className="text-sky-600 hover:text-sky-700"
-            >
-              Xóa tìm kiếm
-            </Button>
-          )}
         </div>
-      )}
-
-      {!isLoading && !error && courses.length > 0 && (
+      ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {courses.map((course) => (
             <CourseCard key={course.id} course={course} variant="catalog" />
           ))}
         </div>
       )}
+
+      <CoursePagination page={page} pages={result.pages} />
     </div>
   );
 }
