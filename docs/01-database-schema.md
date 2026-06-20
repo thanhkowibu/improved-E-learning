@@ -1,350 +1,472 @@
-# Database Schema — E-Learning LMS (PostgreSQL)
+# Database Schema — LearnAI LMS
 
-> **Version:** 3.0  
-> **Last Updated:** 2026-06-04  
-> **Engine:** PostgreSQL 16 + Prisma ORM
-
----
-
-## Entity-Relationship Overview
-
-```
-┌──────────┐       ┌───────────┐       ┌──────────┐
-│  users   │──1:N──│  courses   │──1:N──│ modules  │
-│          │       │            │       │          │
-│ (ADMIN,  │       │ ai_enabled │       └────┬─────┘
-│  TEACHER,│       │ (Gemini)   │            │ 1:N
-│  STUDENT)│       └─────┬──────┘       ┌────┴─────┐
-└────┬─────┘             │              │ lessons  │
-     │                   │              └────┬─────┘
-     │ N:M               │                   │ 1:N
-     │          ┌────────┴────────┐     ┌────┴──────────────┐
-     └──────────│  enrollments    │     │  materials        │
-                └─────────────────┘     │  gemini_file_uri  │
-                                        └────┬─────────────┘
-                                             │ 1:N
-                ┌────────────────────────────┘
-                │
-        ┌───────┴──────────┐     ┌──────────────────┐
-        │ chat_threads     │     │ lesson_progress   │
-        └──────────────────┘     │ (studentId,       │
-                                 │  lessonId,        │
-                                 │  isCompleted)     │
-                                 └──────────────────┘
-```
-
-> `lesson_progress` links `users` ↔ `lessons` (Many-to-Many through progress tracking).
+> **Version:** 9.0
+> **Last Updated:** 2026-06-19
+> **Source of Truth:** `client/prisma/schema.prisma`
+> **Database:** PostgreSQL 16 via Prisma ORM
 
 ---
 
-## Enum Types
+## Overview
 
-```sql
-CREATE TYPE user_role AS ENUM ('ADMIN', 'TEACHER', 'STUDENT');
-CREATE TYPE enrollment_status AS ENUM ('ACTIVE', 'COMPLETED', 'DROPPED');
-CREATE TYPE material_type AS ENUM ('PDF', 'VIDEO', 'LINK', 'OTHER');
-```
+LearnAI currently uses 15 Prisma models:
+
+| # | Model | Table | Purpose |
+| --- | --- | --- | --- |
+| 1 | `User` | `users` | Platform accounts, roles, profile fields, auth state |
+| 2 | `Course` | `courses` | Teacher-owned courses, AI/private/published flags |
+| 3 | `Module` | `modules` | Ordered course sections |
+| 4 | `Lesson` | `lessons` | Ordered learning units, lecture/quiz type |
+| 5 | `Material` | `materials` | UploadThing file URL, file metadata, Gemini file refs |
+| 6 | `Enrollment` | `enrollments` | Student-course membership and status |
+| 7 | `ChatThread` | `chat_threads` | AI Tutor thread per student/course |
+| 8 | `ChatMessage` | `chat_messages` | Stored chat history for Gemini context |
+| 9 | `LessonProgress` | `lesson_progress` | Lesson completion tracking |
+| 10 | `Bookmark` | `bookmarks` | Saved lessons per user |
+| 11 | `Quiz` | `quizzes` | Lesson quiz settings |
+| 12 | `QuizQuestion` | `quiz_questions` | Quiz questions |
+| 13 | `QuizOption` | `quiz_options` | Multiple-choice options and correctness |
+| 14 | `QuizAttempt` | `quiz_attempts` | Student quiz submissions |
+| 15 | `QuizAnswer` | `quiz_answers` | Submitted answer records |
 
 ---
 
-## Tables
+## Enums
 
-### 1. `users`
+```prisma
+enum UserRole {
+  ADMIN
+  TEACHER
+  STUDENT
+}
 
-Stores all platform users. Role determines permissions.
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+}
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `UUID` | `PK, DEFAULT gen_random_uuid()` | Unique user identifier |
-| `email` | `VARCHAR(255)` | `UNIQUE, NOT NULL` | Login email |
-| `hashed_password` | `VARCHAR(255)` | `NOT NULL` | bcrypt hash |
-| `full_name` | `VARCHAR(150)` | `NOT NULL` | Display name |
-| `role` | `user_role` | `NOT NULL, DEFAULT 'STUDENT'` | ADMIN / TEACHER / STUDENT |
-| `avatar_url` | `TEXT` | `NULLABLE` | Profile image URL |
-| `is_active` | `BOOLEAN` | `DEFAULT TRUE` | Soft-disable account |
-| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | Record creation |
-| `updated_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | Last modification |
+enum MaterialType {
+  PDF
+  VIDEO
+  LINK
+  OTHER
+}
 
-```sql
-CREATE TABLE users (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email           VARCHAR(255) UNIQUE NOT NULL,
-    hashed_password VARCHAR(255) NOT NULL,
-    full_name       VARCHAR(150) NOT NULL,
-    role            user_role NOT NULL DEFAULT 'STUDENT',
-    avatar_url      TEXT,
-    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role  ON users(role);
+enum LessonType {
+  LECTURE
+  QUIZ
+}
 ```
 
 ---
 
-### 2. `courses`
+## Relationship Map
 
-A course is owned by a TEACHER and optionally linked to Gemini AI for the AI Tutor feature.
+```text
+User (TEACHER) 1 ─── N Course
+Course 1 ─── N Module
+Module 1 ─── N Lesson
+Lesson 1 ─── N Material
+Lesson 1 ─── 0..1 Quiz
+Quiz 1 ─── N QuizQuestion
+QuizQuestion 1 ─── N QuizOption
+Quiz 1 ─── N QuizAttempt
+QuizAttempt 1 ─── N QuizAnswer
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `UUID` | `PK` | Unique course identifier |
-| `title` | `VARCHAR(255)` | `NOT NULL` | Course title |
-| `description` | `TEXT` | `NULLABLE` | Rich-text description |
-| `thumbnail_url` | `TEXT` | `NULLABLE` | Cover image |
-| `teacher_id` | `UUID` | `FK → users.id, NOT NULL` | Course creator/owner |
-| `ai_enabled` | `BOOLEAN` | `NOT NULL, DEFAULT FALSE` | Gemini AI integration active |
-| `is_published` | `BOOLEAN` | `NOT NULL, DEFAULT FALSE` | Visibility flag |
-| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-| `updated_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-
-```sql
-CREATE TABLE courses (
-    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    title            VARCHAR(255) NOT NULL,
-    description      TEXT,
-    thumbnail_url    TEXT,
-    teacher_id       UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    ai_enabled       BOOLEAN NOT NULL DEFAULT FALSE,
-    is_published     BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_courses_teacher    ON courses(teacher_id);
-CREATE INDEX idx_courses_published  ON courses(is_published);
+User (STUDENT) N ─── N Course via Enrollment
+User (STUDENT) N ─── N Lesson via LessonProgress
+User N ─── N Lesson via Bookmark
+User (STUDENT) + Course 1 ─── N ChatThread
+ChatThread 1 ─── N ChatMessage
 ```
 
----
+Cascade deletes are used heavily:
 
-### 3. `modules`
-
-Logical groupings within a course (e.g., "Week 1", "Chapter 3").
-
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `UUID` | `PK` | |
-| `course_id` | `UUID` | `FK → courses.id, NOT NULL` | Parent course |
-| `title` | `VARCHAR(255)` | `NOT NULL` | Module title |
-| `description` | `TEXT` | `NULLABLE` | |
-| `order_index` | `INTEGER` | `NOT NULL, DEFAULT 0` | Display order within course |
-| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-| `updated_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-
-```sql
-CREATE TABLE modules (
-    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    course_id    UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-    title        VARCHAR(255) NOT NULL,
-    description  TEXT,
-    order_index  INTEGER NOT NULL DEFAULT 0,
-    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_modules_course ON modules(course_id);
-```
+- Deleting a course removes modules, lessons, materials, enrollments, chat threads, quizzes, attempts, and dependent records through relation chains.
+- Deleting a user removes owned courses or student-owned records depending on relation direction.
 
 ---
 
-### 4. `lessons`
+## Models
 
-Individual learning units within a module.
+### `User`
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `UUID` | `PK` | |
-| `module_id` | `UUID` | `FK → modules.id, NOT NULL` | Parent module |
-| `title` | `VARCHAR(255)` | `NOT NULL` | Lesson title |
-| `content` | `TEXT` | `NULLABLE` | Rich-text / Markdown body |
-| `order_index` | `INTEGER` | `NOT NULL, DEFAULT 0` | Display order within module |
-| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-| `updated_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
+Stores all platform users.
 
-```sql
-CREATE TABLE lessons (
-    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    module_id    UUID NOT NULL REFERENCES modules(id) ON DELETE CASCADE,
-    title        VARCHAR(255) NOT NULL,
-    content      TEXT,
-    order_index  INTEGER NOT NULL DEFAULT 0,
-    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Public-safe UUID |
+| `email` | `String @unique` | Login identifier |
+| `hashedPassword` | `String` | bcrypt hash |
+| `fullName` | `String` | Display name |
+| `role` | `UserRole @default(STUDENT)` | ADMIN, TEACHER, STUDENT |
+| `avatarUrl` | `String?` | Public profile/avatar image |
+| `phoneNumber` | `String?` | Private profile field |
+| `gender` | `String?` | Optional profile field |
+| `birthYear` | `Int?` | Optional profile field |
+| `highestEducation` | `String?` | Public profile field |
+| `bio` | `String? @db.Text` | Public profile biography |
+| `isActive` | `Boolean @default(true)` | Soft-disable flag |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+| `updatedAt` | `DateTime @updatedAt` | Updated timestamp |
 
-CREATE INDEX idx_lessons_module ON lessons(module_id);
-```
+Relations:
 
----
+- `courses` as teacher-owned courses.
+- `enrollments` as student enrollments.
+- `chatThreads`, `lessonProgress`, `quizAttempts`, `bookmarks`.
 
-### 5. `materials`
+Indexes:
 
-Uploaded files attached to a lesson. PDFs are uploaded to the Gemini File API for use in AI Tutor context windows.
-
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `UUID` | `PK` | |
-| `lesson_id` | `UUID` | `FK → lessons.id, NOT NULL` | Parent lesson |
-| `title` | `VARCHAR(255)` | `NOT NULL` | Display filename |
-| `material_type` | `material_type` | `NOT NULL, DEFAULT 'PDF'` | File category |
-| `file_url` | `TEXT` | `NOT NULL` | Storage path or URL |
-| `file_size_bytes` | `BIGINT` | `NULLABLE` | Size for UI display |
-| `gemini_file_uri` | `VARCHAR(255)` | `NULLABLE` | Gemini File API URI |
-| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-| `updated_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-
-```sql
-CREATE TABLE materials (
-    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    lesson_id        UUID NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
-    title            VARCHAR(255) NOT NULL,
-    material_type    material_type NOT NULL DEFAULT 'PDF',
-    file_url         TEXT NOT NULL,
-    file_size_bytes  BIGINT,
-    gemini_file_uri  VARCHAR(255),
-    created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_materials_lesson ON materials(lesson_id);
-```
+- `@@index([email])`
+- `@@index([role])`
 
 ---
 
-### 6. `enrollments`
+### `Course`
 
-Join table linking students to courses (N:M).
+Teacher-owned course container.
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `UUID` | `PK` | |
-| `student_id` | `UUID` | `FK → users.id, NOT NULL` | Enrolled student |
-| `course_id` | `UUID` | `FK → courses.id, NOT NULL` | Target course |
-| `status` | `enrollment_status` | `DEFAULT 'ACTIVE'` | ACTIVE / COMPLETED / DROPPED |
-| `enrolled_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | When the student enrolled |
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Course UUID |
+| `title` | `String` | Course title |
+| `description` | `String?` | Course description |
+| `thumbnailUrl` | `String?` | Course cover image |
+| `teacherId` | `String` | FK to `User` |
+| `aiEnabled` | `Boolean @default(false)` | AI Tutor enabled flag |
+| `isPublished` | `Boolean @default(false)` | Catalog visibility |
+| `isPrivate` | `Boolean @default(false)` | Closed enrollment flag |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+| `updatedAt` | `DateTime @updatedAt` | Updated timestamp |
 
-```sql
-CREATE TABLE enrollments (
-    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    student_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    course_id   UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-    status      enrollment_status NOT NULL DEFAULT 'ACTIVE',
-    enrolled_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+Relations:
 
-    UNIQUE(student_id, course_id)
-);
+- `teacher` via `TeacherCourses`.
+- `modules`, `enrollments`, `chatThreads`.
 
-CREATE INDEX idx_enrollments_student ON enrollments(student_id);
-CREATE INDEX idx_enrollments_course  ON enrollments(course_id);
-```
+Important behavior:
 
----
+- `isPrivate = true` disables student self-enrollment and self-unenrollment.
+- Teachers/admins can bulk-add or bulk-remove students.
+- `aiEnabled = true` means Gemini material setup has completed.
 
-### 7. `chat_threads`
+Indexes:
 
-Persists a chat thread per student×course pair so conversation history is maintained.
-
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `UUID` | `PK` | |
-| `student_id` | `UUID` | `FK → users.id, NOT NULL` | Thread owner |
-| `course_id` | `UUID` | `FK → courses.id, NOT NULL` | Scoped course |
-| `title` | `VARCHAR(255)` | `NULLABLE` | Auto-generated or user-set label |
-| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-| `updated_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-
-```sql
-CREATE TABLE chat_threads (
-    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    student_id        UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    course_id         UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-    title             VARCHAR(255),
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_chat_threads_student_course ON chat_threads(student_id, course_id);
-```
+- `@@index([teacherId])`
+- `@@index([isPublished])`
 
 ---
 
-### 8. `chat_messages`
+### `Module`
 
-Local storage of messages. When querying Gemini, this history is retrieved and passed as context.
+Ordered course section.
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `UUID` | `PK` | |
-| `thread_id` | `UUID` | `FK → chat_threads.id, NOT NULL` | Parent thread |
-| `role` | `VARCHAR(20)` | `NOT NULL` | `user` or `model` (Gemini API mapping) |
-| `content` | `TEXT` | `NOT NULL` | Message body |
-| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Module UUID |
+| `courseId` | `String` | FK to `Course` |
+| `title` | `String` | Module title |
+| `description` | `String?` | Optional description |
+| `orderIndex` | `Int @default(0)` | Sort order |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+| `updatedAt` | `DateTime @updatedAt` | Updated timestamp |
 
-```sql
-CREATE TABLE chat_messages (
-    id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    thread_id          UUID NOT NULL REFERENCES chat_threads(id) ON DELETE CASCADE,
-    role               VARCHAR(20) NOT NULL,
-    content            TEXT NOT NULL,
-    created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+Relations:
 
-CREATE INDEX idx_chat_messages_thread ON chat_messages(thread_id);
-```
+- `course`
+- `lessons`
 
----
+Index:
 
-### 9. `lesson_progress`
-
-Tracks which lessons a student has completed. Used to calculate course progress percentages on dashboards and analytics.
-
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `UUID` | `PK` | |
-| `student_id` | `UUID` | `FK → users.id, NOT NULL` | Student who completed the lesson |
-| `lesson_id` | `UUID` | `FK → lessons.id, NOT NULL` | Completed lesson |
-| `is_completed` | `BOOLEAN` | `DEFAULT FALSE` | Whether the lesson is marked complete |
-| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-| `updated_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` | |
-
-```sql
-CREATE TABLE lesson_progress (
-    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    student_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    lesson_id     UUID NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
-    is_completed  BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-    UNIQUE(student_id, lesson_id)
-);
-
-CREATE INDEX idx_lesson_progress_student ON lesson_progress(student_id);
-CREATE INDEX idx_lesson_progress_lesson  ON lesson_progress(lesson_id);
-```
+- `@@index([courseId])`
 
 ---
 
-## Relationship Summary
+### `Lesson`
 
-| Relationship | Type | FK |
-|---|---|---|
-| `users` → `courses` | One-to-Many | `courses.teacher_id` |
-| `courses` → `modules` | One-to-Many | `modules.course_id` |
-| `modules` → `lessons` | One-to-Many | `lessons.module_id` |
-| `lessons` → `materials` | One-to-Many | `materials.lesson_id` |
-| `users` ↔ `courses` (enrollment) | Many-to-Many | `enrollments(student_id, course_id)` |
-| `users` ↔ `lessons` (progress) | Many-to-Many | `lesson_progress(student_id, lesson_id)` |
-| `users` + `courses` → `chat_threads` | One-to-Many | `chat_threads(student_id, course_id)` |
-| `chat_threads` → `chat_messages` | One-to-Many | `chat_messages.thread_id` |
+Ordered learning unit.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Lesson UUID |
+| `moduleId` | `String` | FK to `Module` |
+| `title` | `String` | Lesson title |
+| `content` | `String?` | Markdown body |
+| `lessonType` | `LessonType @default(LECTURE)` | LECTURE or QUIZ |
+| `orderIndex` | `Int @default(0)` | Sort order |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+| `updatedAt` | `DateTime @updatedAt` | Updated timestamp |
+
+Relations:
+
+- `materials`
+- `progress`
+- `bookmarks`
+- `quiz`
+
+Index:
+
+- `@@index([moduleId])`
 
 ---
 
-## Notes
+### `Material`
 
-1. **UUIDs everywhere** — Avoids sequential ID enumeration; safe for public-facing APIs.
-2. **Cascade deletes** — Deleting a course removes its modules, lessons, materials, enrollments, and chat threads.
-3. **Gemini URIs are nullable** — They are populated asynchronously after Gemini File API calls succeed.
-4. **Context window usage** — Gemini models support large context windows. `chat_threads` and `chat_messages` are stored locally, and the history is passed along with `gemini_file_uri`s on every request, avoiding the need for an external stateful Assistant API.
+Lesson file or external material.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Material UUID |
+| `lessonId` | `String` | FK to `Lesson` |
+| `title` | `String` | Display filename/title |
+| `materialType` | `MaterialType @default(PDF)` | PDF, VIDEO, LINK, OTHER |
+| `fileUrl` | `String` | UploadThing URL or external URL |
+| `fileSizeBytes` | `BigInt?` | File size for UI |
+| `geminiFileUri` | `String?` | Gemini File API URI |
+| `geminiFileName` | `String?` | Gemini File API file name/id |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+| `updatedAt` | `DateTime @updatedAt` | Used for Gemini freshness checks |
+
+Important behavior:
+
+- `fileUrl` is the durable source of truth.
+- Gemini file refs may expire and can be re-synced from `fileUrl`.
+
+Index:
+
+- `@@index([lessonId])`
+
+---
+
+### `Enrollment`
+
+Student-course join table.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Enrollment UUID |
+| `studentId` | `String` | FK to `User` |
+| `courseId` | `String` | FK to `Course` |
+| `status` | `EnrollmentStatus @default(ACTIVE)` | ACTIVE, COMPLETED, DROPPED |
+| `enrolledAt` | `DateTime @default(now())` | Enrollment date |
+
+Constraints:
+
+- `@@unique([studentId, courseId])`
+
+Indexes:
+
+- `@@index([studentId])`
+- `@@index([courseId])`
+
+---
+
+### `ChatThread`
+
+AI Tutor conversation thread.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Thread UUID |
+| `studentId` | `String` | FK to `User` |
+| `courseId` | `String` | FK to `Course` |
+| `title` | `String?` | Optional thread label |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+| `updatedAt` | `DateTime @updatedAt` | Updated timestamp |
+
+Relations:
+
+- `messages`
+
+Index:
+
+- `@@index([studentId, courseId])`
+
+---
+
+### `ChatMessage`
+
+Stored chat message.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Message UUID |
+| `threadId` | `String` | FK to `ChatThread` |
+| `role` | `String` | `user` or `model` |
+| `content` | `String` | Message text |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+
+Index:
+
+- `@@index([threadId])`
+
+---
+
+### `LessonProgress`
+
+Tracks per-student lesson completion.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Progress UUID |
+| `studentId` | `String` | FK to `User` |
+| `lessonId` | `String` | FK to `Lesson` |
+| `isCompleted` | `Boolean @default(false)` | Completion flag |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+| `updatedAt` | `DateTime @updatedAt` | Updated timestamp |
+
+Constraints:
+
+- `@@unique([studentId, lessonId])`
+
+Indexes:
+
+- `@@index([studentId])`
+- `@@index([lessonId])`
+
+---
+
+### `Bookmark`
+
+Saved lesson record.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Bookmark UUID |
+| `userId` | `String` | FK to `User` |
+| `lessonId` | `String` | FK to `Lesson` |
+| `createdAt` | `DateTime @default(now())` | Save timestamp |
+
+Constraints:
+
+- `@@unique([userId, lessonId])`
+
+Indexes:
+
+- `@@index([userId])`
+- `@@index([lessonId])`
+
+---
+
+### `Quiz`
+
+Quiz attached one-to-one to a lesson.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Quiz UUID |
+| `lessonId` | `String @unique` | FK to `Lesson` |
+| `dueDate` | `DateTime?` | Optional deadline |
+| `maxAttempts` | `Int @default(1)` | Attempt limit |
+| `passingScore` | `Float @default(0.5)` | Ratio threshold |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+| `updatedAt` | `DateTime @updatedAt` | Updated timestamp |
+
+Relations:
+
+- `questions`
+- `attempts`
+
+---
+
+### `QuizQuestion`
+
+Quiz question.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Question UUID |
+| `quizId` | `String` | FK to `Quiz` |
+| `questionText` | `String` | Prompt |
+| `explanation` | `String?` | Teacher/AI explanation |
+| `orderIndex` | `Int @default(0)` | Sort order |
+| `points` | `Int @default(1)` | Question points |
+| `createdAt` | `DateTime @default(now())` | Created timestamp |
+| `updatedAt` | `DateTime @updatedAt` | Updated timestamp |
+
+Relations:
+
+- `options`
+- `answers`
+
+Index:
+
+- `@@index([quizId])`
+
+---
+
+### `QuizOption`
+
+Multiple-choice option.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Option UUID |
+| `questionId` | `String` | FK to `QuizQuestion` |
+| `optionText` | `String` | Option label |
+| `isCorrect` | `Boolean @default(false)` | Correct answer flag |
+| `orderIndex` | `Int @default(0)` | Sort order |
+
+Relations:
+
+- `answers`
+
+Index:
+
+- `@@index([questionId])`
+
+---
+
+### `QuizAttempt`
+
+Student quiz submission.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Attempt UUID |
+| `quizId` | `String` | FK to `Quiz` |
+| `studentId` | `String` | FK to `User` |
+| `score` | `Float?` | Earned points |
+| `totalPoints` | `Int?` | Total quiz points |
+| `startedAt` | `DateTime @default(now())` | Started timestamp |
+| `submittedAt` | `DateTime?` | Submitted timestamp |
+
+Relations:
+
+- `answers`
+
+Indexes:
+
+- `@@index([quizId])`
+- `@@index([studentId])`
+
+---
+
+### `QuizAnswer`
+
+Selected answer for a question in an attempt.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | `String @id @default(uuid())` | Answer UUID |
+| `attemptId` | `String` | FK to `QuizAttempt` |
+| `questionId` | `String` | FK to `QuizQuestion` |
+| `optionId` | `String` | FK to `QuizOption` |
+
+Index:
+
+- `@@index([attemptId])`
+
+---
+
+## Production Notes
+
+1. **UUIDs are used for public-facing records.**
+2. **UploadThing is the durable material store.** `Material.fileUrl` stores cloud URLs.
+3. **Gemini File API references are cache-like.** `geminiFileUri` and `geminiFileName` can be regenerated from `fileUrl`.
+4. **Course progress is derived.** `LessonProgress` is the source of truth; percentages are calculated in `lib/services/progress.service.ts`.
+5. **Private courses are closed enrollment.** Students cannot self-enroll or self-unenroll when `Course.isPrivate` is true.
+6. **Quiz update safety.** Existing attempts should block destructive question/option edits in service logic.
+7. **Production data migration.** `client/prisma/extract.ts` exports `{ users, courses }`; `client/prisma/seed.ts` restores nested data.

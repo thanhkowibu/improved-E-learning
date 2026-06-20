@@ -1,0 +1,2146 @@
+{
+  "users": [
+    {
+      "id": "ded24259-0df8-40ee-9d16-6c9ad9685022",
+      "email": "test@lms.dev",
+      "hashedPassword": "$2b$12$clpDhOQ7GC5IYJwYklUdLedItcdp/uikCY.VCcXdbhkDdj1N8/Qpm",
+      "fullName": "Test User",
+      "role": "ADMIN",
+      "avatarUrl": null,
+      "phoneNumber": null,
+      "gender": null,
+      "birthYear": null,
+      "highestEducation": null,
+      "bio": null,
+      "isActive": true,
+      "createdAt": "2026-05-20T10:07:27.871Z",
+      "updatedAt": "2026-05-26T07:10:07.246Z"
+    },
+    {
+      "id": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+      "email": "huy@gmail.com",
+      "hashedPassword": "$2b$12$wV.ufmskzGuUBh.vnNYubO7uZ3ehpIYc4TbzkChRi3B5/1MiYd8Cq",
+      "fullName": "Huy Trần",
+      "role": "STUDENT",
+      "avatarUrl": "https://schooler.sun-asterisk.com/storage/images/avatar/student/69dcfdfe42a58.",
+      "phoneNumber": "0123456789",
+      "gender": "Nam",
+      "birthYear": 2004,
+      "highestEducation": "Cử nhân",
+      "bio": "Xin chào mình là Trần Quang Huy sinh viên lớp 06 khóa 67 ngành VIệt Nhật Trường Công nghệ thông tin và Truyền thông",
+      "isActive": true,
+      "createdAt": "2026-05-26T06:03:44.759Z",
+      "updatedAt": "2026-06-17T07:53:06.328Z"
+    },
+    {
+      "id": "baf5efd6-82f1-4f4a-811a-2f32fc88be4b",
+      "email": "teacher@lms.dev",
+      "hashedPassword": "$2b$12$44zmeK6ldeECkx0uzjyVauxxTL.zPK8AFOyiGhtulCfpIEwBAQDji",
+      "fullName": "Kim Ura",
+      "role": "TEACHER",
+      "avatarUrl": "https://ca.slack-edge.com/T02QFU9TCTD-U02RG3RP57C-6820f0c8ad64-512",
+      "phoneNumber": null,
+      "gender": "Nữ",
+      "birthYear": 1980,
+      "highestEducation": "Tiến sĩ",
+      "bio": "みなさん、こんにちは。",
+      "isActive": true,
+      "createdAt": "2026-05-26T06:54:19.343Z",
+      "updatedAt": "2026-06-16T16:18:11.806Z"
+    },
+    {
+      "id": "41a928b8-0e55-4881-9d1d-29009bd28fc3",
+      "email": "deactivated@lms.dev",
+      "hashedPassword": "$2b$12$e7/rpy8e89q5RxcSeIMj5uxnPcA97tMUi8XrRZk5tNCirqypEi4hS",
+      "fullName": "Banned User",
+      "role": "STUDENT",
+      "avatarUrl": null,
+      "phoneNumber": null,
+      "gender": null,
+      "birthYear": null,
+      "highestEducation": null,
+      "bio": null,
+      "isActive": false,
+      "createdAt": "2026-05-26T07:12:03.055Z",
+      "updatedAt": "2026-06-13T18:02:10.869Z"
+    },
+    {
+      "id": "0d2c233b-fd4a-4fc2-85de-1397d4865f4c",
+      "email": "student@lms.dev",
+      "hashedPassword": "$2b$12$ScTpUBP2syGivbJ/SC9cv.UfOXEf508vHXzAwL3SQv2Jojn76OMkK",
+      "fullName": "Test Student",
+      "role": "STUDENT",
+      "avatarUrl": null,
+      "phoneNumber": null,
+      "gender": null,
+      "birthYear": null,
+      "highestEducation": null,
+      "bio": null,
+      "isActive": true,
+      "createdAt": "2026-05-26T16:01:20.367Z",
+      "updatedAt": "2026-05-26T16:01:20.367Z"
+    },
+    {
+      "id": "67e5c20f-a2a8-4e86-8988-bc7c0f04a6b5",
+      "email": "john@example.com",
+      "hashedPassword": "$2b$12$YC9o4dOdxvdK2WzCzI13ku4O8qyMMeGRFgt9Iy/IWDGPj3Dl3G7Lu",
+      "fullName": "John Doe",
+      "role": "TEACHER",
+      "avatarUrl": null,
+      "phoneNumber": null,
+      "gender": null,
+      "birthYear": null,
+      "highestEducation": null,
+      "bio": null,
+      "isActive": true,
+      "createdAt": "2026-05-29T12:28:47.799Z",
+      "updatedAt": "2026-05-29T12:28:47.799Z"
+    },
+    {
+      "id": "95dafe6d-ae97-4bb4-ada1-7279e47ed2e8",
+      "email": "student36@lms.dev",
+      "hashedPassword": "$2b$12$89ZZECnuueCPdK9O3dEJq.Iay4jHtGpUKf9g1R9MHr1FnR6RU9t6C",
+      "fullName": "Student 36",
+      "role": "STUDENT",
+      "avatarUrl": null,
+      "phoneNumber": null,
+      "gender": null,
+      "birthYear": null,
+      "highestEducation": null,
+      "bio": null,
+      "isActive": true,
+      "createdAt": "2026-05-29T12:37:21.845Z",
+      "updatedAt": "2026-05-29T12:37:21.845Z"
+    },
+    {
+      "id": "44acd7c6-d72a-4257-b7b3-b4b0c7e27fd2",
+      "email": "teacher36@lms.dev",
+      "hashedPassword": "$2b$12$7n6ki4M7cdQVa2eXk71fH.tt6mYvOyUavA3gSwggzW8vfjvHNWXiO",
+      "fullName": "Teacher 36",
+      "role": "TEACHER",
+      "avatarUrl": null,
+      "phoneNumber": null,
+      "gender": null,
+      "birthYear": null,
+      "highestEducation": null,
+      "bio": null,
+      "isActive": true,
+      "createdAt": "2026-05-29T12:39:07.079Z",
+      "updatedAt": "2026-05-29T12:39:07.079Z"
+    },
+    {
+      "id": "9df90c49-bdc7-42d6-9c64-512c1f5faf10",
+      "email": "minh@lms.dev",
+      "hashedPassword": "$2b$12$cH9iAbgI0ffTEDzy3QqX8uTfnymFdIVnYYAJ1i/odyW2PJbf02.U2",
+      "fullName": "Nguyễn Lê Minh",
+      "role": "STUDENT",
+      "avatarUrl": null,
+      "phoneNumber": null,
+      "gender": "Nam",
+      "birthYear": 2004,
+      "highestEducation": "Cử nhân",
+      "bio": "Xin chào",
+      "isActive": true,
+      "createdAt": "2026-06-18T13:35:20.146Z",
+      "updatedAt": "2026-06-18T13:36:29.639Z"
+    }
+  ],
+  "courses": [
+    {
+      "id": "c94892f2-5d1f-4299-889e-c89a9edfe0b0",
+      "title": "Intro to AI",
+      "description": "Learn the basic knowledge of AI",
+      "thumbnailUrl": null,
+      "teacherId": "baf5efd6-82f1-4f4a-811a-2f32fc88be4b",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-05-26T11:06:38.621Z",
+      "updatedAt": "2026-06-10T09:21:46.005Z",
+      "enrollments": [
+        {
+          "id": "190aef62-81b5-44a4-9b30-48db4e19e5c4",
+          "studentId": "0d2c233b-fd4a-4fc2-85de-1397d4865f4c",
+          "courseId": "c94892f2-5d1f-4299-889e-c89a9edfe0b0",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-05-27T15:27:54.238Z"
+        },
+        {
+          "id": "d075559d-425b-4db7-b90a-ae7aaf7d680c",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "c94892f2-5d1f-4299-889e-c89a9edfe0b0",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-05-27T15:36:22.800Z"
+        }
+      ],
+      "chatThreads": [
+        {
+          "id": "7c065afd-3779-4211-a0a0-1eca17466b5e",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "c94892f2-5d1f-4299-889e-c89a9edfe0b0",
+          "title": null,
+          "createdAt": "2026-06-10T08:37:18.278Z",
+          "updatedAt": "2026-06-10T08:38:08.488Z",
+          "messages": [
+            {
+              "id": "12ddcd96-f578-4cf2-b5ac-aa76c78b84e3",
+              "threadId": "7c065afd-3779-4211-a0a0-1eca17466b5e",
+              "role": "user",
+              "content": "4. Trạng thái bàn cờ được biểu diễn dưới dạng nào trong phần đầu vào của hệ thống?\n1 point\n\nIncorrect\nDanh sách liên kết\nMảng 8x8 với ký hiệu quân cờ\nYour answer\nMảng 9x10 với ký hiệu quân cờ\nCorrect\nĐồ thị vô hướng\nCorrect answer: Mảng 9x10 với ký hiệu quân cờ\n\nTheo phần đầu vào của hệ thống, trạng thái bàn cờ là mảng 9x10 với ký hiệu quân cờ.\n\nGiải thích tại sao",
+              "createdAt": "2026-06-10T08:37:28.121Z"
+            },
+            {
+              "id": "ab8c1ff8-cd06-46d8-b02d-c43947fe0fb2",
+              "threadId": "7c065afd-3779-4211-a0a0-1eca17466b5e",
+              "role": "model",
+              "content": "Dựa trên tài liệu bạn cung cấp, trạng thái bàn cờ được biểu diễn dưới dạng **\"Mảng 9x10 với ký hiệu quân cờ\"**.\n\nThông tin này được nêu rõ tại mục **\"Trình bày đầu vào và đầu ra hệ thống\"**, phần **\"Đầu vào\"** (trang 1):\n> \"• Trạng thái bàn cờ: Mảng 9x10 với ký hiệu quân cờ\"",
+              "createdAt": "2026-06-10T08:37:30.469Z"
+            },
+            {
+              "id": "c5a0d5e8-3699-45b5-a443-b5b56f81ab96",
+              "threadId": "7c065afd-3779-4211-a0a0-1eca17466b5e",
+              "role": "user",
+              "content": "nhóm này có những sinh viên nào, mssv bao nhiêu",
+              "createdAt": "2026-06-10T08:38:06.627Z"
+            },
+            {
+              "id": "d989d228-e677-4279-a195-9c20d53e5626",
+              "threadId": "7c065afd-3779-4211-a0a0-1eca17466b5e",
+              "role": "model",
+              "content": "Dựa trên tài liệu bạn cung cấp, nhóm thực hiện dự án bao gồm các sinh viên và mã số sinh viên (MSSV) sau (xem phần \"Nhóm\" ở đầu trang 1):\n\n*   **Phạm Lê Thành** - MSSV: 20225765\n*   **Nguyễn Lê Minh** - MSSV: 20225651\n*   **Trần Quang Huy** - MSSV: 20225860",
+              "createdAt": "2026-06-10T08:38:08.480Z"
+            }
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "id": "791ec9ec-10d6-40ae-b305-4488b4a178e2",
+          "courseId": "c94892f2-5d1f-4299-889e-c89a9edfe0b0",
+          "title": "Introduction",
+          "description": "Course overview",
+          "orderIndex": 0,
+          "createdAt": "2026-05-26T12:32:28.681Z",
+          "updatedAt": "2026-06-02T17:11:35.189Z",
+          "lessons": [
+            {
+              "id": "151f5ac2-4643-4ed2-b13b-5aafe52b6ded",
+              "moduleId": "791ec9ec-10d6-40ae-b305-4488b4a178e2",
+              "title": "Lesson 1: What is AI",
+              "content": null,
+              "lessonType": "QUIZ",
+              "orderIndex": 0,
+              "createdAt": "2026-06-02T16:15:43.995Z",
+              "updatedAt": "2026-06-10T09:16:47.278Z",
+              "materials": [
+                {
+                  "id": "b1c63a83-611f-4d8b-858f-719f361e0a76",
+                  "lessonId": "151f5ac2-4643-4ed2-b13b-5aafe52b6ded",
+                  "title": "Tu_luan_tuan_1_PhamLeThanh_20225765.pdf",
+                  "materialType": "PDF",
+                  "fileUrl": "https://utfs.io/f/hjff70ODiO3u6cY1nDNBGEdT0e9I5rpJnMCvgDiOAl7KcLHU",
+                  "fileSizeBytes": "121565",
+                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/lxd4u7ggky02",
+                  "geminiFileName": "files/lxd4u7ggky02",
+                  "createdAt": "2026-06-10T09:16:00.501Z",
+                  "updatedAt": "2026-06-10T09:17:17.585Z"
+                }
+              ],
+              "progress": [
+                {
+                  "id": "8ad1a320-050d-4816-af8e-c21b3aa9dce2",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "151f5ac2-4643-4ed2-b13b-5aafe52b6ded",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-03T15:55:58.916Z",
+                  "updatedAt": "2026-06-03T15:56:05.332Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": {
+                "id": "654b6a9c-7c0a-427a-97c2-db4668a12e9b",
+                "lessonId": "151f5ac2-4643-4ed2-b13b-5aafe52b6ded",
+                "dueDate": null,
+                "maxAttempts": 1,
+                "passingScore": 0.5,
+                "createdAt": "2026-06-11T04:01:27.859Z",
+                "updatedAt": "2026-06-11T04:01:35.611Z",
+                "questions": [
+                  {
+                    "id": "d3a48672-c33b-4239-8516-11c0eda67544",
+                    "quizId": "654b6a9c-7c0a-427a-97c2-db4668a12e9b",
+                    "questionText": "Theo tài liệu, đâu là một trong những nguyên nhân chính dẫn đến 'Mùa đông AI' lần đầu tiên (1974-1980)?",
+                    "explanation": "Tài liệu ghi rõ hạn chế về phần cứng, cụ thể là máy tính thời kỳ đó quá yếu để chạy các thuật toán phức tạp, là một nguyên nhân chính gây ra 'Mùa đông AI' lần thứ nhất.",
+                    "orderIndex": 0,
+                    "points": 1,
+                    "createdAt": "2026-06-11T04:01:35.611Z",
+                    "updatedAt": "2026-06-11T04:01:35.611Z",
+                    "options": [
+                      {
+                        "id": "c09683b6-2b6b-4ea9-85c3-1be321dada90",
+                        "questionId": "d3a48672-c33b-4239-8516-11c0eda67544",
+                        "optionText": "Sự thiếu hụt các nhà nghiên cứu AI.",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "3177bd23-2786-4425-a5c7-9295ebc5e45b",
+                        "questionId": "d3a48672-c33b-4239-8516-11c0eda67544",
+                        "optionText": "Máy tính thời kỳ đó quá yếu để chạy các thuật toán phức tạp.",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "8f1ce6df-f1e0-479b-a594-980cedc5f324",
+                        "questionId": "d3a48672-c33b-4239-8516-11c0eda67544",
+                        "optionText": "Sự bùng nổ quá nhanh của dữ liệu lớn khiến hệ thống bị quá tải.",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "b668af68-f730-46da-908a-f56cfb06e9b6",
+                        "questionId": "d3a48672-c33b-4239-8516-11c0eda67544",
+                        "optionText": "Các công ty công nghệ từ chối đầu tư vào AI.",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "3b225c04-06bb-4628-8cfb-2d1dbdd0a890",
+                    "quizId": "654b6a9c-7c0a-427a-97c2-db4668a12e9b",
+                    "questionText": "Yếu tố nào được liệt kê là một trong những động lực giúp AI phát triển mạnh mẽ sau năm 2010?",
+                    "explanation": "Tài liệu chỉ ra rằng sự bùng nổ của dữ liệu lớn (Big Data) thông qua Internet, mạng xã hội và thiết bị di động đóng vai trò là 'nhiên liệu' cho các thuật toán học sâu.",
+                    "orderIndex": 1,
+                    "points": 1,
+                    "createdAt": "2026-06-11T04:01:35.611Z",
+                    "updatedAt": "2026-06-11T04:01:35.611Z",
+                    "options": [
+                      {
+                        "id": "035d75ce-f483-4020-884c-c5847a3903ef",
+                        "questionId": "3b225c04-06bb-4628-8cfb-2d1dbdd0a890",
+                        "optionText": "Sự thống trị của các hệ chuyên gia cũ.",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "46a1a1d2-4416-4f97-bdaa-ed1b72dac5d3",
+                        "questionId": "3b225c04-06bb-4628-8cfb-2d1dbdd0a890",
+                        "optionText": "Sự bùng nổ của dữ liệu lớn (Big Data).",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "45b68463-ce5c-4cc3-b7b2-66b4a6d240f5",
+                        "questionId": "3b225c04-06bb-4628-8cfb-2d1dbdd0a890",
+                        "optionText": "Việc cấm hoàn toàn các dự án AI nghiên cứu tại Trung Quốc.",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "18a54cd8-ff4d-442e-8194-ad48eb75f150",
+                        "questionId": "3b225c04-06bb-4628-8cfb-2d1dbdd0a890",
+                        "optionText": "Sự sụt giảm chi phí của các máy tính Lisp.",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "e631e5fa-eaab-407f-9698-0b2e6720734f",
+                    "quizId": "654b6a9c-7c0a-427a-97c2-db4668a12e9b",
+                    "questionText": "Theo bài học, tại sao việc AI rơi vào một 'Mùa đông AI' tiếp theo được coi là khó xảy ra hơn trước?",
+                    "explanation": "Tài liệu nêu rõ các yếu tố chống lại 'Mùa đông AI' bao gồm việc AI hiện nay đã gắn chặt với nền kinh tế số (tài chính, y tế, sản xuất...) khiến việc rút hoàn toàn đầu tư là gần như không thể.",
+                    "orderIndex": 2,
+                    "points": 1,
+                    "createdAt": "2026-06-11T04:01:35.611Z",
+                    "updatedAt": "2026-06-11T04:01:35.611Z",
+                    "options": [
+                      {
+                        "id": "8599fef4-d650-40a2-9be8-77dd0eb75656",
+                        "questionId": "e631e5fa-eaab-407f-9698-0b2e6720734f",
+                        "optionText": "Vì AI đã đạt đến trí tuệ nhân tạo tổng quát (AGI).",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "7d802030-ccab-44fc-9046-1a51eb6ac3a0",
+                        "questionId": "e631e5fa-eaab-407f-9698-0b2e6720734f",
+                        "optionText": "Vì AI không còn phụ thuộc vào dữ liệu nữa.",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "6be55372-067f-48e2-9ca3-eb706e5feca7",
+                        "questionId": "e631e5fa-eaab-407f-9698-0b2e6720734f",
+                        "optionText": "Vì AI hiện đã gắn chặt với nền kinh tế số trên nhiều lĩnh vực khác nhau.",
+                        "isCorrect": true,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "f3266f1a-e60e-4534-8ff1-94cf6440d57b",
+                        "questionId": "e631e5fa-eaab-407f-9698-0b2e6720734f",
+                        "optionText": "Vì chỉ có một quốc gia duy nhất là Mỹ đang phát triển AI.",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "2498c900-7e3d-4820-87f5-c6b916701924",
+                    "quizId": "654b6a9c-7c0a-427a-97c2-db4668a12e9b",
+                    "questionText": "Hướng nghiên cứu nào được đề xuất để giúp AI cải thiện khả năng hiểu biết ngữ cảnh sâu và suy luận logic phức tạp?",
+                    "explanation": "Tài liệu đề xuất nghiên cứu AI kết hợp logic và học sâu (Neuro-symbolic AI) để giúp AI thực hiện suy luận và hiểu ngữ nghĩa phức tạp hơn.",
+                    "orderIndex": 3,
+                    "points": 1,
+                    "createdAt": "2026-06-11T04:01:35.611Z",
+                    "updatedAt": "2026-06-11T04:01:35.611Z",
+                    "options": [
+                      {
+                        "id": "f76bc036-7fae-4fcb-8b35-cf641cd9ef5c",
+                        "questionId": "2498c900-7e3d-4820-87f5-c6b916701924",
+                        "optionText": "Nghiên cứu AI kết hợp logic và học sâu (Neuro-symbolic AI).",
+                        "isCorrect": true,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "6e14530a-1081-4a07-babf-fd84babc5eef",
+                        "questionId": "2498c900-7e3d-4820-87f5-c6b916701924",
+                        "optionText": "Tập trung hoàn toàn vào việc tăng số lượng phần cứng.",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "06639f85-466a-443f-8af9-2d66d20abd3b",
+                        "questionId": "2498c900-7e3d-4820-87f5-c6b916701924",
+                        "optionText": "Loại bỏ hoàn toàn các mô hình học sâu.",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "1ed41fb7-bc24-4f71-b880-b5d247168b08",
+                        "questionId": "2498c900-7e3d-4820-87f5-c6b916701924",
+                        "optionText": "Hạn chế AI tiếp xúc với dữ liệu văn học.",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "11e838cd-7415-45fc-8ff1-4febf12fde3c",
+                    "quizId": "654b6a9c-7c0a-427a-97c2-db4668a12e9b",
+                    "questionText": "Tại sao AI hiện nay vẫn gặp khó khăn trong việc thể hiện khả năng sáng tạo thực sự giống con người?",
+                    "explanation": "Theo tài liệu, sự sáng tạo của AI phần lớn dựa trên việc mô phỏng các mẫu có sẵn từ dữ liệu huấn luyện, mang tính cơ học và thiếu sự đột phá.",
+                    "orderIndex": 4,
+                    "points": 1,
+                    "createdAt": "2026-06-11T04:01:35.611Z",
+                    "updatedAt": "2026-06-11T04:01:35.611Z",
+                    "options": [
+                      {
+                        "id": "85854455-625b-4ccb-a10a-1b23c6391117",
+                        "questionId": "11e838cd-7415-45fc-8ff1-4febf12fde3c",
+                        "optionText": "Vì AI không có quyền truy cập vào các tác phẩm nghệ thuật.",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "d7e9a4bf-ed5d-4026-83e6-2f89e09c91e0",
+                        "questionId": "11e838cd-7415-45fc-8ff1-4febf12fde3c",
+                        "optionText": "Vì AI không thể xử lý dữ liệu hình ảnh.",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "e6ef43f7-4801-4aa7-bcbb-7a3054dd2742",
+                        "questionId": "11e838cd-7415-45fc-8ff1-4febf12fde3c",
+                        "optionText": "Vì việc tạo ra nội dung của AI chủ yếu dựa trên việc mô phỏng các mẫu có sẵn từ dữ liệu huấn luyện.",
+                        "isCorrect": true,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "f3259c02-c385-43c8-9313-057418493e76",
+                        "questionId": "11e838cd-7415-45fc-8ff1-4febf12fde3c",
+                        "optionText": "Vì các nhà khoa học đã cố tình lập trình để AI không được sáng tạo.",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  }
+                ],
+                "attempts": [
+                  {
+                    "id": "160a6597-72be-4aa6-b550-534bb794c1a0",
+                    "quizId": "654b6a9c-7c0a-427a-97c2-db4668a12e9b",
+                    "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                    "score": 3,
+                    "totalPoints": 5,
+                    "startedAt": "2026-06-11T04:02:57.575Z",
+                    "submittedAt": "2026-06-11T04:02:57.569Z",
+                    "answers": [
+                      {
+                        "id": "3ee12d06-4896-46a5-9bf7-bf23287ea772",
+                        "attemptId": "160a6597-72be-4aa6-b550-534bb794c1a0",
+                        "questionId": "d3a48672-c33b-4239-8516-11c0eda67544",
+                        "optionId": "8f1ce6df-f1e0-479b-a594-980cedc5f324"
+                      },
+                      {
+                        "id": "d26fd947-6efa-47c7-af3a-e0d9ea33d74a",
+                        "attemptId": "160a6597-72be-4aa6-b550-534bb794c1a0",
+                        "questionId": "3b225c04-06bb-4628-8cfb-2d1dbdd0a890",
+                        "optionId": "46a1a1d2-4416-4f97-bdaa-ed1b72dac5d3"
+                      },
+                      {
+                        "id": "58af3783-769e-49c9-956d-555dc7b16a41",
+                        "attemptId": "160a6597-72be-4aa6-b550-534bb794c1a0",
+                        "questionId": "e631e5fa-eaab-407f-9698-0b2e6720734f",
+                        "optionId": "8599fef4-d650-40a2-9be8-77dd0eb75656"
+                      },
+                      {
+                        "id": "53c2ce42-48e9-4538-bfbb-f59f3e5d91db",
+                        "attemptId": "160a6597-72be-4aa6-b550-534bb794c1a0",
+                        "questionId": "2498c900-7e3d-4820-87f5-c6b916701924",
+                        "optionId": "f76bc036-7fae-4fcb-8b35-cf641cd9ef5c"
+                      },
+                      {
+                        "id": "d99ebc2c-6c23-4a3a-adaa-2f65d26b1506",
+                        "attemptId": "160a6597-72be-4aa6-b550-534bb794c1a0",
+                        "questionId": "11e838cd-7415-45fc-8ff1-4febf12fde3c",
+                        "optionId": "e6ef43f7-4801-4aa7-bcbb-7a3054dd2742"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "id": "0bc27f79-721f-4b6d-a818-3f2792aba212",
+              "moduleId": "791ec9ec-10d6-40ae-b305-4488b4a178e2",
+              "title": "Lesson 2: AI role in the modern world",
+              "content": null,
+              "lessonType": "QUIZ",
+              "orderIndex": 1,
+              "createdAt": "2026-06-02T16:16:06.739Z",
+              "updatedAt": "2026-06-10T09:16:26.711Z",
+              "materials": [],
+              "progress": [
+                {
+                  "id": "c73a8f91-ce22-4ba5-a90a-7eb09e88c12d",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "0bc27f79-721f-4b6d-a818-3f2792aba212",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-03T15:56:08.753Z",
+                  "updatedAt": "2026-06-03T15:56:08.753Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": {
+                "id": "a22d23cd-ea70-4643-bf37-0548d58006fc",
+                "lessonId": "0bc27f79-721f-4b6d-a818-3f2792aba212",
+                "dueDate": null,
+                "maxAttempts": 1,
+                "passingScore": 1,
+                "createdAt": "2026-06-09T15:36:11.985Z",
+                "updatedAt": "2026-06-09T16:29:29.363Z",
+                "questions": [
+                  {
+                    "id": "60db58e3-f975-4952-bafb-63a44ff32b91",
+                    "quizId": "a22d23cd-ea70-4643-bf37-0548d58006fc",
+                    "questionText": "Cau 1: Hay chon dap an C",
+                    "explanation": "Giai thich 1",
+                    "orderIndex": 0,
+                    "points": 5,
+                    "createdAt": "2026-06-09T16:29:29.363Z",
+                    "updatedAt": "2026-06-09T16:29:29.363Z",
+                    "options": [
+                      {
+                        "id": "8690e0fc-4555-4808-88e4-79142143b5f9",
+                        "questionId": "60db58e3-f975-4952-bafb-63a44ff32b91",
+                        "optionText": "A",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "d9139ea3-65c5-4d9d-8502-f80ced8b83cc",
+                        "questionId": "60db58e3-f975-4952-bafb-63a44ff32b91",
+                        "optionText": "B",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "3716b78b-900e-4f3f-b093-e33cdbdac4ba",
+                        "questionId": "60db58e3-f975-4952-bafb-63a44ff32b91",
+                        "optionText": "C",
+                        "isCorrect": true,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "c1b9d524-f8ee-4802-b4fc-0c0ecec16246",
+                        "questionId": "60db58e3-f975-4952-bafb-63a44ff32b91",
+                        "optionText": "D",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "2f548b13-bc09-472f-a797-1dc9229c4a70",
+                    "quizId": "a22d23cd-ea70-4643-bf37-0548d58006fc",
+                    "questionText": "Cau 2: Dung",
+                    "explanation": null,
+                    "orderIndex": 1,
+                    "points": 5,
+                    "createdAt": "2026-06-09T16:29:29.363Z",
+                    "updatedAt": "2026-06-09T16:29:29.363Z",
+                    "options": [
+                      {
+                        "id": "b7091a80-9b47-4dc8-8413-960969a86c69",
+                        "questionId": "2f548b13-bc09-472f-a797-1dc9229c4a70",
+                        "optionText": "True",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "61bdea6b-7e1d-494e-8f91-c511929101fb",
+                        "questionId": "2f548b13-bc09-472f-a797-1dc9229c4a70",
+                        "optionText": "False",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      }
+                    ]
+                  }
+                ],
+                "attempts": []
+              }
+            }
+          ]
+        },
+        {
+          "id": "e0177984-3ff9-474a-b722-ae611c11d446",
+          "courseId": "c94892f2-5d1f-4299-889e-c89a9edfe0b0",
+          "title": "Basic Agent in AI",
+          "description": "Learn about AI agent",
+          "orderIndex": 1,
+          "createdAt": "2026-05-26T12:39:17.045Z",
+          "updatedAt": "2026-06-02T17:11:35.189Z",
+          "lessons": [
+            {
+              "id": "166349d5-68ac-4e99-b29a-804508ff6a4d",
+              "moduleId": "e0177984-3ff9-474a-b722-ae611c11d446",
+              "title": "Lesson 1: Introduction",
+              "content": "### Technologies Used\n\n- **Backend**: Spring Boot (Java)\n- **Frontend**: ReactJS\n- **Database**: SQL Server\n- **Authentication**: JWT\n- **API**: RESTful\n- **Deployment**: Docker (docker-compose -f bluemoon.yml)\n\n### 🧩 Key Features\n\n- Manage resident & apartment info\n- Bill management\n- Notifications and feedback system\n- Maintenance request management\n- Facility booking\n\n### ⚙️ Run Backend with Docker\n\n```bash\ndocker-compose -f bluemoon.yml up --build\n```\n\n### ⚙️ Run Frontend with npm\n\n```bash\ncd .\\frontend\\\n\nnpm install --force\n\nnpm run dev\n```\n\n---",
+              "lessonType": "QUIZ",
+              "orderIndex": 0,
+              "createdAt": "2026-05-26T15:48:14.626Z",
+              "updatedAt": "2026-06-09T17:33:03.699Z",
+              "materials": [],
+              "progress": [
+                {
+                  "id": "5c155559-85c5-4f34-ad74-063b9007dc31",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "166349d5-68ac-4e99-b29a-804508ff6a4d",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-03T15:56:12.235Z",
+                  "updatedAt": "2026-06-14T15:27:56.285Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": {
+                "id": "e53e47c1-3421-4eff-b168-b762b92c9ad6",
+                "lessonId": "166349d5-68ac-4e99-b29a-804508ff6a4d",
+                "dueDate": "2026-06-10T17:00:00.000Z",
+                "maxAttempts": 1,
+                "passingScore": 0.5,
+                "createdAt": "2026-06-09T17:28:20.847Z",
+                "updatedAt": "2026-06-09T17:30:02.866Z",
+                "questions": [
+                  {
+                    "id": "05735630-4dd1-4211-ad9d-a2a10dfc8b54",
+                    "quizId": "e53e47c1-3421-4eff-b168-b762b92c9ad6",
+                    "questionText": "Qs 1",
+                    "explanation": null,
+                    "orderIndex": 0,
+                    "points": 1,
+                    "createdAt": "2026-06-09T17:30:02.866Z",
+                    "updatedAt": "2026-06-09T17:30:02.866Z",
+                    "options": [
+                      {
+                        "id": "896ed112-a072-474d-89f8-c622d3f994f8",
+                        "questionId": "05735630-4dd1-4211-ad9d-a2a10dfc8b54",
+                        "optionText": "A",
+                        "isCorrect": true,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "4d460841-8e3b-493c-bb92-b2a2a86f66b3",
+                        "questionId": "05735630-4dd1-4211-ad9d-a2a10dfc8b54",
+                        "optionText": "B",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      }
+                    ]
+                  }
+                ],
+                "attempts": [
+                  {
+                    "id": "c8682ba7-c3e5-41d5-8d81-aab4052695e9",
+                    "quizId": "e53e47c1-3421-4eff-b168-b762b92c9ad6",
+                    "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                    "score": 0,
+                    "totalPoints": 1,
+                    "startedAt": "2026-06-09T17:30:42.237Z",
+                    "submittedAt": "2026-06-09T17:30:42.235Z",
+                    "answers": [
+                      {
+                        "id": "37b9bf38-c6c2-4fa7-9920-49f013b901d9",
+                        "attemptId": "c8682ba7-c3e5-41d5-8d81-aab4052695e9",
+                        "questionId": "05735630-4dd1-4211-ad9d-a2a10dfc8b54",
+                        "optionId": "4d460841-8e3b-493c-bb92-b2a2a86f66b3"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "id": "e9e9d5c0-1f32-41e5-b94a-01744330daa4",
+              "moduleId": "e0177984-3ff9-474a-b722-ae611c11d446",
+              "title": "Lesson 2: Quiz",
+              "content": null,
+              "lessonType": "QUIZ",
+              "orderIndex": 1,
+              "createdAt": "2026-05-27T03:10:02.767Z",
+              "updatedAt": "2026-06-09T10:31:00.905Z",
+              "materials": [],
+              "progress": [
+                {
+                  "id": "3efae227-ca02-40c8-8502-64023069348e",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "e9e9d5c0-1f32-41e5-b94a-01744330daa4",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-03T16:07:51.428Z",
+                  "updatedAt": "2026-06-03T16:07:51.428Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": {
+                "id": "d53c0c80-9b75-47b4-87d8-d87654114cca",
+                "lessonId": "e9e9d5c0-1f32-41e5-b94a-01744330daa4",
+                "dueDate": null,
+                "maxAttempts": 3,
+                "passingScore": 0.5,
+                "createdAt": "2026-06-09T10:31:24.642Z",
+                "updatedAt": "2026-06-09T10:31:24.642Z",
+                "questions": [
+                  {
+                    "id": "fb59de13-0da5-4362-bbba-5b183f586091",
+                    "quizId": "d53c0c80-9b75-47b4-87d8-d87654114cca",
+                    "questionText": "Thủ đô của Việt Nam là gì?",
+                    "explanation": "Hà Nội là thủ đô của nước CHXHCN Việt Nam.",
+                    "orderIndex": 0,
+                    "points": 10,
+                    "createdAt": "2026-06-09T10:31:24.642Z",
+                    "updatedAt": "2026-06-09T10:31:24.642Z",
+                    "options": [
+                      {
+                        "id": "0964bd7e-0895-42d1-bdb3-f74d7b94043b",
+                        "questionId": "fb59de13-0da5-4362-bbba-5b183f586091",
+                        "optionText": "Hồ Chí Minh",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "bacccfef-9601-4f9c-b421-27297ec45bd5",
+                        "questionId": "fb59de13-0da5-4362-bbba-5b183f586091",
+                        "optionText": "Hà Nội",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "10644a5b-d6b8-4c6e-a633-f2d166e4be38",
+                        "questionId": "fb59de13-0da5-4362-bbba-5b183f586091",
+                        "optionText": "Đà Nẵng",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      }
+                    ]
+                  },
+                  {
+                    "id": "c7b9750b-aeff-4402-8fca-7348c51e8520",
+                    "quizId": "d53c0c80-9b75-47b4-87d8-d87654114cca",
+                    "questionText": "1 + 1 bằng mấy?",
+                    "explanation": null,
+                    "orderIndex": 1,
+                    "points": 5,
+                    "createdAt": "2026-06-09T10:31:24.642Z",
+                    "updatedAt": "2026-06-09T10:31:24.642Z",
+                    "options": [
+                      {
+                        "id": "766be4ff-6409-4ad9-9146-439d0642ddbe",
+                        "questionId": "c7b9750b-aeff-4402-8fca-7348c51e8520",
+                        "optionText": "2",
+                        "isCorrect": true,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "3860b203-9a1d-482f-9861-f49ff0034686",
+                        "questionId": "c7b9750b-aeff-4402-8fca-7348c51e8520",
+                        "optionText": "3",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      }
+                    ]
+                  }
+                ],
+                "attempts": [
+                  {
+                    "id": "9e800433-e167-410f-8128-5d1bae7dd1cd",
+                    "quizId": "d53c0c80-9b75-47b4-87d8-d87654114cca",
+                    "studentId": "0d2c233b-fd4a-4fc2-85de-1397d4865f4c",
+                    "score": 10,
+                    "totalPoints": 15,
+                    "startedAt": "2026-06-09T10:40:11.971Z",
+                    "submittedAt": "2026-06-09T10:40:11.966Z",
+                    "answers": [
+                      {
+                        "id": "27e41aa2-7f30-4aca-b8ce-dc2294a57092",
+                        "attemptId": "9e800433-e167-410f-8128-5d1bae7dd1cd",
+                        "questionId": "fb59de13-0da5-4362-bbba-5b183f586091",
+                        "optionId": "bacccfef-9601-4f9c-b421-27297ec45bd5"
+                      },
+                      {
+                        "id": "a4d78498-f3e7-48d8-8741-7d41dcaba6b9",
+                        "attemptId": "9e800433-e167-410f-8128-5d1bae7dd1cd",
+                        "questionId": "c7b9750b-aeff-4402-8fca-7348c51e8520",
+                        "optionId": "3860b203-9a1d-482f-9861-f49ff0034686"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d35aa6f6-1aef-4066-9ecd-13c5c45b0f91",
+                    "quizId": "d53c0c80-9b75-47b4-87d8-d87654114cca",
+                    "studentId": "0d2c233b-fd4a-4fc2-85de-1397d4865f4c",
+                    "score": 15,
+                    "totalPoints": 15,
+                    "startedAt": "2026-06-09T10:42:29.791Z",
+                    "submittedAt": "2026-06-09T10:42:29.789Z",
+                    "answers": [
+                      {
+                        "id": "eab46137-5f06-4cbb-a292-03d600e71a05",
+                        "attemptId": "d35aa6f6-1aef-4066-9ecd-13c5c45b0f91",
+                        "questionId": "fb59de13-0da5-4362-bbba-5b183f586091",
+                        "optionId": "bacccfef-9601-4f9c-b421-27297ec45bd5"
+                      },
+                      {
+                        "id": "cbb88cc1-5e53-4185-8edb-3a324da75b9b",
+                        "attemptId": "d35aa6f6-1aef-4066-9ecd-13c5c45b0f91",
+                        "questionId": "c7b9750b-aeff-4402-8fca-7348c51e8520",
+                        "optionId": "766be4ff-6409-4ad9-9146-439d0642ddbe"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "600cc0f7-f8e6-4ca3-bb26-95a667275f02",
+                    "quizId": "d53c0c80-9b75-47b4-87d8-d87654114cca",
+                    "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                    "score": 15,
+                    "totalPoints": 15,
+                    "startedAt": "2026-06-09T10:56:23.458Z",
+                    "submittedAt": "2026-06-09T10:56:23.456Z",
+                    "answers": [
+                      {
+                        "id": "39449f6f-414a-4116-875e-bfb58cce1e88",
+                        "attemptId": "600cc0f7-f8e6-4ca3-bb26-95a667275f02",
+                        "questionId": "fb59de13-0da5-4362-bbba-5b183f586091",
+                        "optionId": "bacccfef-9601-4f9c-b421-27297ec45bd5"
+                      },
+                      {
+                        "id": "56dc5d56-9ad0-457a-9e24-3dc72e173b29",
+                        "attemptId": "600cc0f7-f8e6-4ca3-bb26-95a667275f02",
+                        "questionId": "c7b9750b-aeff-4402-8fca-7348c51e8520",
+                        "optionId": "766be4ff-6409-4ad9-9146-439d0642ddbe"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "id": "f116b739-8179-4cfb-b79d-28d6d2a826cb",
+              "moduleId": "e0177984-3ff9-474a-b722-ae611c11d446",
+              "title": "Lesson 3:",
+              "content": null,
+              "lessonType": "QUIZ",
+              "orderIndex": 2,
+              "createdAt": "2026-05-27T03:09:58.475Z",
+              "updatedAt": "2026-06-09T17:32:43.244Z",
+              "materials": [],
+              "progress": [
+                {
+                  "id": "7c2bfe84-e690-4b50-962c-b72ca0849087",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "f116b739-8179-4cfb-b79d-28d6d2a826cb",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-03T15:56:19.768Z",
+                  "updatedAt": "2026-06-14T15:28:00.508Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": {
+                "id": "606f00d8-75d9-48c0-8dda-1f2db805560e",
+                "lessonId": "f116b739-8179-4cfb-b79d-28d6d2a826cb",
+                "dueDate": null,
+                "maxAttempts": 2,
+                "passingScore": 0.5,
+                "createdAt": "2026-06-09T17:34:07.946Z",
+                "updatedAt": "2026-06-09T17:34:40.253Z",
+                "questions": [
+                  {
+                    "id": "0a0bc6b4-cc34-465c-b244-085e64109a5e",
+                    "quizId": "606f00d8-75d9-48c0-8dda-1f2db805560e",
+                    "questionText": "Question Text",
+                    "explanation": "Explanation here",
+                    "orderIndex": 0,
+                    "points": 1,
+                    "createdAt": "2026-06-09T17:34:40.253Z",
+                    "updatedAt": "2026-06-09T17:34:40.253Z",
+                    "options": [
+                      {
+                        "id": "d3f5c6dd-ef44-4b15-8784-65d23e03d35a",
+                        "questionId": "0a0bc6b4-cc34-465c-b244-085e64109a5e",
+                        "optionText": "Option 1",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "e13e765a-13ed-4120-9c72-417c39cc4824",
+                        "questionId": "0a0bc6b4-cc34-465c-b244-085e64109a5e",
+                        "optionText": "Option 2",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "82004526-58ca-4f8a-a4b0-629009fa95a5",
+                        "questionId": "0a0bc6b4-cc34-465c-b244-085e64109a5e",
+                        "optionText": "Option 3",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      }
+                    ]
+                  }
+                ],
+                "attempts": [
+                  {
+                    "id": "12261e50-f5b8-4009-8ffb-e8fcf02cd64f",
+                    "quizId": "606f00d8-75d9-48c0-8dda-1f2db805560e",
+                    "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                    "score": 0,
+                    "totalPoints": 1,
+                    "startedAt": "2026-06-09T17:34:58.719Z",
+                    "submittedAt": "2026-06-09T17:34:58.717Z",
+                    "answers": [
+                      {
+                        "id": "ef7fb6b5-f3af-48d0-8c12-43f40308e2b1",
+                        "attemptId": "12261e50-f5b8-4009-8ffb-e8fcf02cd64f",
+                        "questionId": "0a0bc6b4-cc34-465c-b244-085e64109a5e",
+                        "optionId": "d3f5c6dd-ef44-4b15-8784-65d23e03d35a"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "727558c3-ca5f-4e24-a39b-fb311d98c2a9",
+                    "quizId": "606f00d8-75d9-48c0-8dda-1f2db805560e",
+                    "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                    "score": 1,
+                    "totalPoints": 1,
+                    "startedAt": "2026-06-09T17:35:17.618Z",
+                    "submittedAt": "2026-06-09T17:35:17.616Z",
+                    "answers": [
+                      {
+                        "id": "52d187ff-46f0-4d67-924b-e2fec1a8a014",
+                        "attemptId": "727558c3-ca5f-4e24-a39b-fb311d98c2a9",
+                        "questionId": "0a0bc6b4-cc34-465c-b244-085e64109a5e",
+                        "optionId": "e13e765a-13ed-4120-9c72-417c39cc4824"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "id": "4b34ede6-bf03-44f7-adf6-bab9ea14c49b",
+              "moduleId": "e0177984-3ff9-474a-b722-ae611c11d446",
+              "title": "Lesson 4:",
+              "content": "Nhóm:  \nPhạm Lê Thành 20225765 \nNguyễn Lê Minh 20225651 \nTrần Quang Huy 20225860 - Mô tả bài toán sẽ được giải quyết \nTriển khai và so sánh ba thuật toán: Minimax, Cắt tỉa Alpha-Beta và Monte \nCarlo Tree Search (MCTS), nhằm đánh giá hiệu suất của chúng trong việc tìm \nkiếm nước đi tối ưu cho cờ tướng. - Sơ lược (ý tưởng) về phương pháp (giải pháp) sẽ thực hiện \n+ Minimax: Tìm nước đi tối ưu bằng cách duyệt toàn bộ cây trò chơi tới độ sâu \ngiới hạn, tối đa hóa lợi ích của AI và tối thiểu hóa của đối thủ. \n+ Cắt tỉa Alpha-Beta: Cải tiến Minimax, cắt bỏ nhánh không cần thiết bằng \nbiến alpha và beta để giảm thời gian tính toán. \n+ Monte Carlo Tree Search (MCTS): Dùng mô phỏng ngẫu nhiên và UCT để \nxây dựng cây tìm kiếm, tập trung vào nước đi hứa hẹn, phù hợp với không gian \ntrạng thái lớn của cờ tướng. - Trình bày đầu vào và đầu ra hệ thống \n+ Đầu vào: \n• Trạng thái bàn cờ: Mảng 9x10 với ký hiệu quân cờ \n• Lượt chơi: Bên Đỏ hoặc Đen. \n• Thuật toán: Minimax (depth), Alpha-Beta (depth), MCTS (time). \n+ Đầu ra: \n• Nước đi tối ưu \n• Trạng thái bàn cờ mới. \n• Kết quả: \"Đỏ thắng\", \"Đen thắng\", \"Hòa\", \"Chưa kết thúc\". \n• Hiệu suất: Tỷ lệ thắng/thua/hòa, thời gian trung bình, số nút thăm.",
+              "lessonType": "QUIZ",
+              "orderIndex": 3,
+              "createdAt": "2026-06-02T16:52:58.177Z",
+              "updatedAt": "2026-06-10T08:24:12.952Z",
+              "materials": [
+                {
+                  "id": "a4bdd72f-e00e-4ffe-a51a-71865e4c5596",
+                  "lessonId": "4b34ede6-bf03-44f7-adf6-bab9ea14c49b",
+                  "title": "BTVN_tuan_7.pdf",
+                  "materialType": "PDF",
+                  "fileUrl": "https://utfs.io/f/hjff70ODiO3uSRstnm5bV9pCKYqehlX312snQRZ7zDLB8aAG",
+                  "fileSizeBytes": "60239",
+                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/osq7sj7fdko4",
+                  "geminiFileName": "files/osq7sj7fdko4",
+                  "createdAt": "2026-06-10T08:35:26.032Z",
+                  "updatedAt": "2026-06-10T08:35:42.751Z"
+                }
+              ],
+              "progress": [
+                {
+                  "id": "e720a4e7-bf26-4ac2-a0e9-14c5d2062bfb",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "4b34ede6-bf03-44f7-adf6-bab9ea14c49b",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-03T16:08:06.589Z",
+                  "updatedAt": "2026-06-03T16:08:50.064Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": {
+                "id": "5f94a653-a9bf-4af1-8742-830e7f05ccc6",
+                "lessonId": "4b34ede6-bf03-44f7-adf6-bab9ea14c49b",
+                "dueDate": null,
+                "maxAttempts": 1,
+                "passingScore": 0.5,
+                "createdAt": "2026-06-10T08:24:46.849Z",
+                "updatedAt": "2026-06-10T08:24:46.849Z",
+                "questions": [
+                  {
+                    "id": "15c3d43e-b99e-401f-ba5d-eb11d04b3a6f",
+                    "quizId": "5f94a653-a9bf-4af1-8742-830e7f05ccc6",
+                    "questionText": "Ba thuật toán nào được nhóm sinh viên triển khai và so sánh để giải quyết bài toán cờ tướng?",
+                    "explanation": "Theo tài liệu, nhóm thực hiện triển khai và so sánh ba thuật toán: Minimax, Cắt tỉa Alpha-Beta và Monte Carlo Tree Search (MCTS).",
+                    "orderIndex": 0,
+                    "points": 1,
+                    "createdAt": "2026-06-10T08:24:46.849Z",
+                    "updatedAt": "2026-06-10T08:24:46.849Z",
+                    "options": [
+                      {
+                        "id": "5c5baf4f-020e-4836-a133-71af601ef53d",
+                        "questionId": "15c3d43e-b99e-401f-ba5d-eb11d04b3a6f",
+                        "optionText": "Minimax, Deep Learning, MCTS",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "3387672f-4823-46e2-b791-a7c6a8e832c5",
+                        "questionId": "15c3d43e-b99e-401f-ba5d-eb11d04b3a6f",
+                        "optionText": "Minimax, Cắt tỉa Alpha-Beta, MCTS",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "89ff7547-216e-4742-afd8-13f3d9ae0bbd",
+                        "questionId": "15c3d43e-b99e-401f-ba5d-eb11d04b3a6f",
+                        "optionText": "Alpha-Beta, A*, Minimax",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "f097329f-8b7e-4e9e-9791-17a27edff171",
+                        "questionId": "15c3d43e-b99e-401f-ba5d-eb11d04b3a6f",
+                        "optionText": "MCTS, Dynamic Programming, Alpha-Beta",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "cb1fd007-36ae-4806-a3da-494cd907f623",
+                    "quizId": "5f94a653-a9bf-4af1-8742-830e7f05ccc6",
+                    "questionText": "Mục đích chính của việc sử dụng biến alpha và beta trong thuật toán Cắt tỉa Alpha-Beta là gì?",
+                    "explanation": "Cắt tỉa Alpha-Beta là cải tiến của Minimax giúp cắt bỏ các nhánh không cần thiết để giảm thời gian tính toán.",
+                    "orderIndex": 1,
+                    "points": 1,
+                    "createdAt": "2026-06-10T08:24:46.849Z",
+                    "updatedAt": "2026-06-10T08:24:46.849Z",
+                    "options": [
+                      {
+                        "id": "a94741da-43a4-45f1-82dc-d8a1538a52d0",
+                        "questionId": "cb1fd007-36ae-4806-a3da-494cd907f623",
+                        "optionText": "Tăng độ sâu duyệt cây trò chơi",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "2052a8ef-1505-4289-8234-e25e89d9396a",
+                        "questionId": "cb1fd007-36ae-4806-a3da-494cd907f623",
+                        "optionText": "Cắt bỏ các nhánh không cần thiết để giảm thời gian tính toán",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "3d3388c1-5c07-4c82-b565-77c4a5067fb5",
+                        "questionId": "cb1fd007-36ae-4806-a3da-494cd907f623",
+                        "optionText": "Thay thế hoàn toàn thuật toán Minimax",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "cafcf600-a91f-4743-a612-f4458188b4ab",
+                        "questionId": "cb1fd007-36ae-4806-a3da-494cd907f623",
+                        "optionText": "Dùng để mô phỏng ngẫu nhiên các nước đi",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "2fa0a6d9-3022-4942-a2ca-9f560a570ea6",
+                    "quizId": "5f94a653-a9bf-4af1-8742-830e7f05ccc6",
+                    "questionText": "Đâu là thành phần dùng để xây dựng cây tìm kiếm trong thuật toán Monte Carlo Tree Search (MCTS)?",
+                    "explanation": "MCTS sử dụng mô phỏng ngẫu nhiên và UCT để xây dựng cây tìm kiếm.",
+                    "orderIndex": 2,
+                    "points": 1,
+                    "createdAt": "2026-06-10T08:24:46.849Z",
+                    "updatedAt": "2026-06-10T08:24:46.849Z",
+                    "options": [
+                      {
+                        "id": "a37ede89-7b8b-4892-b948-da4fc162dec0",
+                        "questionId": "2fa0a6d9-3022-4942-a2ca-9f560a570ea6",
+                        "optionText": "Duyệt toàn bộ cây trò chơi tới độ sâu giới hạn",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "c0f931cb-8787-4de0-8607-a8e016f4d107",
+                        "questionId": "2fa0a6d9-3022-4942-a2ca-9f560a570ea6",
+                        "optionText": "Mô phỏng ngẫu nhiên và UCT",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "f7bcaa47-133f-4d82-bccb-3a2d4ebcc271",
+                        "questionId": "2fa0a6d9-3022-4942-a2ca-9f560a570ea6",
+                        "optionText": "Sử dụng biến alpha và beta để đánh giá",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "8c3b7eea-9071-42ad-80de-c8e4aef6ba4b",
+                        "questionId": "2fa0a6d9-3022-4942-a2ca-9f560a570ea6",
+                        "optionText": "Chỉ dựa vào lượt chơi của bên Đỏ",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "4fd11c17-e356-4322-9497-a21f440ea380",
+                    "quizId": "5f94a653-a9bf-4af1-8742-830e7f05ccc6",
+                    "questionText": "Trạng thái bàn cờ được biểu diễn dưới dạng nào trong phần đầu vào của hệ thống?",
+                    "explanation": "Theo phần đầu vào của hệ thống, trạng thái bàn cờ là mảng 9x10 với ký hiệu quân cờ.",
+                    "orderIndex": 3,
+                    "points": 1,
+                    "createdAt": "2026-06-10T08:24:46.849Z",
+                    "updatedAt": "2026-06-10T08:24:46.849Z",
+                    "options": [
+                      {
+                        "id": "2c0ae666-fe04-447c-b939-41786d56ddfb",
+                        "questionId": "4fd11c17-e356-4322-9497-a21f440ea380",
+                        "optionText": "Danh sách liên kết",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "6e9f780d-5add-4b02-8a20-61cf3a2d875c",
+                        "questionId": "4fd11c17-e356-4322-9497-a21f440ea380",
+                        "optionText": "Mảng 8x8 với ký hiệu quân cờ",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "15be072a-1f73-492a-a3ad-8538584a4c28",
+                        "questionId": "4fd11c17-e356-4322-9497-a21f440ea380",
+                        "optionText": "Mảng 9x10 với ký hiệu quân cờ",
+                        "isCorrect": true,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "5c985143-d4e6-4db3-9b48-2a440ef03e21",
+                        "questionId": "4fd11c17-e356-4322-9497-a21f440ea380",
+                        "optionText": "Đồ thị vô hướng",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "a093fceb-59b4-4cbe-90ed-81cf0e3d5b1f",
+                    "quizId": "5f94a653-a9bf-4af1-8742-830e7f05ccc6",
+                    "questionText": "Thông tin nào sau đây không thuộc phần đầu ra của hệ thống?",
+                    "explanation": "Đầu ra bao gồm nước đi tối ưu, trạng thái bàn cờ mới, kết quả (Đỏ thắng/Đen thắng/Hòa/Chưa kết thúc) và hiệu suất (tỷ lệ thắng/thua/hòa, thời gian, số nút thăm). Lượt chơi là dữ liệu đầu vào.",
+                    "orderIndex": 4,
+                    "points": 1,
+                    "createdAt": "2026-06-10T08:24:46.849Z",
+                    "updatedAt": "2026-06-10T08:24:46.849Z",
+                    "options": [
+                      {
+                        "id": "be473367-215b-4853-9c51-748be1b1e8d9",
+                        "questionId": "a093fceb-59b4-4cbe-90ed-81cf0e3d5b1f",
+                        "optionText": "Lượt chơi",
+                        "isCorrect": true,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "872e1b12-afa0-494f-bd79-987956b71487",
+                        "questionId": "a093fceb-59b4-4cbe-90ed-81cf0e3d5b1f",
+                        "optionText": "Nước đi tối ưu",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "ed22e349-008c-4e17-9edb-b1d1bb74dc53",
+                        "questionId": "a093fceb-59b4-4cbe-90ed-81cf0e3d5b1f",
+                        "optionText": "Kết quả trận đấu",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "8d68f199-fe72-46a6-ba95-7b76ec6115e4",
+                        "questionId": "a093fceb-59b4-4cbe-90ed-81cf0e3d5b1f",
+                        "optionText": "Số nút thăm",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  }
+                ],
+                "attempts": [
+                  {
+                    "id": "b572fd70-6b36-464e-bdf9-d7674b377b7a",
+                    "quizId": "5f94a653-a9bf-4af1-8742-830e7f05ccc6",
+                    "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                    "score": 3,
+                    "totalPoints": 5,
+                    "startedAt": "2026-06-10T08:32:45.678Z",
+                    "submittedAt": "2026-06-10T08:32:45.673Z",
+                    "answers": [
+                      {
+                        "id": "3e8a6f15-7397-4dd4-b595-dd82a8c4f015",
+                        "attemptId": "b572fd70-6b36-464e-bdf9-d7674b377b7a",
+                        "questionId": "15c3d43e-b99e-401f-ba5d-eb11d04b3a6f",
+                        "optionId": "3387672f-4823-46e2-b791-a7c6a8e832c5"
+                      },
+                      {
+                        "id": "ea4cf493-722d-4ebf-88c2-295ad42a44ad",
+                        "attemptId": "b572fd70-6b36-464e-bdf9-d7674b377b7a",
+                        "questionId": "cb1fd007-36ae-4806-a3da-494cd907f623",
+                        "optionId": "2052a8ef-1505-4289-8234-e25e89d9396a"
+                      },
+                      {
+                        "id": "29271d4a-1700-49cc-ad3f-d242ce90ac9c",
+                        "attemptId": "b572fd70-6b36-464e-bdf9-d7674b377b7a",
+                        "questionId": "2fa0a6d9-3022-4942-a2ca-9f560a570ea6",
+                        "optionId": "c0f931cb-8787-4de0-8607-a8e016f4d107"
+                      },
+                      {
+                        "id": "6726db0b-db05-40f3-b787-81c69eb24b81",
+                        "attemptId": "b572fd70-6b36-464e-bdf9-d7674b377b7a",
+                        "questionId": "4fd11c17-e356-4322-9497-a21f440ea380",
+                        "optionId": "6e9f780d-5add-4b02-8a20-61cf3a2d875c"
+                      },
+                      {
+                        "id": "338abd01-2e84-4fd5-8e56-9283144fe83c",
+                        "attemptId": "b572fd70-6b36-464e-bdf9-d7674b377b7a",
+                        "questionId": "a093fceb-59b4-4cbe-90ed-81cf0e3d5b1f",
+                        "optionId": "8d68f199-fe72-46a6-ba95-7b76ec6115e4"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "ec792dcf-b60a-4a73-ad51-fc599a267ad9",
+          "courseId": "c94892f2-5d1f-4299-889e-c89a9edfe0b0",
+          "title": "Machine learning",
+          "description": "Learn about machine learning",
+          "orderIndex": 2,
+          "createdAt": "2026-05-26T12:38:39.218Z",
+          "updatedAt": "2026-06-12T11:55:10.764Z",
+          "lessons": []
+        }
+      ]
+    },
+    {
+      "id": "9319fc06-2a29-4cfe-83be-8211dae2ad30",
+      "title": "C Basics",
+      "description": "Learn the basics of C language",
+      "thumbnailUrl": null,
+      "teacherId": "baf5efd6-82f1-4f4a-811a-2f32fc88be4b",
+      "aiEnabled": false,
+      "isPublished": false,
+      "isPrivate": false,
+      "createdAt": "2026-05-29T04:24:07.190Z",
+      "updatedAt": "2026-06-03T17:20:42.355Z",
+      "enrollments": [],
+      "chatThreads": [],
+      "modules": []
+    },
+    {
+      "id": "decebccd-3f1a-4699-8694-3cf55c179766",
+      "title": "Signaling",
+      "description": "Learn about signal executing",
+      "thumbnailUrl": "https://plus.unsplash.com/premium_photo-1733317453473-175c9831c874?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "teacherId": "baf5efd6-82f1-4f4a-811a-2f32fc88be4b",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-05-29T05:43:27.778Z",
+      "updatedAt": "2026-06-11T04:17:24.681Z",
+      "enrollments": [
+        {
+          "id": "994a8aa7-bd7b-4686-8e37-e38a8c05ad3d",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "decebccd-3f1a-4699-8694-3cf55c179766",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-03T16:30:56.322Z"
+        },
+        {
+          "id": "632224d5-371d-4951-8d43-eea5c4369348",
+          "studentId": "9df90c49-bdc7-42d6-9c64-512c1f5faf10",
+          "courseId": "decebccd-3f1a-4699-8694-3cf55c179766",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-18T15:28:33.809Z"
+        }
+      ],
+      "chatThreads": [
+        {
+          "id": "5d44a8b9-486c-4ff2-83ce-1e832d6806df",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "decebccd-3f1a-4699-8694-3cf55c179766",
+          "title": null,
+          "createdAt": "2026-06-05T07:47:09.945Z",
+          "updatedAt": "2026-06-05T07:47:14.304Z",
+          "messages": [
+            {
+              "id": "c92d131a-41a0-439a-a4f3-f9e6f10e11a7",
+              "threadId": "5d44a8b9-486c-4ff2-83ce-1e832d6806df",
+              "role": "user",
+              "content": "Chào thầy, mật khẩu của khóa học là gì ạ?",
+              "createdAt": "2026-06-05T07:47:10.775Z"
+            },
+            {
+              "id": "2e1b2294-881a-4298-9af2-548f5a279246",
+              "threadId": "5d44a8b9-486c-4ff2-83ce-1e832d6806df",
+              "role": "model",
+              "content": "Chào bạn, dựa trên các tài liệu về đề cương môn học \"Xử lý tín hiệu số\" (mã học phần: ELE 1430) mà bạn đã cung cấp, không có thông tin nào đề cập đến \"mật khẩu của khóa học\".",
+              "createdAt": "2026-06-05T07:47:14.299Z"
+            }
+          ]
+        },
+        {
+          "id": "361b6243-019f-4651-9e87-eef92c25a9b6",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "decebccd-3f1a-4699-8694-3cf55c179766",
+          "title": null,
+          "createdAt": "2026-06-08T07:35:52.952Z",
+          "updatedAt": "2026-06-08T07:40:53.520Z",
+          "messages": [
+            {
+              "id": "c3ea6f6c-d356-4db2-b02c-40d1cc6d918d",
+              "threadId": "361b6243-019f-4651-9e87-eef92c25a9b6",
+              "role": "user",
+              "content": "Chào thầy, môn học này dạy về cái gì",
+              "createdAt": "2026-06-08T07:35:56.889Z"
+            },
+            {
+              "id": "3c5318f2-113a-42b3-ab9e-570f0a159ef9",
+              "threadId": "361b6243-019f-4651-9e87-eef92c25a9b6",
+              "role": "model",
+              "content": "Chào bạn, dựa trên tài liệu môn học \"Xử lý tín hiệu số\" (mã học phần ELE 1330 hoặc ELE 1430), môn học này tập trung vào các nội dung chính sau:\n\n*   **Kiến thức cơ bản:** Phân tích và thiết kế hệ thống xử lý tín hiệu số trong các miền khác nhau: miền thời gian rời rạc ($n$), miền $Z$, miền tần số liên tục và miền tần số rời rạc.\n*   **Bộ lọc số:** Phân tích, thiết kế và ứng dụng của các bộ lọc số (bao gồm bộ lọc FIR và IIR).\n*   **Các kỹ năng chính:**\n    *   Phân tích và thiết kế hệ thống xử lý tín hiệu số.\n    *   Giải các bài toán xử lý tín hiệu số.\n    *   Tư duy hệ thống.\n\nBạn có thể xem chi tiết mục tiêu môn học tại **Trang 3** của tài liệu đề cương môn học và tóm tắt nội dung tại **Trang 4 - 5**.",
+              "createdAt": "2026-06-08T07:36:01.768Z"
+            },
+            {
+              "id": "9e6f06aa-6fb2-4f04-b2fc-9bd14fa4e89d",
+              "threadId": "361b6243-019f-4651-9e87-eef92c25a9b6",
+              "role": "user",
+              "content": "Thầy có thể tóm tắt nội dung và công thức cần nhớ của bài 1.2 Tín hiệu rời rạc được không",
+              "createdAt": "2026-06-08T07:36:45.990Z"
+            },
+            {
+              "id": "7fcd0746-4105-4ce7-b965-b1d650d7e163",
+              "threadId": "361b6243-019f-4651-9e87-eef92c25a9b6",
+              "role": "model",
+              "content": "Dựa trên tài liệu \"Chương 1: Tín hiệu và hệ thống rời rạc\", dưới đây là tóm tắt nội dung và các công thức chính cho mục **1.2. Tín hiệu rời rạc**:\n\n### 1. Nội dung chính\nMục 1.2 tập trung vào việc mô tả các tín hiệu trong miền thời gian rời rạc, bao gồm:\n*   **Biểu diễn tín hiệu:** Tín hiệu rời rạc $x(n)$ là một dãy các giá trị tại các thời điểm rời rạc $n$.\n*   **Các dãy cơ bản:** Bao gồm các dãy chuẩn dùng để phân tích hệ thống (như hàm xung đơn vị $\\delta(n)$).\n*   **Phép toán và đặc trưng:** Cách thực hiện các phép toán trên dãy số và xác định các tính chất đặc trưng của chúng.\n\n### 2. Các công thức và khái niệm cần nhớ\n\nTừ slide bài giảng (Trang 3, 4, 6), các công thức quan trọng bạn cần nắm vững bao gồm:\n\n*   **Tín hiệu vào/ra và toán tử hệ thống:**\n    Hệ thống được biểu diễn bởi toán tử $T$ tác động lên tín hiệu vào $x(n)$ để tạo ra đáp ứng $y(n)$:\n    $$T[x(n)] = y(n)$$\n\n*   **Đáp ứng xung (Impulse response):**\n    Khi tín hiệu vào là hàm xung đơn vị $\\delta(n)$, đáp ứng của hệ thống được gọi là đáp ứng xung $h(n)$:\n    $$T[\\delta(n)] = h(n)$$\n\n*   **Tín hiệu tổng quát trong hệ thống tuyến tính:**\n    Mọi tín hiệu vào $x(n)$ có thể được biểu diễn dưới dạng tổng các xung đơn vị dịch chuyển:\n    $$x(n) = \\sum_{k=-\\infty}^{\\infty} x(k)\\delta(n-k)$$\n\n*   **Tích chập (Convolution):**\n    Đối với hệ thống tuyến tính bất biến (LTI), tín hiệu ra $y(n)$ được tính bằng tổng chập giữa tín hiệu vào $x(n)$ và đáp ứng xung $h(n)$ (Trang 6):\n    $$y(n) = \\sum_{k=-\\infty}^{\\infty} x(k)h(n-k) = x(n) * h(n)$$\n\n*   **Định nghĩa dịch chuyển:**\n    Nếu hệ thống có tính chất bất biến, tín hiệu vào bị trễ $k$ đơn vị sẽ dẫn đến tín hiệu ra cũng bị trễ tương ứng:\n    $$x(n-k) \\rightarrow y(n-k)$$\n    $$\\delta(n-k) \\rightarrow h(n-k)$$\n\nBạn hãy lưu ý kỹ công thức **tổng chập** ở trang 6, vì đây là nền tảng quan trọng nhất để phân tích hệ thống trong các chương tiếp theo.",
+              "createdAt": "2026-06-08T07:36:54.455Z"
+            },
+            {
+              "id": "af671331-29ad-450b-bf10-996fe6aa9c2e",
+              "threadId": "361b6243-019f-4651-9e87-eef92c25a9b6",
+              "role": "user",
+              "content": "Chào thầy, để em kiểm tra tính năng hiển thị giao diện của lớp học, thầy hãy giúp em 3 việc sau nhé (thầy có thể lấy ví dụ bên ngoài tài liệu để minh họa):\n1. Lập một bảng gồm 2 cột so sánh ngắn gọn mục đích của biến đổi Z và biến đổi Fourier.\n2. Viết công thức toán học cơ bản của biến đổi Fourier rời rạc (DFT) hoặc công thức $f = 1/T$ bằng định dạng LaTeX (dùng cặp dấu đô la).\n3. Viết một đoạn mã giả (pseudo-code) hoặc code Python thật ngắn (khoảng 3 dòng) dùng để khởi tạo một tín hiệu rời rạc, và đặt nó trong một khối code (code block).",
+              "createdAt": "2026-06-08T07:40:49.009Z"
+            },
+            {
+              "id": "246893c5-6359-4204-bfa3-68dfe3f56639",
+              "threadId": "361b6243-019f-4651-9e87-eef92c25a9b6",
+              "role": "model",
+              "content": "Chào bạn, rất vui được hỗ trợ bạn kiểm tra tính năng hiển thị. Dựa trên yêu cầu của bạn, dưới đây là thông tin chi tiết:\n\n### 1. Bảng so sánh mục đích của Biến đổi Z và Biến đổi Fourier\n\n| Đặc điểm | Biến đổi Z | Biến đổi Fourier |\n| :--- | :--- | :--- |\n| **Mục đích chính** | Phân tích hệ thống rời rạc, khảo sát tính ổn định thông qua cực và điểm không. | Phân tích phổ tần số của tín hiệu, tìm đáp ứng tần số của hệ thống. |\n| **Miền biến đổi** | Miền phức $z$ (tổng quát hơn). | Miền tần số $\\omega$ (trên vòng tròn đơn vị). |\n\n---\n\n### 2. Công thức toán học (Định dạng LaTeX)\n\nCông thức biến đổi Fourier rời rạc (DFT) của một chuỗi $x(n)$ có chiều dài $N$ được viết như sau:\n\n$$X(k) = \\sum_{n=0}^{N-1} x(n) e^{-j\\frac{2\\pi}{N}kn}$$\n\nHoặc công thức liên hệ giữa tần số ($f$) và chu kỳ lấy mẫu ($T$):\n\n$$f = \\frac{1}{T}$$\n\n---\n\n### 3. Ví dụ mã Python khởi tạo tín hiệu rời rạc\n\nDưới đây là ví dụ dùng thư viện `numpy` để tạo một dãy tín hiệu rời rạc cơ bản:\n\n```python\nimport numpy as np\n# Khởi tạo tín hiệu xung đơn vị có độ dài 5\nx = np.array([1, 0, 0, 0, 0])\nprint(x)\n```\n\nHy vọng các ví dụ này giúp bạn kiểm tra giao diện hiển thị thành công! Nếu cần thêm thông tin gì từ tài liệu môn học, bạn cứ đặt câu hỏi nhé.",
+              "createdAt": "2026-06-08T07:40:53.510Z"
+            }
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "id": "6f5046ae-e0ca-4b5d-830b-6f551fff73ff",
+          "courseId": "decebccd-3f1a-4699-8694-3cf55c179766",
+          "title": "Chương 1: Tín hiệu và hệ thống rời rạc",
+          "description": null,
+          "orderIndex": 0,
+          "createdAt": "2026-06-03T16:20:45.984Z",
+          "updatedAt": "2026-06-03T16:20:45.984Z",
+          "lessons": [
+            {
+              "id": "64ec5644-be47-4223-9faf-7f3f737fffad",
+              "moduleId": "6f5046ae-e0ca-4b5d-830b-6f551fff73ff",
+              "title": "1.1. Khái niệm chung",
+              "content": "- **Hiểu rõ khái niệm về tín hiệu, tín hiệu rời rạc.**\n- **Hiểu khái niệm về hệ thống rời rạc.**\n- **Hiểu khái niệm về phương trình sai phân tuyến tính hệ số hằng.**\n\n\n\n\n---\n- Phân loại tín hiệu và sự chuyển đổi giữa các tín hiệu.\n- Phân loại hệ thống rời rạc.\n- Phân loại phương trình sai phân và mối quan hệ của chúng với các hệ thống rời rạc.\n\n\n---\n- Biết cách biểu diễn, phân tích các đặc trưng và làm các phép toán với tín hiệu rời rạc.\n- Giải phương trình sai phân và thực hiện các hệ thống rời rạc.\n",
+              "lessonType": "QUIZ",
+              "orderIndex": 0,
+              "createdAt": "2026-06-03T16:21:43.081Z",
+              "updatedAt": "2026-06-11T05:31:34.674Z",
+              "materials": [
+                {
+                  "id": "f0f26e82-5e9f-4f52-9d81-7d9ce568d4d0",
+                  "lessonId": "64ec5644-be47-4223-9faf-7f3f737fffad",
+                  "title": "DeCuong_XLTHS_TC_2013.pdf",
+                  "materialType": "PDF",
+                  "fileUrl": "https://utfs.io/f/hjff70ODiO3urkJpMJujmywLNOVWfMsnKJoDYhAXGZgUpId4",
+                  "fileSizeBytes": "339409",
+                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/g1z8tsv8d3au",
+                  "geminiFileName": "files/g1z8tsv8d3au",
+                  "createdAt": "2026-06-08T07:33:50.960Z",
+                  "updatedAt": "2026-06-15T07:08:49.013Z"
+                },
+                {
+                  "id": "32a0090b-cb99-4f25-bab8-337d71fa03ca",
+                  "lessonId": "64ec5644-be47-4223-9faf-7f3f737fffad",
+                  "title": "Screenshot 2026-06-08 111711.png",
+                  "materialType": "OTHER",
+                  "fileUrl": "https://utfs.io/f/hjff70ODiO3us5KjUcdVjcJvoWhHFYXuyqsr6IQSwOZm17pd",
+                  "fileSizeBytes": "28375",
+                  "geminiFileUri": null,
+                  "geminiFileName": null,
+                  "createdAt": "2026-06-08T12:11:32.312Z",
+                  "updatedAt": "2026-06-08T12:11:32.312Z"
+                },
+                {
+                  "id": "192260a0-e85c-44e7-94cb-b0759c537666",
+                  "lessonId": "64ec5644-be47-4223-9faf-7f3f737fffad",
+                  "title": "LCK Top Comments Vtrans's 5-16-2026 story.mp4",
+                  "materialType": "VIDEO",
+                  "fileUrl": "https://utfs.io/f/hjff70ODiO3uKdGnyEziG4FHNVZyuLJIvXQPakpY03SDTstO",
+                  "fileSizeBytes": "602366",
+                  "geminiFileUri": null,
+                  "geminiFileName": null,
+                  "createdAt": "2026-06-08T12:13:50.939Z",
+                  "updatedAt": "2026-06-08T12:13:50.939Z"
+                }
+              ],
+              "progress": [
+                {
+                  "id": "26b86f53-e101-4407-8e51-7146e88a35fa",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "64ec5644-be47-4223-9faf-7f3f737fffad",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-03T16:31:40.683Z",
+                  "updatedAt": "2026-06-05T15:47:56.330Z"
+                }
+              ],
+              "bookmarks": [
+                {
+                  "id": "912f037f-3eb6-4380-887e-fb0a44a8497e",
+                  "userId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "64ec5644-be47-4223-9faf-7f3f737fffad",
+                  "createdAt": "2026-06-18T15:51:44.151Z"
+                }
+              ],
+              "quiz": null
+            },
+            {
+              "id": "1de41221-918f-4ed9-b7e0-6713ffc07b7c",
+              "moduleId": "6f5046ae-e0ca-4b5d-830b-6f551fff73ff",
+              "title": "1.2. Tín hiệu rời rạc",
+              "content": null,
+              "lessonType": "QUIZ",
+              "orderIndex": 1,
+              "createdAt": "2026-06-03T16:21:52.172Z",
+              "updatedAt": "2026-06-11T03:58:31.076Z",
+              "materials": [
+                {
+                  "id": "2734e4c2-dc29-4fbf-b9b4-eb5059fcf4e4",
+                  "lessonId": "1de41221-918f-4ed9-b7e0-6713ffc07b7c",
+                  "title": "Lesson2.pdf",
+                  "materialType": "PDF",
+                  "fileUrl": "https://utfs.io/f/hjff70ODiO3uYOhJfEtqMxedb5G3vr2V09W4ALKlugYTzkUH",
+                  "fileSizeBytes": "368897",
+                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/ufiqeq205b9w",
+                  "geminiFileName": "files/ufiqeq205b9w",
+                  "createdAt": "2026-06-08T07:24:19.441Z",
+                  "updatedAt": "2026-06-15T07:08:53.498Z"
+                }
+              ],
+              "progress": [
+                {
+                  "id": "c6fd3385-ec7e-43d9-888e-5a54a778e2a4",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "1de41221-918f-4ed9-b7e0-6713ffc07b7c",
+                  "isCompleted": false,
+                  "createdAt": "2026-06-03T16:31:49.335Z",
+                  "updatedAt": "2026-06-18T04:38:09.864Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": {
+                "id": "d0cbd23d-881e-4661-9776-081f1000d6f4",
+                "lessonId": "1de41221-918f-4ed9-b7e0-6713ffc07b7c",
+                "dueDate": null,
+                "maxAttempts": 3,
+                "passingScore": 0.5,
+                "createdAt": "2026-06-15T07:10:35.554Z",
+                "updatedAt": "2026-06-15T07:10:35.554Z",
+                "questions": [
+                  {
+                    "id": "a66d6df0-21e0-4797-9d4a-00d8c3978959",
+                    "quizId": "d0cbd23d-881e-4661-9776-081f1000d6f4",
+                    "questionText": "Trong sơ đồ hệ thống rời rạc, ký hiệu x(n) biểu thị điều gì?",
+                    "explanation": "Theo tài liệu, x(n) được định nghĩa là tín hiệu vào (kích thích) của hệ thống rời rạc.",
+                    "orderIndex": 0,
+                    "points": 1,
+                    "createdAt": "2026-06-15T07:10:35.554Z",
+                    "updatedAt": "2026-06-15T07:10:35.554Z",
+                    "options": [
+                      {
+                        "id": "56303d2b-8db9-4c62-9124-19e59949061c",
+                        "questionId": "a66d6df0-21e0-4797-9d4a-00d8c3978959",
+                        "optionText": "Tín hiệu ra (đáp ứng)",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "7e90c0ff-6935-417b-aea9-d8260145fecb",
+                        "questionId": "a66d6df0-21e0-4797-9d4a-00d8c3978959",
+                        "optionText": "Toán tử thực hiện hệ thống",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "e5ec2c74-d715-4e08-8d28-bad0bde13294",
+                        "questionId": "a66d6df0-21e0-4797-9d4a-00d8c3978959",
+                        "optionText": "Tín hiệu vào (kích thích)",
+                        "isCorrect": true,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "e8a33fed-9178-4d7e-b1b9-96add822db56",
+                        "questionId": "a66d6df0-21e0-4797-9d4a-00d8c3978959",
+                        "optionText": "Đáp ứng xung của hệ thống",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "c3b1535a-88a7-47e8-9d1a-052236f95eaf",
+                    "quizId": "d0cbd23d-881e-4661-9776-081f1000d6f4",
+                    "questionText": "Công thức nào sau đây thể hiện tính chất của một hệ thống tuyến tính?",
+                    "explanation": "Hệ thống tuyến tính được định nghĩa bởi tính chất: T[a.x1(n) + b.x2(n)] = a.T[x1(n)] + b.T[x2(n)] = a.y1(n) + b.y2(n).",
+                    "orderIndex": 1,
+                    "points": 1,
+                    "createdAt": "2026-06-15T07:10:35.554Z",
+                    "updatedAt": "2026-06-15T07:10:35.554Z",
+                    "options": [
+                      {
+                        "id": "c6ca6232-d5d3-4403-b843-5248f07db26d",
+                        "questionId": "c3b1535a-88a7-47e8-9d1a-052236f95eaf",
+                        "optionText": "T[x(n)] = y(n-k)",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "2d4e1492-8ab7-447b-9e2c-179be0157839",
+                        "questionId": "c3b1535a-88a7-47e8-9d1a-052236f95eaf",
+                        "optionText": "T[a.x1(n) + b.x2(n)] = a.T[x1(n)] + b.T[x2(n)]",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "331f39df-d642-4df8-9624-41f1c9a66baa",
+                        "questionId": "c3b1535a-88a7-47e8-9d1a-052236f95eaf",
+                        "optionText": "h(n) = 0 với mọi n < 0",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "593a6f52-1932-43a7-b0ef-79c5612cb7fc",
+                        "questionId": "c3b1535a-88a7-47e8-9d1a-052236f95eaf",
+                        "optionText": "S = Σ|h(n)| < ∞",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "cf2a6086-6e2a-4328-946f-bd6ccd0c82e7",
+                    "quizId": "d0cbd23d-881e-4661-9776-081f1000d6f4",
+                    "questionText": "Đối với một hệ thống nhân quả (tuyến tính bất biến), điều kiện nào sau đây phải được thỏa mãn đối với đáp ứng xung h(n)?",
+                    "explanation": "Theo nội dung bài học, tính chất của hệ thống nhân quả là h(n) = 0 với mọi n < 0.",
+                    "orderIndex": 2,
+                    "points": 1,
+                    "createdAt": "2026-06-15T07:10:35.554Z",
+                    "updatedAt": "2026-06-15T07:10:35.554Z",
+                    "options": [
+                      {
+                        "id": "3d6e3f66-d5c3-4f4a-a236-c09caee291e8",
+                        "questionId": "cf2a6086-6e2a-4328-946f-bd6ccd0c82e7",
+                        "optionText": "h(n) = 1 với mọi n < 0",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "7160c62d-3a71-4199-ba11-1a4d583004b4",
+                        "questionId": "cf2a6086-6e2a-4328-946f-bd6ccd0c82e7",
+                        "optionText": "h(n) = 0 với mọi n < 0",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "6d7684ce-270a-456e-91e4-2816946f70bd",
+                        "questionId": "cf2a6086-6e2a-4328-946f-bd6ccd0c82e7",
+                        "optionText": "Σ|h(n)| < ∞",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "fa31dd19-b665-4bd4-b248-c3755afe0e3b",
+                        "questionId": "cf2a6086-6e2a-4328-946f-bd6ccd0c82e7",
+                        "optionText": "y(n) độc lập với x(n+k) với mọi k < 0",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "97f9cea9-3081-4955-9ffc-084cdaf0c493",
+                    "quizId": "d0cbd23d-881e-4661-9776-081f1000d6f4",
+                    "questionText": "Phát biểu nào sau đây đúng về định nghĩa ổn định của hệ thống tuyến tính bất biến?",
+                    "explanation": "Định nghĩa ổn định trong tài liệu được nêu là khi tín hiệu vào có giới hạn (|x(n)| < ∞) thì tín hiệu ra cũng phải có giới hạn (|y(n)| < ∞).",
+                    "orderIndex": 3,
+                    "points": 1,
+                    "createdAt": "2026-06-15T07:10:35.554Z",
+                    "updatedAt": "2026-06-15T07:10:35.554Z",
+                    "options": [
+                      {
+                        "id": "ccab7a67-9aad-4412-99e0-894db017fc35",
+                        "questionId": "97f9cea9-3081-4955-9ffc-084cdaf0c493",
+                        "optionText": "Tín hiệu ra y(n) luôn bằng 0.",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "c510cd65-adbb-43d3-92ff-aafc8530d183",
+                        "questionId": "97f9cea9-3081-4955-9ffc-084cdaf0c493",
+                        "optionText": "Hệ thống chỉ ổn định nếu đáp ứng xung h(n) bằng 0.",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "81f074be-2532-445a-b559-df4e28cc0d77",
+                        "questionId": "97f9cea9-3081-4955-9ffc-084cdaf0c493",
+                        "optionText": "Khi tín hiệu vào |x(n)| < ∞ thì tín hiệu ra |y(n)| < ∞.",
+                        "isCorrect": true,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "6f3394ba-2a87-4f58-bc83-e832a2411031",
+                        "questionId": "97f9cea9-3081-4955-9ffc-084cdaf0c493",
+                        "optionText": "Hệ thống ổn định nếu Σ|h(n)| = ∞.",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "0007a20f-ced7-422a-a8be-3c1c92b77d00",
+                    "quizId": "d0cbd23d-881e-4661-9776-081f1000d6f4",
+                    "questionText": "Đối với hệ thống tuyến tính bất biến, tín hiệu ra y(n) có thể được tính thông qua phép toán nào với tín hiệu vào x(n) và đáp ứng xung h(n)?",
+                    "explanation": "Tài liệu chỉ rõ rằng đối với hệ thống tuyến tính bất biến, y(n) = x(n) * h(n), tức là phép chập giữa tín hiệu vào và đáp ứng xung.",
+                    "orderIndex": 4,
+                    "points": 1,
+                    "createdAt": "2026-06-15T07:10:35.554Z",
+                    "updatedAt": "2026-06-15T07:10:35.554Z",
+                    "options": [
+                      {
+                        "id": "1e6a92e5-dabd-4c43-95e8-63daac537a8d",
+                        "questionId": "0007a20f-ced7-422a-a8be-3c1c92b77d00",
+                        "optionText": "Phép nhân thông thường",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "8365bed9-1bdc-4533-af0b-3de822e835cb",
+                        "questionId": "0007a20f-ced7-422a-a8be-3c1c92b77d00",
+                        "optionText": "Phép cộng",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "15b54852-a8c1-4017-adf3-935663f09ba9",
+                        "questionId": "0007a20f-ced7-422a-a8be-3c1c92b77d00",
+                        "optionText": "Phép chập (*)",
+                        "isCorrect": true,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "aed75ed7-3e49-410b-8af6-ed8a77f70589",
+                        "questionId": "0007a20f-ced7-422a-a8be-3c1c92b77d00",
+                        "optionText": "Phép chia",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  }
+                ],
+                "attempts": [
+                  {
+                    "id": "2c04c31d-f676-409b-ab1d-ad0de63eed58",
+                    "quizId": "d0cbd23d-881e-4661-9776-081f1000d6f4",
+                    "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                    "score": 2,
+                    "totalPoints": 5,
+                    "startedAt": "2026-06-15T07:12:39.538Z",
+                    "submittedAt": "2026-06-15T07:12:39.532Z",
+                    "answers": [
+                      {
+                        "id": "eda8b4da-f060-4db4-9a82-d4e3544e260c",
+                        "attemptId": "2c04c31d-f676-409b-ab1d-ad0de63eed58",
+                        "questionId": "a66d6df0-21e0-4797-9d4a-00d8c3978959",
+                        "optionId": "e5ec2c74-d715-4e08-8d28-bad0bde13294"
+                      },
+                      {
+                        "id": "90a8d2fc-0ff2-4a90-82ec-1ab4eff7ae08",
+                        "attemptId": "2c04c31d-f676-409b-ab1d-ad0de63eed58",
+                        "questionId": "c3b1535a-88a7-47e8-9d1a-052236f95eaf",
+                        "optionId": "331f39df-d642-4df8-9624-41f1c9a66baa"
+                      },
+                      {
+                        "id": "641e9a11-ef71-460b-972a-252f5f582f5a",
+                        "attemptId": "2c04c31d-f676-409b-ab1d-ad0de63eed58",
+                        "questionId": "cf2a6086-6e2a-4328-946f-bd6ccd0c82e7",
+                        "optionId": "6d7684ce-270a-456e-91e4-2816946f70bd"
+                      },
+                      {
+                        "id": "2e9cb69c-3b62-453a-9c00-9495d7211ef5",
+                        "attemptId": "2c04c31d-f676-409b-ab1d-ad0de63eed58",
+                        "questionId": "97f9cea9-3081-4955-9ffc-084cdaf0c493",
+                        "optionId": "c510cd65-adbb-43d3-92ff-aafc8530d183"
+                      },
+                      {
+                        "id": "c3f77832-771b-4505-8cb6-c7f0a2f717e8",
+                        "attemptId": "2c04c31d-f676-409b-ab1d-ad0de63eed58",
+                        "questionId": "0007a20f-ced7-422a-a8be-3c1c92b77d00",
+                        "optionId": "15b54852-a8c1-4017-adf3-935663f09ba9"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "c80e2c6b-7aa3-4c66-abcf-d93e8be4c85d",
+                    "quizId": "d0cbd23d-881e-4661-9776-081f1000d6f4",
+                    "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                    "score": 3,
+                    "totalPoints": 5,
+                    "startedAt": "2026-06-15T07:15:53.254Z",
+                    "submittedAt": "2026-06-15T07:15:53.251Z",
+                    "answers": [
+                      {
+                        "id": "f97679bc-e422-44a2-a4a9-3a5dfd129b97",
+                        "attemptId": "c80e2c6b-7aa3-4c66-abcf-d93e8be4c85d",
+                        "questionId": "a66d6df0-21e0-4797-9d4a-00d8c3978959",
+                        "optionId": "e5ec2c74-d715-4e08-8d28-bad0bde13294"
+                      },
+                      {
+                        "id": "945921d1-7b84-4923-9ff6-90c3fb6d7101",
+                        "attemptId": "c80e2c6b-7aa3-4c66-abcf-d93e8be4c85d",
+                        "questionId": "c3b1535a-88a7-47e8-9d1a-052236f95eaf",
+                        "optionId": "593a6f52-1932-43a7-b0ef-79c5612cb7fc"
+                      },
+                      {
+                        "id": "057c3ccd-b37a-42bf-9861-f39d2a3efd4d",
+                        "attemptId": "c80e2c6b-7aa3-4c66-abcf-d93e8be4c85d",
+                        "questionId": "cf2a6086-6e2a-4328-946f-bd6ccd0c82e7",
+                        "optionId": "6d7684ce-270a-456e-91e4-2816946f70bd"
+                      },
+                      {
+                        "id": "53a78ef6-3552-4747-9a62-642636cc5c65",
+                        "attemptId": "c80e2c6b-7aa3-4c66-abcf-d93e8be4c85d",
+                        "questionId": "97f9cea9-3081-4955-9ffc-084cdaf0c493",
+                        "optionId": "81f074be-2532-445a-b559-df4e28cc0d77"
+                      },
+                      {
+                        "id": "d14f392f-7039-48d0-b3f1-30468d744742",
+                        "attemptId": "c80e2c6b-7aa3-4c66-abcf-d93e8be4c85d",
+                        "questionId": "0007a20f-ced7-422a-a8be-3c1c92b77d00",
+                        "optionId": "15b54852-a8c1-4017-adf3-935663f09ba9"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "b40c03fb-ab93-40a7-89e3-f0ce806dd585",
+                    "quizId": "d0cbd23d-881e-4661-9776-081f1000d6f4",
+                    "studentId": "0d2c233b-fd4a-4fc2-85de-1397d4865f4c",
+                    "score": 4,
+                    "totalPoints": 5,
+                    "startedAt": "2026-06-15T12:51:42.618Z",
+                    "submittedAt": "2026-06-15T12:51:42.615Z",
+                    "answers": [
+                      {
+                        "id": "cb16e6d7-dea2-45fe-977b-3ed519a45d4e",
+                        "attemptId": "b40c03fb-ab93-40a7-89e3-f0ce806dd585",
+                        "questionId": "a66d6df0-21e0-4797-9d4a-00d8c3978959",
+                        "optionId": "e5ec2c74-d715-4e08-8d28-bad0bde13294"
+                      },
+                      {
+                        "id": "08a8cdac-3592-45f0-8fd7-b09f4d175506",
+                        "attemptId": "b40c03fb-ab93-40a7-89e3-f0ce806dd585",
+                        "questionId": "c3b1535a-88a7-47e8-9d1a-052236f95eaf",
+                        "optionId": "331f39df-d642-4df8-9624-41f1c9a66baa"
+                      },
+                      {
+                        "id": "66231fdf-2893-4995-96a0-24a6c10f228a",
+                        "attemptId": "b40c03fb-ab93-40a7-89e3-f0ce806dd585",
+                        "questionId": "cf2a6086-6e2a-4328-946f-bd6ccd0c82e7",
+                        "optionId": "7160c62d-3a71-4199-ba11-1a4d583004b4"
+                      },
+                      {
+                        "id": "b0ce4e53-eaf9-4de3-96cf-f1e3bf02863b",
+                        "attemptId": "b40c03fb-ab93-40a7-89e3-f0ce806dd585",
+                        "questionId": "97f9cea9-3081-4955-9ffc-084cdaf0c493",
+                        "optionId": "81f074be-2532-445a-b559-df4e28cc0d77"
+                      },
+                      {
+                        "id": "62ac403b-f175-40a3-b4d7-60b9b4074bfc",
+                        "attemptId": "b40c03fb-ab93-40a7-89e3-f0ce806dd585",
+                        "questionId": "0007a20f-ced7-422a-a8be-3c1c92b77d00",
+                        "optionId": "15b54852-a8c1-4017-adf3-935663f09ba9"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "id": "985573ef-f73e-4c01-8be1-f4216c0746d9",
+              "moduleId": "6f5046ae-e0ca-4b5d-830b-6f551fff73ff",
+              "title": "1.3. Hệ thống rời rạc",
+              "content": null,
+              "lessonType": "QUIZ",
+              "orderIndex": 2,
+              "createdAt": "2026-06-03T16:21:58.855Z",
+              "updatedAt": "2026-06-11T03:58:34.726Z",
+              "materials": [],
+              "progress": [
+                {
+                  "id": "0dad00cd-e13b-4168-83c8-e5165d2a3362",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "985573ef-f73e-4c01-8be1-f4216c0746d9",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-03T16:31:52.082Z",
+                  "updatedAt": "2026-06-03T16:31:52.082Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "2eecf467-ca8c-46e2-b514-917575af8f06",
+              "moduleId": "6f5046ae-e0ca-4b5d-830b-6f551fff73ff",
+              "title": "1.4. Phương trình sai phân tuyến tính",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 3,
+              "createdAt": "2026-06-03T16:22:04.012Z",
+              "updatedAt": "2026-06-03T16:22:04.012Z",
+              "materials": [],
+              "progress": [
+                {
+                  "id": "cbd71f9c-fb61-4af7-8298-da4f7d1259d3",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "2eecf467-ca8c-46e2-b514-917575af8f06",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-03T17:27:54.069Z",
+                  "updatedAt": "2026-06-03T17:27:54.069Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": null
+            }
+          ]
+        },
+        {
+          "id": "3830d1b3-5fdb-4380-a37e-f87fa678eb08",
+          "courseId": "decebccd-3f1a-4699-8694-3cf55c179766",
+          "title": "Chương 2: Biểu diễn tín hiệu và hệ thống trong miền Z",
+          "description": null,
+          "orderIndex": 1,
+          "createdAt": "2026-06-03T16:20:56.545Z",
+          "updatedAt": "2026-06-03T16:20:56.545Z",
+          "lessons": [
+            {
+              "id": "f6746a29-a82c-416a-aafa-8030c4546a83",
+              "moduleId": "3830d1b3-5fdb-4380-a37e-f87fa678eb08",
+              "title": "Biến đổi Z",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 0,
+              "createdAt": "2026-06-03T16:22:15.502Z",
+              "updatedAt": "2026-06-03T16:22:15.502Z",
+              "materials": [],
+              "progress": [
+                {
+                  "id": "173fc47d-b474-4f63-8f4e-cb9103bec105",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "f6746a29-a82c-416a-aafa-8030c4546a83",
+                  "isCompleted": true,
+                  "createdAt": "2026-06-14T16:47:27.466Z",
+                  "updatedAt": "2026-06-14T16:47:27.466Z"
+                }
+              ],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "c38a7acc-ded0-4c82-9768-80f2aea6ffaa",
+              "moduleId": "3830d1b3-5fdb-4380-a37e-f87fa678eb08",
+              "title": "Biến đổi Z ngược",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 1,
+              "createdAt": "2026-06-03T16:22:21.396Z",
+              "updatedAt": "2026-06-03T16:22:21.396Z",
+              "materials": [],
+              "progress": [
+                {
+                  "id": "87b2fa70-a63a-4459-bfb2-a7fdf27afb40",
+                  "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "c38a7acc-ded0-4c82-9768-80f2aea6ffaa",
+                  "isCompleted": false,
+                  "createdAt": "2026-06-14T16:47:29.571Z",
+                  "updatedAt": "2026-06-14T17:17:22.992Z"
+                }
+              ],
+              "bookmarks": [
+                {
+                  "id": "eddf6f52-0122-4379-a780-0909313983b4",
+                  "userId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                  "lessonId": "c38a7acc-ded0-4c82-9768-80f2aea6ffaa",
+                  "createdAt": "2026-06-18T04:46:38.598Z"
+                }
+              ],
+              "quiz": null
+            },
+            {
+              "id": "49155d2d-b9ff-4818-8342-666bfb411765",
+              "moduleId": "3830d1b3-5fdb-4380-a37e-f87fa678eb08",
+              "title": "Các tính chất của biến đổi Z",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 2,
+              "createdAt": "2026-06-03T16:22:27.594Z",
+              "updatedAt": "2026-06-03T16:22:27.594Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            }
+          ]
+        },
+        {
+          "id": "613368c6-4f5d-42eb-aad9-cedde01bda8e",
+          "courseId": "decebccd-3f1a-4699-8694-3cf55c179766",
+          "title": "Chương 3: Biểu diễn tín hiệu và hệ thống trong miền tần số liên tục",
+          "description": null,
+          "orderIndex": 2,
+          "createdAt": "2026-06-03T16:21:05.960Z",
+          "updatedAt": "2026-06-03T16:21:05.960Z",
+          "lessons": [
+            {
+              "id": "1628b5e6-538e-457f-8271-babbf8e2f4fb",
+              "moduleId": "613368c6-4f5d-42eb-aad9-cedde01bda8e",
+              "title": "Biến đổi Fourier của các tín hiệu rời rạc",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 0,
+              "createdAt": "2026-06-03T16:33:06.692Z",
+              "updatedAt": "2026-06-03T16:33:06.692Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "438b18f4-5631-4d38-b8ad-86134d40ba7b",
+              "moduleId": "613368c6-4f5d-42eb-aad9-cedde01bda8e",
+              "title": "Các tính chất của biến đổi Fourier",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 1,
+              "createdAt": "2026-06-03T16:33:11.321Z",
+              "updatedAt": "2026-06-03T16:33:11.321Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "da1edddc-129e-4419-848e-a1dbfdc27f42",
+              "moduleId": "613368c6-4f5d-42eb-aad9-cedde01bda8e",
+              "title": "Biểu diễn hệ thống rời rạc trong miền tần số liên tục",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 2,
+              "createdAt": "2026-06-03T16:33:21.279Z",
+              "updatedAt": "2026-06-03T16:33:21.279Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            }
+          ]
+        },
+        {
+          "id": "f5acb0ab-9a07-497e-86fd-f2547469abe4",
+          "courseId": "decebccd-3f1a-4699-8694-3cf55c179766",
+          "title": "Chương 4: Biểu diễn tín hiệu và hệ thống trong miền tần số rời rạc",
+          "description": null,
+          "orderIndex": 3,
+          "createdAt": "2026-06-03T16:21:13.441Z",
+          "updatedAt": "2026-06-03T16:21:13.441Z",
+          "lessons": [
+            {
+              "id": "097b1d9c-ec88-48cb-9630-69846cded550",
+              "moduleId": "f5acb0ab-9a07-497e-86fd-f2547469abe4",
+              "title": "Biến đổi Fourier rời rạc đối với các tín hiệu tuần hoàn có chu kỳ N",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 0,
+              "createdAt": "2026-06-11T14:58:56.043Z",
+              "updatedAt": "2026-06-11T14:58:56.043Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "9e63a8c9-b7d6-4d16-9e3c-87efedc9cde7",
+              "moduleId": "f5acb0ab-9a07-497e-86fd-f2547469abe4",
+              "title": "Biến đổi Fourier rời rạc đối với các dãy có chiều dài hữu hạn",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 1,
+              "createdAt": "2026-06-11T15:24:42.678Z",
+              "updatedAt": "2026-06-11T15:24:42.678Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            }
+          ]
+        },
+        {
+          "id": "e5f42c8f-69d1-4c2d-88d7-9f1ed134ace1",
+          "courseId": "decebccd-3f1a-4699-8694-3cf55c179766",
+          "title": "Chương 5: Bộ lọc số",
+          "description": null,
+          "orderIndex": 4,
+          "createdAt": "2026-06-03T16:21:19.419Z",
+          "updatedAt": "2026-06-03T16:21:19.419Z",
+          "lessons": []
+        }
+      ]
+    },
+    {
+      "id": "376be29b-e9ff-4208-a4ee-51791174f4f6",
+      "title": "Intro to BigData",
+      "description": "Learn about Big Data",
+      "thumbnailUrl": null,
+      "teacherId": "67e5c20f-a2a8-4e86-8988-bc7c0f04a6b5",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-05-29T12:31:43.809Z",
+      "updatedAt": "2026-05-29T12:31:53.316Z",
+      "enrollments": [],
+      "chatThreads": [],
+      "modules": []
+    },
+    {
+      "id": "3d812e5c-310a-4ae9-bf52-562d76ba6ef8",
+      "title": "Nhập môn Khoa học dữ liệu",
+      "description": null,
+      "thumbnailUrl": null,
+      "teacherId": "baf5efd6-82f1-4f4a-811a-2f32fc88be4b",
+      "aiEnabled": false,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-06-16T16:57:45.826Z",
+      "updatedAt": "2026-06-16T17:01:13.310Z",
+      "enrollments": [],
+      "chatThreads": [],
+      "modules": []
+    },
+    {
+      "id": "2cdbf68d-99f7-4fc9-839a-b23121f4e823",
+      "title": "Nhập môn học máy",
+      "description": null,
+      "thumbnailUrl": null,
+      "teacherId": "baf5efd6-82f1-4f4a-811a-2f32fc88be4b",
+      "aiEnabled": false,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-06-16T17:06:41.702Z",
+      "updatedAt": "2026-06-16T17:06:52.178Z",
+      "enrollments": [],
+      "chatThreads": [],
+      "modules": []
+    },
+    {
+      "id": "12b4db4a-74b6-4a65-943e-11ab7c3f06bf",
+      "title": "Nhập môn Kỹ thuật truyền thông",
+      "description": null,
+      "thumbnailUrl": null,
+      "teacherId": "baf5efd6-82f1-4f4a-811a-2f32fc88be4b",
+      "aiEnabled": false,
+      "isPublished": true,
+      "isPrivate": true,
+      "createdAt": "2026-06-16T17:07:14.263Z",
+      "updatedAt": "2026-06-18T12:57:34.639Z",
+      "enrollments": [
+        {
+          "id": "553c17ab-0b0b-4ba6-a38b-530dbb53af22",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "12b4db4a-74b6-4a65-943e-11ab7c3f06bf",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-18T15:23:32.443Z"
+        },
+        {
+          "id": "5966178c-2da2-4dbb-893b-d8d5cedae391",
+          "studentId": "95dafe6d-ae97-4bb4-ada1-7279e47ed2e8",
+          "courseId": "12b4db4a-74b6-4a65-943e-11ab7c3f06bf",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-18T15:23:32.443Z"
+        }
+      ],
+      "chatThreads": [],
+      "modules": []
+    }
+  ]
+}

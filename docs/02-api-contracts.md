@@ -1,22 +1,9 @@
-# API Contracts — E-Learning LMS
+# API Contracts — LearnAI LMS
 
-> **Version:** 2.0  
-> **Last Updated:** 2026-05-18  
-> **Base URL:** `http://localhost:8000/api/v1`  
-> **Auth:** Bearer JWT token in `Authorization` header (unless noted as Public)
-
----
-
-## Table of Contents
-
-1. [Authentication](#1-authentication)
-2. [Users](#2-users)
-3. [Courses](#3-courses)
-4. [Modules](#4-modules)
-5. [Lessons](#5-lessons)
-6. [Materials](#6-materials)
-7. [Enrollments](#7-enrollments)
-8. [AI Tutor Chat](#8-ai-tutor-chat)
+> **Version:** 9.0
+> **Last Updated:** 2026-06-19
+> **Base URL:** `/api`
+> **Auth:** Custom JWT via HTTP-only cookie and/or `Authorization: Bearer <token>`
 
 ---
 
@@ -24,679 +11,711 @@
 
 ### Response Envelope
 
-All responses follow a consistent structure:
-
 ```json
 {
   "success": true,
-  "data": { ... },
-  "message": "Optional human-readable message"
+  "data": {},
+  "message": "Optional message"
 }
 ```
 
-### Error Response
+### Error Envelope
 
 ```json
 {
   "success": false,
   "data": null,
-  "message": "Detailed error description",
+  "message": "Validation failed.",
   "errors": [
-    { "field": "email", "message": "Email already registered" }
+    {
+      "field": "email",
+      "message": "Email is required."
+    }
   ]
 }
 ```
 
-### HTTP Status Codes
+### Common Status Codes
 
 | Code | Meaning |
-|---|---|
+| --- | --- |
 | `200` | Success |
 | `201` | Created |
-| `204` | No Content (successful delete) |
-| `400` | Bad Request / Validation Error |
-| `401` | Unauthorized (missing/invalid token) |
-| `403` | Forbidden (insufficient role) |
-| `404` | Not Found |
-| `422` | Unprocessable Entity |
-| `500` | Internal Server Error |
+| `204` | No content |
+| `400` | Validation or bad request |
+| `401` | Missing/invalid auth |
+| `403` | Authenticated but not allowed |
+| `404` | Not found or intentionally hidden |
+| `422` | Domain precondition not met |
+| `500` | Unexpected server error |
 
-### Pagination Query Params
+### Pagination
 
-| Param | Type | Default | Description |
-|---|---|---|---|
-| `page` | `int` | `1` | Page number |
-| `limit` | `int` | `20` | Items per page (max 100) |
+List endpoints generally use:
 
-### Paginated Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "items": [ ... ],
-    "total": 42,
-    "page": 1,
-    "limit": 20,
-    "pages": 3
-  }
-}
-```
+| Param | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `page` | number | `1` | 1-based |
+| `limit` | number | `20` | max usually `100` |
+| `search` | string | optional | title/text search where supported |
 
 ---
 
-## 1. Authentication
+## Auth
 
-### `POST /api/v1/auth/register`
+### `POST /api/auth/register`
 
-> **Access:** Public
-
-Register a new user account.
-
-**Request Body:**
+Access: Public
 
 ```json
 {
   "email": "student@example.com",
-  "password": "securePass123!",
-  "full_name": "John Doe",
+  "password": "securePassword123",
+  "fullName": "Nguyễn Văn A",
   "role": "STUDENT"
 }
 ```
 
-**Response `201 Created`:**
+### `POST /api/auth/login`
 
-```json
-{
-  "success": true,
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "email": "student@example.com",
-    "full_name": "John Doe",
-    "role": "STUDENT",
-    "created_at": "2026-05-18T10:00:00Z"
-  }
-}
-```
-
----
-
-### `POST /api/v1/auth/login`
-
-> **Access:** Public
-
-Authenticate and receive a JWT.
-
-**Request Body:**
+Access: Public
 
 ```json
 {
   "email": "student@example.com",
-  "password": "securePass123!"
+  "password": "securePassword123"
 }
 ```
 
-**Response `200 OK`:**
+Response includes user data and sets auth token delivery used by the app.
 
-```json
-{
-  "success": true,
-  "data": {
-    "access_token": "eyJhbGciOiJIUzI1NiIs...",
-    "token_type": "bearer",
-    "user": {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "email": "student@example.com",
-      "full_name": "John Doe",
-      "role": "STUDENT"
-    }
-  }
-}
-```
+### `GET /api/auth/me`
+
+Access: Authenticated
+
+Returns the current authenticated user.
 
 ---
 
-### `GET /api/v1/auth/me`
+## Users & Profiles
 
-> **Access:** Authenticated
+### `GET /api/users`
 
-Get current user profile.
+Access: ADMIN
 
-**Response `200 OK`:**
+Lists users with pagination.
 
-```json
-{
-  "success": true,
-  "data": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "email": "student@example.com",
-    "full_name": "John Doe",
-    "role": "STUDENT",
-    "avatar_url": null,
-    "created_at": "2026-05-18T10:00:00Z"
-  }
-}
-```
+### `GET /api/users/search?q=query`
 
----
+Access: TEACHER, ADMIN
 
-## 2. Users
+Lightweight autocomplete search for active students by email or full name.
 
-### `GET /api/v1/users`
-
-> **Access:** ADMIN only
-
-List all users with pagination.
-
-**Query Params:** `page`, `limit`, `role` (optional filter)
-
-**Response `200 OK`:** Paginated list of user objects.
-
----
-
-### `GET /api/v1/users/{user_id}`
-
-> **Access:** ADMIN or self
-
-Get a single user profile.
-
----
-
-### `PATCH /api/v1/users/{user_id}`
-
-> **Access:** ADMIN or self
-
-Update user profile.
-
-**Request Body (partial):**
-
-```json
-{
-  "full_name": "Jane Doe",
-  "avatar_url": "https://cdn.example.com/avatars/jane.jpg"
-}
-```
-
----
-
-### `DELETE /api/v1/users/{user_id}`
-
-> **Access:** ADMIN only
-
-Soft-delete a user (sets `is_active = false`).
-
-**Response:** `204 No Content`
-
----
-
-## 3. Courses
-
-### `POST /api/v1/courses`
-
-> **Access:** TEACHER, ADMIN
-
-Create a new course.
-
-**Request Body:**
-
-```json
-{
-  "title": "Introduction to Machine Learning",
-  "description": "A beginner-friendly course covering ML fundamentals.",
-  "thumbnail_url": "https://cdn.example.com/courses/ml-101.jpg"
-}
-```
-
-**Response `201 Created`:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "title": "Introduction to Machine Learning",
-    "description": "A beginner-friendly course covering ML fundamentals.",
-    "thumbnail_url": "https://cdn.example.com/courses/ml-101.jpg",
-    "teacher_id": "550e8400-e29b-41d4-a716-446655440000",
-    "ai_enabled": false,
-    "is_published": false,
-    "created_at": "2026-05-18T10:00:00Z"
-  }
-}
-```
-
----
-
-### `GET /api/v1/courses`
-
-> **Access:** Public (published only) | TEACHER sees own courses | ADMIN sees all
-
-**Query Params:** `page`, `limit`, `search` (title search)
-
-**Response `200 OK`:** Paginated list of course objects.
-
----
-
-### `GET /api/v1/courses/{course_id}`
-
-> **Access:** Public (if published) | Owner | Enrolled student | ADMIN
-
-Get full course details including module/lesson tree.
-
-**Response `200 OK`:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "title": "Introduction to Machine Learning",
-    "description": "...",
-    "teacher": {
-      "id": "...",
-      "full_name": "Dr. Smith",
-      "avatar_url": "..."
-    },
-    "ai_enabled": true,
-    "is_published": true,
-    "modules": [
-      {
-        "id": "...",
-        "title": "Week 1: Foundations",
-        "order_index": 0,
-        "lessons": [
-          {
-            "id": "...",
-            "title": "What is ML?",
-            "order_index": 0,
-            "material_count": 2
-          }
-        ]
-      }
-    ],
-    "enrolled_count": 42,
-    "created_at": "2026-05-18T10:00:00Z"
-  }
-}
-```
-
----
-
-### `PATCH /api/v1/courses/{course_id}`
-
-> **Access:** Owner TEACHER, ADMIN
-
-Update course metadata.
-
-**Request Body (partial):**
-
-```json
-{
-  "title": "Updated Title",
-  "is_published": true
-}
-```
-
----
-
-### `DELETE /api/v1/courses/{course_id}`
-
-> **Access:** Owner TEACHER, ADMIN
-
-Delete a course and all nested resources. Also cleans up Gemini files.
-
-**Response:** `204 No Content`
-
----
-
-### `POST /api/v1/courses/{course_id}/setup-ai`
-
-> **Access:** Owner TEACHER, ADMIN
-
-Manually trigger creation of Gemini file integrations for this course. Uploads all existing materials to Gemini using the File API.
-
-**Response `200 OK`:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "ai_enabled": true,
-    "files_synced": 5
-  },
-  "message": "AI Tutor enabled. 5 files uploaded to Gemini."
-}
-```
-
----
-
-## 4. Modules
-
-### `POST /api/v1/courses/{course_id}/modules`
-
-> **Access:** Owner TEACHER, ADMIN
-
-**Request Body:**
-
-```json
-{
-  "title": "Week 1: Foundations",
-  "description": "Introduction and core concepts.",
-  "order_index": 0
-}
-```
-
-**Response `201 Created`:** Module object.
-
----
-
-### `GET /api/v1/courses/{course_id}/modules`
-
-> **Access:** Enrolled student, Owner, ADMIN
-
-List all modules for a course, ordered by `order_index`.
-
----
-
-### `PATCH /api/v1/courses/{course_id}/modules/{module_id}`
-
-> **Access:** Owner TEACHER, ADMIN
-
-Update module title, description, or order.
-
----
-
-### `DELETE /api/v1/courses/{course_id}/modules/{module_id}`
-
-> **Access:** Owner TEACHER, ADMIN
-
-**Response:** `204 No Content`
-
----
-
-## 5. Lessons
-
-### `POST /api/v1/modules/{module_id}/lessons`
-
-> **Access:** Course Owner TEACHER, ADMIN
-
-**Request Body:**
-
-```json
-{
-  "title": "What is Machine Learning?",
-  "content": "# Introduction\n\nMachine learning is...",
-  "order_index": 0
-}
-```
-
-**Response `201 Created`:** Lesson object.
-
----
-
-### `GET /api/v1/modules/{module_id}/lessons`
-
-> **Access:** Enrolled student, Owner, ADMIN
-
-List all lessons for a module.
-
----
-
-### `GET /api/v1/lessons/{lesson_id}`
-
-> **Access:** Enrolled student, Owner, ADMIN
-
-Get lesson detail with materials list.
-
-**Response `200 OK`:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "...",
-    "title": "What is Machine Learning?",
-    "content": "# Introduction\n\n...",
-    "order_index": 0,
-    "materials": [
-      {
-        "id": "...",
-        "title": "ML Basics Slides.pdf",
-        "material_type": "PDF",
-        "file_url": "/files/materials/abc123.pdf",
-        "file_size_bytes": 2048576,
-        "gemini_file_uri": "https://generativelanguage.googleapis.com/v1beta/files/abc12345"
-      }
-    ],
-    "module_id": "...",
-    "created_at": "2026-05-18T10:00:00Z"
-  }
-}
-```
-
----
-
-### `PATCH /api/v1/lessons/{lesson_id}`
-
-> **Access:** Course Owner TEACHER, ADMIN
-
----
-
-### `DELETE /api/v1/lessons/{lesson_id}`
-
-> **Access:** Course Owner TEACHER, ADMIN
-
-**Response:** `204 No Content`
-
----
-
-## 6. Materials
-
-### `POST /api/v1/lessons/{lesson_id}/materials/upload`
-
-> **Access:** Course Owner TEACHER, ADMIN
-
-Upload a file and optionally sync it to Gemini File API if the course has AI enabled.
-
-**Request:** `multipart/form-data`
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `file` | `File` | Yes | The file to upload |
-| `title` | `string` | No | Display name (defaults to filename) |
-| `material_type` | `string` | No | `PDF`, `VIDEO`, `LINK`, `OTHER` (defaults to `PDF`) |
-
-**Response `201 Created`:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "...",
-    "title": "ML Basics Slides.pdf",
-    "material_type": "PDF",
-    "file_url": "/files/materials/abc123.pdf",
-    "file_size_bytes": 2048576,
-    "gemini_file_uri": "https://generativelanguage.googleapis.com/v1beta/files/abc12345",
-    "lesson_id": "...",
-    "created_at": "2026-05-18T10:00:00Z"
-  },
-  "message": "File uploaded and synced to AI tutor."
-}
-```
-
----
-
-### `GET /api/v1/lessons/{lesson_id}/materials`
-
-> **Access:** Enrolled student, Owner, ADMIN
-
-List all materials for a lesson.
-
----
-
-### `GET /api/v1/materials/{material_id}/download`
-
-> **Access:** Enrolled student, Owner, ADMIN
-
-Download the material file. Returns a file stream or redirect to storage URL.
-
----
-
-### `DELETE /api/v1/materials/{material_id}`
-
-> **Access:** Course Owner TEACHER, ADMIN
-
-Deletes material from storage and removes from Gemini if synced.
-
-**Response:** `204 No Content`
-
----
-
-## 7. Enrollments
-
-### `POST /api/v1/courses/{course_id}/enroll`
-
-> **Access:** STUDENT (authenticated)
-
-Enroll the current student in a published course.
-
-**Response `201 Created`:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "...",
-    "student_id": "...",
-    "course_id": "...",
-    "status": "ACTIVE",
-    "enrolled_at": "2026-05-18T10:00:00Z"
-  },
-  "message": "Successfully enrolled in the course."
-}
-```
-
----
-
-### `DELETE /api/v1/courses/{course_id}/enroll`
-
-> **Access:** Enrolled STUDENT
-
-Unenroll (drop) from a course. Sets status to `DROPPED`.
-
-**Response:** `204 No Content`
-
----
-
-### `GET /api/v1/enrollments/my`
-
-> **Access:** STUDENT (authenticated)
-
-List all courses the current student is enrolled in.
-
-**Response `200 OK`:** Paginated list of enrollment objects with nested course summary.
-
-```json
-{
-  "success": true,
-  "data": {
-    "items": [
-      {
-        "id": "...",
-        "status": "ACTIVE",
-        "enrolled_at": "2026-05-18T10:00:00Z",
-        "course": {
-          "id": "...",
-          "title": "Introduction to Machine Learning",
-          "thumbnail_url": "...",
-          "teacher": {
-            "full_name": "Dr. Smith"
-          }
-        }
-      }
-    ],
-    "total": 3,
-    "page": 1,
-    "limit": 20,
-    "pages": 1
-  }
-}
-```
-
----
-
-### `GET /api/v1/courses/{course_id}/students`
-
-> **Access:** Owner TEACHER, ADMIN
-
-List all enrolled students for a course.
-
----
-
-## 8. AI Tutor Chat
-
-### `POST /api/v1/courses/{course_id}/chat/threads`
-
-> **Access:** Enrolled STUDENT
-
-Create a new chat thread locally.
-
-**Request Body:**
-
-```json
-{
-  "title": "Help with Gradient Descent"
-}
-```
-
-**Response `201 Created`:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "...",
-    "course_id": "...",
-    "title": "Help with Gradient Descent",
-    "created_at": "2026-05-18T10:00:00Z"
-  }
-}
-```
-
----
-
-### `GET /api/v1/courses/{course_id}/chat/threads`
-
-> **Access:** Enrolled STUDENT (own threads only)
-
-List all chat threads for the current student in this course.
-
----
-
-### `GET /api/v1/chat/threads/{thread_id}/messages`
-
-> **Access:** Thread owner
-
-Get all messages in a thread.
-
-**Response `200 OK`:**
+Response:
 
 ```json
 {
   "success": true,
   "data": [
     {
-      "id": "...",
-      "role": "user",
-      "content": "Can you explain gradient descent?",
-      "created_at": "2026-05-18T10:00:00Z"
-    },
+      "id": "user-id",
+      "fullName": "Nguyễn Văn A",
+      "email": "student@example.com",
+      "avatarUrl": null
+    }
+  ]
+}
+```
+
+### `GET /api/users/[userId]`
+
+Access: ADMIN or self
+
+Returns private user detail.
+
+### `PATCH /api/users/[userId]`
+
+Access: ADMIN or self, with self-only password change behavior.
+
+Profile update fields:
+
+```json
+{
+  "fullName": "Nguyễn Văn A",
+  "avatarUrl": "https://example.com/avatar.jpg",
+  "phoneNumber": "0900000000",
+  "gender": "Nam",
+  "birthYear": 2000,
+  "highestEducation": "Cử nhân",
+  "bio": "Giới thiệu ngắn..."
+}
+```
+
+Password change fields:
+
+```json
+{
+  "currentPassword": "old-password",
+  "newPassword": "new-password"
+}
+```
+
+### `PATCH /api/users/[userId]/status`
+
+Access: ADMIN
+
+Toggles `isActive`.
+
+### `DELETE /api/users/[userId]`
+
+Access: ADMIN
+
+Soft-disables user account.
+
+### `GET /api/users/[userId]/public`
+
+Access: Authenticated
+
+Returns public-safe profile fields plus completed courses. Excludes sensitive fields such as password, email, and phone number.
+
+---
+
+## Courses
+
+### `GET /api/courses`
+
+Access:
+
+- Public/Student: published courses.
+- Teacher: own courses.
+- Admin: all courses.
+
+Query:
+
+- `page`
+- `limit`
+- `search`
+
+### `POST /api/courses`
+
+Access: TEACHER, ADMIN
+
+```json
+{
+  "title": "Tín hiệu và hệ thống",
+  "description": "Mô tả khóa học",
+  "thumbnailUrl": "https://example.com/cover.jpg",
+  "isPublished": false
+}
+```
+
+### `GET /api/courses/[courseId]`
+
+Access:
+
+- Public if published.
+- Enrolled student.
+- Owner teacher.
+- Admin.
+
+Returns course detail with teacher, ordered modules, ordered lessons, materials summary, and counts.
+
+### `PATCH /api/courses/[courseId]`
+
+Access: Owner teacher, ADMIN
+
+```json
+{
+  "title": "Tên mới",
+  "description": "Mô tả mới",
+  "thumbnailUrl": "https://example.com/cover.jpg",
+  "isPublished": true,
+  "isPrivate": false,
+  "aiEnabled": true
+}
+```
+
+### `DELETE /api/courses/[courseId]`
+
+Access: Owner teacher, ADMIN
+
+Deletes the course and nested records through Prisma cascade.
+
+### `GET /api/courses/[courseId]/learn`
+
+Access: Enrolled student, owner teacher, ADMIN
+
+Combined learning payload:
+
+```json
+{
+  "success": true,
+  "data": {
+    "course": {},
+    "completedLessonIds": ["lesson-id"]
+  }
+}
+```
+
+### `GET /api/courses/[courseId]/students`
+
+Access: Owner teacher, ADMIN
+
+Returns enrolled students with `progressPercentage`.
+
+### `POST /api/courses/[courseId]/enroll`
+
+Access: STUDENT
+
+Enrolls the current student in a published, non-private course.
+
+Private-course behavior:
+
+- If `Course.isPrivate` is true, self-enrollment is rejected.
+
+### `DELETE /api/courses/[courseId]/enroll`
+
+Access: STUDENT
+
+Drops the current student's enrollment unless the course is private.
+
+Private-course behavior:
+
+- If `Course.isPrivate` is true, self-unenrollment is rejected.
+
+### `POST /api/courses/[courseId]/enroll-bulk`
+
+Access: Owner teacher, ADMIN
+
+Adds students by email. Accepts either a raw string or an array.
+
+```json
+{
+  "emails": [
+    "student1@example.com",
+    "student2@example.com"
+  ]
+}
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "addedCount": 2,
+    "matchedCount": 2,
+    "skippedCount": 0
+  }
+}
+```
+
+### `DELETE /api/courses/[courseId]/enroll-bulk`
+
+Access: Owner teacher, ADMIN
+
+Removes selected students from a course.
+
+```json
+{
+  "userIds": ["student-user-id-1", "student-user-id-2"]
+}
+```
+
+### `POST /api/courses/[courseId]/setup-ai`
+
+Access: Owner teacher, ADMIN
+
+Uploads eligible course materials to Gemini File API, waits for ACTIVE state, stores `geminiFileUri` and `geminiFileName`, then sets `aiEnabled = true`.
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "uploadedCount": 3,
+    "aiEnabled": true
+  }
+}
+```
+
+### `GET /api/courses/[courseId]/materials`
+
+Access: Owner teacher, ADMIN
+
+Returns all course materials with lesson and module location.
+
+### `POST /api/courses/[courseId]/materials/[materialId]/resync`
+
+Access: Owner teacher, ADMIN
+
+Downloads the durable UploadThing file URL, re-uploads it to Gemini, and updates `geminiFileUri`/`geminiFileName`.
+
+### `GET /api/courses/[courseId]/bookmarks`
+
+Access: Authenticated student
+
+Returns the current user's saved lessons in this course with lesson and module data.
+
+---
+
+## Modules
+
+### `GET /api/courses/[courseId]/modules`
+
+Access: Enrolled student, owner teacher, ADMIN
+
+Lists ordered modules.
+
+### `POST /api/courses/[courseId]/modules`
+
+Access: Owner teacher, ADMIN
+
+```json
+{
+  "title": "Chương 1",
+  "description": "Tổng quan"
+}
+```
+
+`orderIndex` is calculated server-side.
+
+### `PUT /api/courses/[courseId]/modules`
+
+Access: Owner teacher, ADMIN
+
+Reorders modules.
+
+```json
+{
+  "orderedIds": ["module-id-1", "module-id-2"]
+}
+```
+
+### `PATCH /api/courses/[courseId]/modules/[moduleId]`
+
+Access: Owner teacher, ADMIN
+
+Updates module metadata.
+
+### `DELETE /api/courses/[courseId]/modules/[moduleId]`
+
+Access: Owner teacher, ADMIN
+
+Deletes a module and nested lessons through cascade.
+
+---
+
+## Lessons
+
+### `GET /api/modules/[moduleId]/lessons`
+
+Access: Enrolled student, owner teacher, ADMIN
+
+Lists lessons in a module.
+
+### `POST /api/modules/[moduleId]/lessons`
+
+Access: Owner teacher, ADMIN
+
+```json
+{
+  "title": "Biến đổi Z",
+  "content": "Markdown content",
+  "lessonType": "LECTURE"
+}
+```
+
+`lessonType` may be `LECTURE` or `QUIZ`.
+
+### `GET /api/lessons/[lessonId]`
+
+Access: Enrolled student, owner teacher, ADMIN
+
+Returns lesson detail with materials and parent course/module context.
+
+### `PATCH /api/lessons/[lessonId]`
+
+Access: Owner teacher, ADMIN
+
+Updates lesson title, content, type, publication-related fields, or order metadata supported by validation.
+
+### `DELETE /api/lessons/[lessonId]`
+
+Access: Owner teacher, ADMIN
+
+Deletes lesson and nested materials/progress/bookmarks/quiz.
+
+### `GET /api/lessons/[lessonId]/progress`
+
+Access: STUDENT
+
+Returns current student's progress for the lesson.
+
+### `POST /api/lessons/[lessonId]/progress`
+
+Access: STUDENT
+
+Upserts lesson completion state.
+
+```json
+{
+  "isCompleted": true
+}
+```
+
+### `POST /api/lessons/[lessonId]/bookmark`
+
+Access: Authenticated student
+
+Toggles bookmark for the current user.
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "bookmarked": true
+  }
+}
+```
+
+---
+
+## Materials
+
+### `POST /api/lessons/[lessonId]/materials/upload`
+
+Access: Owner teacher, ADMIN
+
+Creates a material record from an UploadThing upload callback payload.
+
+```json
+{
+  "name": "lecture.pdf",
+  "url": "https://utfs.io/f/file-key.pdf",
+  "size": 2048000,
+  "type": "application/pdf"
+}
+```
+
+### `GET /api/lessons/[lessonId]/materials`
+
+Access: Enrolled student, owner teacher, ADMIN
+
+Lists materials for a lesson.
+
+### `GET /api/materials/[materialId]/download`
+
+Access: Enrolled student, owner teacher, ADMIN
+
+Redirects or streams the durable material URL.
+
+### `DELETE /api/materials/[materialId]`
+
+Access: Owner teacher, ADMIN
+
+Deletes the material database row and deletes the UploadThing file by key.
+
+---
+
+## UploadThing
+
+### `GET /api/uploadthing`
+
+UploadThing App Router handler.
+
+### `POST /api/uploadthing`
+
+UploadThing App Router handler.
+
+Current file router supports course material uploads for PDFs, videos, and images.
+
+---
+
+## AI Tutor Chat
+
+### `GET /api/courses/[courseId]/chat/threads`
+
+Access: Enrolled student
+
+Lists the current student's AI Tutor threads for a course.
+
+Returns `200` with readiness info when AI is disabled instead of surfacing noisy forbidden errors.
+
+### `POST /api/courses/[courseId]/chat/threads`
+
+Access: Enrolled student
+
+Creates a local chat thread.
+
+### `GET /api/chat/threads/[threadId]/messages`
+
+Access: Thread owner
+
+Returns ordered chat messages.
+
+### `POST /api/chat/threads/[threadId]/ask`
+
+Access: Thread owner, enrolled student
+
+```json
+{
+  "message": "Giải thích nội dung bài học này giúp em."
+}
+```
+
+Backend flow:
+
+1. Save user message.
+2. Load course Gemini file refs.
+3. Load chat history.
+4. Call `gemini-3.1-flash-lite`.
+5. Save model response.
+6. Return assistant message.
+
+### `DELETE /api/chat/threads/[threadId]`
+
+Access: Thread owner
+
+Deletes thread and messages.
+
+---
+
+## Quiz
+
+### `GET /api/lessons/[lessonId]/quiz`
+
+Access: Enrolled student, owner teacher, ADMIN
+
+Returns quiz data. For students, correct option flags are omitted.
+
+If no quiz exists, returns:
+
+```json
+{
+  "success": true,
+  "data": null
+}
+```
+
+### `POST /api/lessons/[lessonId]/quiz`
+
+Access: Owner teacher, ADMIN
+
+Creates a quiz.
+
+```json
+{
+  "maxAttempts": 2,
+  "passingScore": 0.6,
+  "dueDate": "2026-06-30T23:59:00.000Z",
+  "questions": [
     {
-      "id": "...",
-      "role": "model",
-      "content": "Gradient descent is an optimization algorithm...",
-      "created_at": "2026-05-18T10:00:05Z"
+      "questionText": "Câu hỏi?",
+      "points": 1,
+      "explanation": "Giải thích",
+      "options": [
+        { "optionText": "A", "isCorrect": true },
+        { "optionText": "B", "isCorrect": false }
+      ]
+    }
+  ]
+}
+```
+
+Validation requires:
+
+- At least one question.
+- At least two options per question.
+- Exactly one correct option per question.
+
+### `PATCH /api/lessons/[lessonId]/quiz`
+
+Access: Owner teacher, ADMIN
+
+Updates quiz settings/questions/options if no attempts exist. Existing attempts block destructive question/option edits.
+
+### `DELETE /api/lessons/[lessonId]/quiz`
+
+Access: Owner teacher, ADMIN
+
+Deletes the quiz and nested records.
+
+### `POST /api/lessons/[lessonId]/quiz/submit`
+
+Access: Enrolled student
+
+```json
+{
+  "answers": [
+    {
+      "questionId": "question-id",
+      "optionId": "option-id"
+    }
+  ]
+}
+```
+
+Calculates score and creates `QuizAttempt` plus `QuizAnswer` records.
+
+### `GET /api/lessons/[lessonId]/quiz/attempts`
+
+Access:
+
+- STUDENT: own attempts only.
+- TEACHER/ADMIN: all submissions with student data.
+
+### `GET /api/lessons/[lessonId]/quiz/analytics`
+
+Access: Owner teacher, ADMIN
+
+Returns top difficult questions with error rate and answer options.
+
+### `POST /api/lessons/[lessonId]/quiz/generate`
+
+Access: Owner teacher, ADMIN
+
+Uses Gemini to generate draft quiz questions from lesson markdown and/or attached Gemini-synced files.
+
+```json
+{
+  "numberOfQuestions": 5
+}
+```
+
+Returns generated question JSON only; it does not save the quiz.
+
+### `POST /api/quiz/explain`
+
+Access: Authenticated
+
+Generates a short AI explanation for a quiz review question.
+
+```json
+{
+  "questionText": "Question text",
+  "options": ["A", "B"],
+  "correctOption": "A",
+  "studentOption": "B"
+}
+```
+
+### `POST /api/lessons/[lessonId]/quiz/ai-advice`
+
+Access: Owner teacher, ADMIN
+
+Generates pedagogical advice from top difficult questions.
+
+```json
+{
+  "topQuestions": [
+    {
+      "questionText": "Question text",
+      "errorRatePercentage": 80
     }
   ]
 }
@@ -704,95 +723,118 @@ Get all messages in a thread.
 
 ---
 
-### `POST /api/v1/chat/threads/{thread_id}/ask`
+## Course Analytics
 
-> **Access:** Thread owner (enrolled STUDENT)
+### `GET /api/courses/[courseId]/analytics/quizzes`
 
-Send a message to the AI Tutor. The backend will:
-1. Save the user message locally
-2. Gather conversation history and Gemini file URIs
-3. Call `genai.generate_content()` (Gemini API)
-4. Save the model's response locally
-5. Return both messages
+Access: Owner teacher, ADMIN
 
-**Request Body:**
+Returns quiz-level statistics:
 
 ```json
-{
-  "message": "Can you explain gradient descent in simple terms?"
-}
-```
-
-**Response `200 OK`:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "user_message": {
-      "id": "...",
-      "role": "user",
-      "content": "Can you explain gradient descent in simple terms?",
-      "created_at": "2026-05-18T10:01:00Z"
-    },
-    "assistant_message": {
-      "id": "...",
-      "role": "model",
-      "content": "Sure! Imagine you're standing on a hill and you want to get to the lowest point...",
-      "created_at": "2026-05-18T10:01:05Z"
-    }
+[
+  {
+    "lessonId": "lesson-id",
+    "quizId": "quiz-id",
+    "quizTitle": "Lesson title",
+    "totalSubmissions": 12,
+    "averageScore": 75
   }
-}
+]
 ```
 
 ---
 
-### `DELETE /api/v1/chat/threads/{thread_id}`
+## Enrollments
 
-> **Access:** Thread owner
+### `GET /api/enrollments/my`
 
-Delete a chat thread and its messages locally.
+Access: STUDENT
 
-**Response:** `204 No Content`
+Returns current student's enrollments with course summaries, progress, next lesson, teacher, and counts.
 
 ---
 
-## Endpoint Summary Table
+## Production Data Scripts
 
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| `POST` | `/auth/register` | Public | Register |
-| `POST` | `/auth/login` | Public | Login |
-| `GET` | `/auth/me` | Auth | Current user |
-| `GET` | `/users` | ADMIN | List users |
-| `GET` | `/users/{id}` | ADMIN/Self | Get user |
-| `PATCH` | `/users/{id}` | ADMIN/Self | Update user |
-| `DELETE` | `/users/{id}` | ADMIN | Deactivate user |
-| `POST` | `/courses` | TEACHER/ADMIN | Create course |
-| `GET` | `/courses` | Public/Auth | List courses |
-| `GET` | `/courses/{id}` | Public/Auth | Get course detail |
-| `PATCH` | `/courses/{id}` | Owner/ADMIN | Update course |
-| `DELETE` | `/courses/{id}` | Owner/ADMIN | Delete course |
-| `POST` | `/courses/{id}/setup-ai` | Owner/ADMIN | Init Gemini AI integration |
-| `POST` | `/courses/{id}/modules` | Owner/ADMIN | Create module |
-| `GET` | `/courses/{id}/modules` | Enrolled/Owner | List modules |
-| `PATCH` | `/courses/{id}/modules/{id}` | Owner/ADMIN | Update module |
-| `DELETE` | `/courses/{id}/modules/{id}` | Owner/ADMIN | Delete module |
-| `POST` | `/modules/{id}/lessons` | Owner/ADMIN | Create lesson |
-| `GET` | `/modules/{id}/lessons` | Enrolled/Owner | List lessons |
-| `GET` | `/lessons/{id}` | Enrolled/Owner | Get lesson detail |
-| `PATCH` | `/lessons/{id}` | Owner/ADMIN | Update lesson |
-| `DELETE` | `/lessons/{id}` | Owner/ADMIN | Delete lesson |
-| `POST` | `/lessons/{id}/materials/upload` | Owner/ADMIN | Upload material |
-| `GET` | `/lessons/{id}/materials` | Enrolled/Owner | List materials |
-| `GET` | `/materials/{id}/download` | Enrolled/Owner | Download file |
-| `DELETE` | `/materials/{id}` | Owner/ADMIN | Delete material |
-| `POST` | `/courses/{id}/enroll` | STUDENT | Enroll |
-| `DELETE` | `/courses/{id}/enroll` | STUDENT | Unenroll |
-| `GET` | `/enrollments/my` | STUDENT | My enrollments |
-| `GET` | `/courses/{id}/students` | Owner/ADMIN | List students |
-| `POST` | `/courses/{id}/chat/threads` | STUDENT | Create thread |
-| `GET` | `/courses/{id}/chat/threads` | STUDENT | List threads |
-| `GET` | `/chat/threads/{id}/messages` | Owner | Get messages |
-| `POST` | `/chat/threads/{id}/ask` | Owner | Ask AI tutor |
-| `DELETE` | `/chat/threads/{id}` | Owner | Delete thread |
+These are package/Prisma scripts, not HTTP APIs.
+
+### `npm run db:extract`
+
+Runs `client/prisma/extract.ts` and writes local data to:
+
+```text
+client/prisma/data.json
+```
+
+### `npx prisma db seed`
+
+Runs `client/prisma/seed.ts` and upserts/restores users plus nested course data from `prisma/data.json`.
+
+---
+
+## Endpoint Inventory
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| POST | `/api/auth/register` | Public | Register |
+| POST | `/api/auth/login` | Public | Login |
+| GET | `/api/auth/me` | Auth | Current user |
+| GET | `/api/users` | ADMIN | List users |
+| GET | `/api/users/search` | TEACHER/ADMIN | Student autocomplete |
+| GET | `/api/users/[userId]` | ADMIN/self | User detail |
+| PATCH | `/api/users/[userId]` | ADMIN/self | Profile/password update |
+| DELETE | `/api/users/[userId]` | ADMIN | Disable user |
+| PATCH | `/api/users/[userId]/status` | ADMIN | Toggle active state |
+| GET | `/api/users/[userId]/public` | Auth | Public profile |
+| GET | `/api/courses` | Public/Auth | List courses |
+| POST | `/api/courses` | TEACHER/ADMIN | Create course |
+| GET | `/api/courses/[courseId]` | Public/Auth | Course detail |
+| PATCH | `/api/courses/[courseId]` | Owner/ADMIN | Update course |
+| DELETE | `/api/courses/[courseId]` | Owner/ADMIN | Delete course |
+| GET | `/api/courses/[courseId]/learn` | Enrolled/Owner/ADMIN | Course learning payload |
+| GET | `/api/courses/[courseId]/students` | Owner/ADMIN | Student roster |
+| POST | `/api/courses/[courseId]/enroll` | STUDENT | Self-enroll |
+| DELETE | `/api/courses/[courseId]/enroll` | STUDENT | Self-unenroll |
+| POST | `/api/courses/[courseId]/enroll-bulk` | Owner/ADMIN | Add students |
+| DELETE | `/api/courses/[courseId]/enroll-bulk` | Owner/ADMIN | Remove students |
+| POST | `/api/courses/[courseId]/setup-ai` | Owner/ADMIN | Sync AI Tutor materials |
+| GET | `/api/courses/[courseId]/materials` | Owner/ADMIN | Course materials dashboard |
+| POST | `/api/courses/[courseId]/materials/[materialId]/resync` | Owner/ADMIN | Re-sync Gemini file |
+| GET | `/api/courses/[courseId]/bookmarks` | STUDENT | Course bookmarks |
+| GET | `/api/courses/[courseId]/modules` | Enrolled/Owner/ADMIN | List modules |
+| POST | `/api/courses/[courseId]/modules` | Owner/ADMIN | Create module |
+| PUT | `/api/courses/[courseId]/modules` | Owner/ADMIN | Reorder modules |
+| PATCH | `/api/courses/[courseId]/modules/[moduleId]` | Owner/ADMIN | Update module |
+| DELETE | `/api/courses/[courseId]/modules/[moduleId]` | Owner/ADMIN | Delete module |
+| GET | `/api/modules/[moduleId]/lessons` | Enrolled/Owner/ADMIN | List lessons |
+| POST | `/api/modules/[moduleId]/lessons` | Owner/ADMIN | Create lesson |
+| GET | `/api/lessons/[lessonId]` | Enrolled/Owner/ADMIN | Lesson detail |
+| PATCH | `/api/lessons/[lessonId]` | Owner/ADMIN | Update lesson |
+| DELETE | `/api/lessons/[lessonId]` | Owner/ADMIN | Delete lesson |
+| GET | `/api/lessons/[lessonId]/progress` | STUDENT | Lesson progress |
+| POST | `/api/lessons/[lessonId]/progress` | STUDENT | Update progress |
+| POST | `/api/lessons/[lessonId]/bookmark` | STUDENT | Toggle bookmark |
+| POST | `/api/lessons/[lessonId]/materials/upload` | Owner/ADMIN | Save uploaded material |
+| GET | `/api/lessons/[lessonId]/materials` | Enrolled/Owner/ADMIN | List lesson materials |
+| GET | `/api/materials/[materialId]/download` | Enrolled/Owner/ADMIN | Download material |
+| DELETE | `/api/materials/[materialId]` | Owner/ADMIN | Delete material |
+| GET | `/api/courses/[courseId]/chat/threads` | STUDENT | List chat threads |
+| POST | `/api/courses/[courseId]/chat/threads` | STUDENT | Create chat thread |
+| GET | `/api/chat/threads/[threadId]/messages` | Owner | Chat messages |
+| POST | `/api/chat/threads/[threadId]/ask` | Owner | Ask AI Tutor |
+| DELETE | `/api/chat/threads/[threadId]` | Owner | Delete chat thread |
+| GET | `/api/lessons/[lessonId]/quiz` | Enrolled/Owner/ADMIN | Quiz detail |
+| POST | `/api/lessons/[lessonId]/quiz` | Owner/ADMIN | Create quiz |
+| PATCH | `/api/lessons/[lessonId]/quiz` | Owner/ADMIN | Update quiz |
+| DELETE | `/api/lessons/[lessonId]/quiz` | Owner/ADMIN | Delete quiz |
+| POST | `/api/lessons/[lessonId]/quiz/submit` | STUDENT | Submit quiz |
+| GET | `/api/lessons/[lessonId]/quiz/attempts` | STUDENT/Owner/ADMIN | Attempts/submissions |
+| GET | `/api/lessons/[lessonId]/quiz/analytics` | Owner/ADMIN | Question analytics |
+| POST | `/api/lessons/[lessonId]/quiz/generate` | Owner/ADMIN | AI quiz generation |
+| POST | `/api/quiz/explain` | Auth | AI answer explanation |
+| POST | `/api/lessons/[lessonId]/quiz/ai-advice` | Owner/ADMIN | AI teaching advice |
+| GET | `/api/courses/[courseId]/analytics/quizzes` | Owner/ADMIN | Course quiz analytics |
+| GET | `/api/enrollments/my` | STUDENT | My enrollments |
+| GET | `/api/uploadthing` | UploadThing | UploadThing handler |
+| POST | `/api/uploadthing` | UploadThing | UploadThing handler |
