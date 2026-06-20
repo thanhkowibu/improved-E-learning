@@ -70,7 +70,7 @@ const TEACHER_NAV: NavItem[] = [
 
 const ADMIN_NAV: NavItem[] = [
   { href: "/admin/users", label: "Người dùng" },
-  { href: "/admin/courses", label: "Khóa học" },
+  { href: "/courses", label: "Khóa học" },
   { href: "/admin/analytics", label: "Thống kê" },
   { href: "/dashboard", label: "Bảng điều khiển" },
 ];

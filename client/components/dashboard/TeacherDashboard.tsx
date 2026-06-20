@@ -185,7 +185,9 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
     api
       .get<{ items: CourseItem[] }>("/api/courses?limit=100")
       .then((res) => {
-        if (res.success && res.data) setCourses(res.data.items);
+        setCourses(
+          res.success && Array.isArray(res.data?.items) ? res.data.items : [],
+        );
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -210,10 +212,11 @@ export default function TeacherDashboard({ fullName }: { fullName: string }) {
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div>
                 <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900">
-                  Hello, {firstName} 👨‍🏫
+                  Xin chào, {firstName}
                 </h2>
                 <p className="text-slate-500 text-sm mt-1">
-                  Quản lý khóa học và theo dõi tiến độ học tập của sinh viên.
+                  Quản lý khóa học và theo dõi tiến độ học tập của sinh viên tại
+                  đây.
                 </p>
               </div>
               <Link href="/courses/new">

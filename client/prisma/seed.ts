@@ -204,7 +204,9 @@ function userScalarData(user: UserData) {
   };
 }
 
-function buildQuizCreateData(quiz: QuizData): Prisma.QuizCreateWithoutLessonInput {
+function buildQuizCreateData(
+  quiz: QuizData,
+): Prisma.QuizCreateWithoutLessonInput {
   return {
     id: quiz.id,
     dueDate: toNullableDate(quiz.dueDate),
@@ -410,6 +412,11 @@ async function seedQuizAttempts(courses: CourseData[]) {
 }
 
 async function main() {
+  // Dòng log này sẽ in ra phần đuôi của URL (che đi mật khẩu của bạn)
+  console.log(
+    "🚀 Đang seed vào máy chủ:",
+    process.env.DATABASE_URL?.split("@")[1],
+  );
   const dataPath = path.join(process.cwd(), "prisma", "data.json");
   const rawData = fs.readFileSync(dataPath, "utf8");
   const data = JSON.parse(rawData) as SeedData;

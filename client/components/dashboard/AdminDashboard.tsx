@@ -148,11 +148,20 @@ export default function AdminDashboard({ fullName }: { fullName: string }) {
       api.get<{ items: CourseItem[]; total: number }>("/api/courses?limit=1"),
     ])
       .then(([uRes, cRes, uTotal, cTotal]) => {
-        if (uRes.success && uRes.data) setUsers(uRes.data.items);
-        if (cRes.success && cRes.data) setCourses(cRes.data.items);
+        const users =
+          uRes.success && Array.isArray(uRes.data?.items)
+            ? uRes.data.items
+            : [];
+        const recentCourses =
+          cRes.success && Array.isArray(cRes.data?.items)
+            ? cRes.data.items
+            : [];
+
+        setUsers(users);
+        setCourses(recentCourses);
 
         // Build stats from what we have
-        const allCourses = cRes.success && cRes.data ? cRes.data.items : [];
+        const allCourses = Array.isArray(recentCourses) ? recentCourses : [];
         setStats({
           totalUsers: uTotal.success && uTotal.data ? uTotal.data.total : 0,
           totalCourses: cTotal.success && cTotal.data ? cTotal.data.total : 0,
@@ -336,7 +345,7 @@ export default function AdminDashboard({ fullName }: { fullName: string }) {
                           </p>
                           <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
                             <Users size={10} />
-                            {course._count.enrollments} enrolled ·{" "}
+                            {course._count.enrollments} đã đăng ký ·{" "}
                             {course.teacher.fullName}
                           </p>
                         </div>

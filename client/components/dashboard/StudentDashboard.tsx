@@ -52,6 +52,14 @@ interface EnrollmentItem {
   };
 }
 
+interface PaginatedEnrollments {
+  items?: EnrollmentItem[];
+  total: number;
+  page: number;
+  limit: number;
+  pages?: number;
+}
+
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 
 function StatCard({
@@ -180,16 +188,19 @@ export default function StudentDashboard({ fullName }: { fullName: string }) {
 
   useEffect(() => {
     api
-      .get<EnrollmentItem[]>("/api/enrollments/my")
+      .get<PaginatedEnrollments>("/api/enrollments/my")
       .then((res) => {
-        if (res.success && res.data) setEnrollments(res.data);
+        setEnrollments(
+          res.success && Array.isArray(res.data?.items) ? res.data.items : [],
+        );
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const active = enrollments.filter((e) => e.status === "ACTIVE");
-  const completed = enrollments.filter((e) => e.status === "COMPLETED");
+  const enrollmentItems = Array.isArray(enrollments) ? enrollments : [];
+  const active = enrollmentItems.filter((e) => e.status === "ACTIVE");
+  const completed = enrollmentItems.filter((e) => e.status === "COMPLETED");
 
   // Average progress across active courses
   const avgProgress =

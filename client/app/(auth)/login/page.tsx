@@ -67,7 +67,11 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/courses";
+  const nextParam = searchParams.get("next");
+  const nextPath =
+    nextParam?.startsWith("/") && !nextParam.startsWith("//")
+      ? nextParam
+      : "/dashboard";
 
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -87,6 +91,7 @@ export default function LoginPage() {
       await login(data.email, data.password);
       toast.success("Chào mừng bạn trở lại!", { id: toastId });
       router.push(nextPath);
+      router.refresh();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Đăng nhập thất bại.";
       setServerError(msg);

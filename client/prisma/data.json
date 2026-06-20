@@ -143,6 +143,22 @@
       "isActive": true,
       "createdAt": "2026-06-18T13:35:20.146Z",
       "updatedAt": "2026-06-18T13:36:29.639Z"
+    },
+    {
+      "id": "c03b3d24-3e1b-49b2-b8d7-539b09d1e7bf",
+      "email": "yourname@lms.dev",
+      "hashedPassword": "$2b$12$RUUzv0aUbzCO7p.HDEldfeYvzBES114YEXMLxO4SFA9bX0QmTRwum",
+      "fullName": "Nguyễn Văn Mười",
+      "role": "TEACHER",
+      "avatarUrl": null,
+      "phoneNumber": null,
+      "gender": null,
+      "birthYear": null,
+      "highestEducation": null,
+      "bio": null,
+      "isActive": true,
+      "createdAt": "2026-06-20T06:50:59.512Z",
+      "updatedAt": "2026-06-20T06:50:59.512Z"
     }
   ],
   "courses": [
@@ -169,7 +185,7 @@
           "id": "d075559d-425b-4db7-b90a-ae7aaf7d680c",
           "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
           "courseId": "c94892f2-5d1f-4299-889e-c89a9edfe0b0",
-          "status": "ACTIVE",
+          "status": "COMPLETED",
           "enrolledAt": "2026-05-27T15:36:22.800Z"
         }
       ],
@@ -1416,10 +1432,10 @@
                   "materialType": "PDF",
                   "fileUrl": "https://utfs.io/f/hjff70ODiO3urkJpMJujmywLNOVWfMsnKJoDYhAXGZgUpId4",
                   "fileSizeBytes": "339409",
-                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/g1z8tsv8d3au",
-                  "geminiFileName": "files/g1z8tsv8d3au",
+                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/n98kvyghxz5c",
+                  "geminiFileName": "files/n98kvyghxz5c",
                   "createdAt": "2026-06-08T07:33:50.960Z",
-                  "updatedAt": "2026-06-15T07:08:49.013Z"
+                  "updatedAt": "2026-06-19T05:39:05.175Z"
                 },
                 {
                   "id": "32a0090b-cb99-4f25-bab8-337d71fa03ca",
@@ -1483,10 +1499,10 @@
                   "materialType": "PDF",
                   "fileUrl": "https://utfs.io/f/hjff70ODiO3uYOhJfEtqMxedb5G3vr2V09W4ALKlugYTzkUH",
                   "fileSizeBytes": "368897",
-                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/ufiqeq205b9w",
-                  "geminiFileName": "files/ufiqeq205b9w",
+                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/5iaee6e140mv",
+                  "geminiFileName": "files/5iaee6e140mv",
                   "createdAt": "2026-06-08T07:24:19.441Z",
-                  "updatedAt": "2026-06-15T07:08:53.498Z"
+                  "updatedAt": "2026-06-19T05:39:09.626Z"
                 }
               ],
               "progress": [
@@ -2078,7 +2094,15 @@
       "isPrivate": false,
       "createdAt": "2026-05-29T12:31:43.809Z",
       "updatedAt": "2026-05-29T12:31:53.316Z",
-      "enrollments": [],
+      "enrollments": [
+        {
+          "id": "64fb0459-7887-4397-9b14-bb04080ddf08",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "376be29b-e9ff-4208-a4ee-51791174f4f6",
+          "status": "DROPPED",
+          "enrolledAt": "2026-06-20T07:18:20.575Z"
+        }
+      ],
       "chatThreads": [],
       "modules": []
     },
@@ -2093,13 +2117,21 @@
       "isPrivate": false,
       "createdAt": "2026-06-16T16:57:45.826Z",
       "updatedAt": "2026-06-16T17:01:13.310Z",
-      "enrollments": [],
+      "enrollments": [
+        {
+          "id": "5ac0600a-2c60-431d-b701-8898d97ea3f7",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "3d812e5c-310a-4ae9-bf52-562d76ba6ef8",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-20T07:18:35.959Z"
+        }
+      ],
       "chatThreads": [],
       "modules": []
     },
     {
       "id": "2cdbf68d-99f7-4fc9-839a-b23121f4e823",
-      "title": "Nhập môn học máy",
+      "title": "Nhập môn Công nghệ phần mềm",
       "description": null,
       "thumbnailUrl": null,
       "teacherId": "baf5efd6-82f1-4f4a-811a-2f32fc88be4b",
@@ -2107,10 +2139,84 @@
       "isPublished": true,
       "isPrivate": false,
       "createdAt": "2026-06-16T17:06:41.702Z",
-      "updatedAt": "2026-06-16T17:06:52.178Z",
-      "enrollments": [],
+      "updatedAt": "2026-06-20T04:31:32.464Z",
+      "enrollments": [
+        {
+          "id": "fcb55779-9b2c-4829-8f51-76a8e878a4d3",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "2cdbf68d-99f7-4fc9-839a-b23121f4e823",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-20T07:18:38.906Z"
+        }
+      ],
       "chatThreads": [],
-      "modules": []
+      "modules": [
+        {
+          "id": "43eb1eef-88ac-497a-a6de-b9c50444f7b1",
+          "courseId": "2cdbf68d-99f7-4fc9-839a-b23121f4e823",
+          "title": "Chương 1",
+          "description": null,
+          "orderIndex": 0,
+          "createdAt": "2026-06-20T04:30:28.736Z",
+          "updatedAt": "2026-06-20T04:30:28.736Z",
+          "lessons": [
+            {
+              "id": "8d41b0be-66f3-41f7-b103-5e729b6aac5d",
+              "moduleId": "43eb1eef-88ac-497a-a6de-b9c50444f7b1",
+              "title": "Mở đầu",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 0,
+              "createdAt": "2026-06-20T04:31:04.044Z",
+              "updatedAt": "2026-06-20T04:31:04.044Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            }
+          ]
+        },
+        {
+          "id": "6994bf28-a366-46e4-80f5-493b80b89e24",
+          "courseId": "2cdbf68d-99f7-4fc9-839a-b23121f4e823",
+          "title": "Chương 2",
+          "description": null,
+          "orderIndex": 1,
+          "createdAt": "2026-06-20T04:30:35.611Z",
+          "updatedAt": "2026-06-20T04:30:35.611Z",
+          "lessons": []
+        },
+        {
+          "id": "ce6dc35e-adeb-490f-94d3-f8f459e27209",
+          "courseId": "2cdbf68d-99f7-4fc9-839a-b23121f4e823",
+          "title": "Chương 3",
+          "description": null,
+          "orderIndex": 2,
+          "createdAt": "2026-06-20T04:30:40.430Z",
+          "updatedAt": "2026-06-20T04:30:40.430Z",
+          "lessons": []
+        },
+        {
+          "id": "94912d3d-82cd-4989-b670-c7555af907ec",
+          "courseId": "2cdbf68d-99f7-4fc9-839a-b23121f4e823",
+          "title": "Chương 4",
+          "description": null,
+          "orderIndex": 3,
+          "createdAt": "2026-06-20T04:30:44.973Z",
+          "updatedAt": "2026-06-20T04:30:44.973Z",
+          "lessons": []
+        },
+        {
+          "id": "24232c5c-62b7-4b87-828a-582076c820cb",
+          "courseId": "2cdbf68d-99f7-4fc9-839a-b23121f4e823",
+          "title": "Chương 5",
+          "description": null,
+          "orderIndex": 4,
+          "createdAt": "2026-06-20T04:30:51.155Z",
+          "updatedAt": "2026-06-20T04:30:51.155Z",
+          "lessons": []
+        }
+      ]
     },
     {
       "id": "12b4db4a-74b6-4a65-943e-11ab7c3f06bf",
@@ -2125,20 +2231,781 @@
       "updatedAt": "2026-06-18T12:57:34.639Z",
       "enrollments": [
         {
-          "id": "553c17ab-0b0b-4ba6-a38b-530dbb53af22",
-          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
-          "courseId": "12b4db4a-74b6-4a65-943e-11ab7c3f06bf",
-          "status": "ACTIVE",
-          "enrolledAt": "2026-06-18T15:23:32.443Z"
-        },
-        {
           "id": "5966178c-2da2-4dbb-893b-d8d5cedae391",
           "studentId": "95dafe6d-ae97-4bb4-ada1-7279e47ed2e8",
           "courseId": "12b4db4a-74b6-4a65-943e-11ab7c3f06bf",
           "status": "ACTIVE",
           "enrolledAt": "2026-06-18T15:23:32.443Z"
+        },
+        {
+          "id": "553c17ab-0b0b-4ba6-a38b-530dbb53af22",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "12b4db4a-74b6-4a65-943e-11ab7c3f06bf",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-18T15:23:32.443Z"
         }
       ],
+      "chatThreads": [],
+      "modules": []
+    },
+    {
+      "id": "99efdb0a-2c8c-4205-aed5-2d17271acdbc",
+      "title": "Nhập môn Học máy",
+      "description": "aaaa",
+      "thumbnailUrl": null,
+      "teacherId": "baf5efd6-82f1-4f4a-811a-2f32fc88be4b",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": true,
+      "createdAt": "2026-06-19T09:21:36.447Z",
+      "updatedAt": "2026-06-19T09:26:25.952Z",
+      "enrollments": [
+        {
+          "id": "bc71fd9e-4344-4d36-9dee-1b4c1d78e765",
+          "studentId": "9df90c49-bdc7-42d6-9c64-512c1f5faf10",
+          "courseId": "99efdb0a-2c8c-4205-aed5-2d17271acdbc",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-19T09:25:20.054Z"
+        },
+        {
+          "id": "8d0134f4-0611-4857-a5a4-29ba3c6a5ece",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "99efdb0a-2c8c-4205-aed5-2d17271acdbc",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-19T09:25:20.054Z"
+        }
+      ],
+      "chatThreads": [
+        {
+          "id": "1b49e1cc-f23c-4e00-ae9d-594cc95087b3",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "99efdb0a-2c8c-4205-aed5-2d17271acdbc",
+          "title": null,
+          "createdAt": "2026-06-19T09:27:11.182Z",
+          "updatedAt": "2026-06-19T09:27:14.936Z",
+          "messages": [
+            {
+              "id": "48b7c8bb-3ab3-4348-a495-d1442c764883",
+              "threadId": "1b49e1cc-f23c-4e00-ae9d-594cc95087b3",
+              "role": "user",
+              "content": "Giúp tôi tóm tắt nội dung bài học",
+              "createdAt": "2026-06-19T09:27:11.303Z"
+            },
+            {
+              "id": "bd90d894-8e45-4c9f-96f9-b38e4f8ef238",
+              "threadId": "1b49e1cc-f23c-4e00-ae9d-594cc95087b3",
+              "role": "model",
+              "content": "Chào bạn, dựa trên tài liệu \"HƯỚNG DẪN GIẢI BÀI TẬP THI XLTHS\" được cung cấp, nội dung bài học tập trung vào các công thức toán học bổ trợ để giải bài tập, bao gồm 3 nhóm chính:\n\n1. **Công thức Euler:**\n   - Định nghĩa mối quan hệ giữa hàm mũ phức và các hàm lượng giác:\n     - $e^{jx} = \\cos(x) + j\\sin(x)$\n     - $e^{-jx} = \\cos(x) - j\\sin(x)$\n\n2. **Các công thức quan hệ giữa hàm lượng giác và hàm mũ ($e^x$):**\n   Tài liệu cung cấp cách biến đổi các hàm lượng giác cơ bản sang dạng hàm mũ:\n   - Biểu diễn $\\cos(x)$ và $\\sin(x)$ thông qua $e^{jx}$ và $e^{-jx}$.\n   - Các công thức biến đổi lũy thừa như $\\cos^2(x)$ và $\\sin^2(x)$ sang dạng hàm mũ.\n   - Các công thức biến đổi biểu thức chứa $(1 + e^{-jx})$ và $(1 - e^{-jx})$ sang dạng hàm lượng giác có nhân tử là $e$ và $\\cos$ hoặc $\\sin$.\n\n3. **Các công thức lượng giác cơ bản:**\n   Liệt kê các hệ thức lượng giác thường dùng trong tính toán:\n   - Hệ thức Pythagoras: $\\cos^2(x) + \\sin^2(x) = 1$\n   - Công thức nhân đôi và hạ bậc:\n     - $\\cos^2(x) - \\sin^2(x) = \\cos(2x)$\n     - $1 + \\cos(x) = 2\\cos^2(0,5x)$\n     - $1 - \\cos(x) = 2\\sin^2(0,5x)$\n     - $\\sin(x) = 2\\sin(0,5x)\\cos(0,5x)$\n\nTài liệu này đóng vai trò là bảng tra cứu công thức để hỗ trợ giải các bài tập liên quan đến biến đổi tín hiệu và hệ thống.",
+              "createdAt": "2026-06-19T09:27:14.931Z"
+            }
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "id": "54affd4c-4cae-4123-9e89-91ae010c0445",
+          "courseId": "99efdb0a-2c8c-4205-aed5-2d17271acdbc",
+          "title": "Chuong 1: aca",
+          "description": null,
+          "orderIndex": 0,
+          "createdAt": "2026-06-19T09:23:20.546Z",
+          "updatedAt": "2026-06-19T09:23:28.588Z",
+          "lessons": [
+            {
+              "id": "9499f8e0-e257-4f79-af56-225df2357121",
+              "moduleId": "54affd4c-4cae-4123-9e89-91ae010c0445",
+              "title": "Bai 1",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 0,
+              "createdAt": "2026-06-19T09:23:35.861Z",
+              "updatedAt": "2026-06-19T09:23:35.861Z",
+              "materials": [
+                {
+                  "id": "fb5b89fd-7413-4d0b-bea3-0cc33f8ee0b8",
+                  "lessonId": "9499f8e0-e257-4f79-af56-225df2357121",
+                  "title": "Mot_so_cong_thuc.pdf",
+                  "materialType": "PDF",
+                  "fileUrl": "https://utfs.io/f/hjff70ODiO3u5rEz4EZ7BRhmv8inWeosO9U01FKr4bScVaPy",
+                  "fileSizeBytes": "102030",
+                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/g1tjc0yj8xd3",
+                  "geminiFileName": "files/g1tjc0yj8xd3",
+                  "createdAt": "2026-06-19T09:24:10.747Z",
+                  "updatedAt": "2026-06-19T09:24:36.622Z"
+                }
+              ],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "cdd5067c-c2ba-4270-ab57-bc6a16619011",
+              "moduleId": "54affd4c-4cae-4123-9e89-91ae010c0445",
+              "title": "Quiz 1",
+              "content": null,
+              "lessonType": "QUIZ",
+              "orderIndex": 1,
+              "createdAt": "2026-06-19T09:28:01.462Z",
+              "updatedAt": "2026-06-19T09:28:11.217Z",
+              "materials": [
+                {
+                  "id": "d0625b3e-62f3-48d4-a4cc-1855e325e1df",
+                  "lessonId": "cdd5067c-c2ba-4270-ab57-bc6a16619011",
+                  "title": "Mot_so_cong_thuc.pdf",
+                  "materialType": "PDF",
+                  "fileUrl": "https://utfs.io/f/hjff70ODiO3uyiySaqHGs4vRYcUpVHKOQPMrTN06EqFai1dn",
+                  "fileSizeBytes": "102030",
+                  "geminiFileUri": "https://generativelanguage.googleapis.com/v1beta/files/b16wjsf2eocq",
+                  "geminiFileName": "files/b16wjsf2eocq",
+                  "createdAt": "2026-06-19T09:28:28.665Z",
+                  "updatedAt": "2026-06-19T09:28:35.612Z"
+                }
+              ],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": {
+                "id": "4cd8b56f-c228-478a-b2e8-6faf8306a748",
+                "lessonId": "cdd5067c-c2ba-4270-ab57-bc6a16619011",
+                "dueDate": null,
+                "maxAttempts": 1,
+                "passingScore": 0.5,
+                "createdAt": "2026-06-19T09:29:36.642Z",
+                "updatedAt": "2026-06-19T09:29:36.642Z",
+                "questions": [
+                  {
+                    "id": "d576d988-5d33-434d-b775-6dbbf180be3a",
+                    "quizId": "4cd8b56f-c228-478a-b2e8-6faf8306a748",
+                    "questionText": "Công thức lượng giác nào sau đây đúng theo tài liệu cung cấp?",
+                    "explanation": "Tài liệu liệt kê công thức 1 + cos(x) = 2cos^2(0,5x).",
+                    "orderIndex": 0,
+                    "points": 1,
+                    "createdAt": "2026-06-19T09:29:36.642Z",
+                    "updatedAt": "2026-06-19T09:29:36.642Z",
+                    "options": [
+                      {
+                        "id": "4fb4c10e-b2b3-4129-96e1-1f72515bcfbb",
+                        "questionId": "d576d988-5d33-434d-b775-6dbbf180be3a",
+                        "optionText": "1 + cos(x) = 2cos^2(0,5x)",
+                        "isCorrect": true,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "a9528872-3c2a-470d-b3b6-cba42983a0bc",
+                        "questionId": "d576d988-5d33-434d-b775-6dbbf180be3a",
+                        "optionText": "1 + cos(x) = 2sin^2(0,5x)",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "4da82639-33cc-45c2-a694-839e340fe571",
+                        "questionId": "d576d988-5d33-434d-b775-6dbbf180be3a",
+                        "optionText": "1 - cos(x) = 2cos^2(0,5x)",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "024a7dc0-4aad-4b7a-8dfc-f1911243a29e",
+                        "questionId": "d576d988-5d33-434d-b775-6dbbf180be3a",
+                        "optionText": "1 + cos(x) = sin^2(0,5x)",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "d73af384-826f-4246-b432-213bf70077e3",
+                    "quizId": "4cd8b56f-c228-478a-b2e8-6faf8306a748",
+                    "questionText": "Dựa trên công thức Euler, biểu thức của e^jx là gì?",
+                    "explanation": "Theo tài liệu, công thức Euler cho e^jx là cos(x) + jsin(x).",
+                    "orderIndex": 1,
+                    "points": 1,
+                    "createdAt": "2026-06-19T09:29:36.642Z",
+                    "updatedAt": "2026-06-19T09:29:36.642Z",
+                    "options": [
+                      {
+                        "id": "2168aac4-06a7-4b22-8d69-ff096e47daf0",
+                        "questionId": "d73af384-826f-4246-b432-213bf70077e3",
+                        "optionText": "cos(x) - jsin(x)",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "733d72e6-99c6-430f-b41a-48f742ffa538",
+                        "questionId": "d73af384-826f-4246-b432-213bf70077e3",
+                        "optionText": "cos(x) + jsin(x)",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "95401676-0e39-458c-b989-1c599dbc2b98",
+                        "questionId": "d73af384-826f-4246-b432-213bf70077e3",
+                        "optionText": "sin(x) + jcos(x)",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "713c6096-7591-41ee-891c-d74b16108fda",
+                        "questionId": "d73af384-826f-4246-b432-213bf70077e3",
+                        "optionText": "sin(x) - jcos(x)",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dc47863f-b50c-436b-b35e-c9ab263bfa38",
+                    "quizId": "4cd8b56f-c228-478a-b2e8-6faf8306a748",
+                    "questionText": "Giá trị của biểu thức 1 - cos(x) theo công thức trong tài liệu là gì?",
+                    "explanation": "Trong phần các công thức lượng giác, tài liệu ghi rõ 1 - cos(x) = 2sin^2(0,5x).",
+                    "orderIndex": 2,
+                    "points": 1,
+                    "createdAt": "2026-06-19T09:29:36.642Z",
+                    "updatedAt": "2026-06-19T09:29:36.642Z",
+                    "options": [
+                      {
+                        "id": "04231a0b-78ac-4f58-b746-39637c93d532",
+                        "questionId": "dc47863f-b50c-436b-b35e-c9ab263bfa38",
+                        "optionText": "2cos^2(0,5x)",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "faaca3e1-e06b-414c-9d95-97ba74af759f",
+                        "questionId": "dc47863f-b50c-436b-b35e-c9ab263bfa38",
+                        "optionText": "sin^2(0,5x)",
+                        "isCorrect": false,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "59249b9a-0581-44fb-86ab-ceeefbc971ab",
+                        "questionId": "dc47863f-b50c-436b-b35e-c9ab263bfa38",
+                        "optionText": "2sin^2(0,5x)",
+                        "isCorrect": true,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "0abd22c3-aa1e-40d3-be62-6670bbcbde97",
+                        "questionId": "dc47863f-b50c-436b-b35e-c9ab263bfa38",
+                        "optionText": "sin(0,5x)cos(0,5x)",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  },
+                  {
+                    "id": "e2ec133d-5aab-47cc-9033-fa739a55efc9",
+                    "quizId": "4cd8b56f-c228-478a-b2e8-6faf8306a748",
+                    "questionText": "Công thức nào sau đây mô tả đúng biểu thức của sin(x) theo hàm e?",
+                    "explanation": "Tài liệu xác định sin(x) = (e^jx - e^-jx) / 2j.",
+                    "orderIndex": 3,
+                    "points": 1,
+                    "createdAt": "2026-06-19T09:29:36.642Z",
+                    "updatedAt": "2026-06-19T09:29:36.642Z",
+                    "options": [
+                      {
+                        "id": "f089dd87-7344-48a5-bcb5-51875b875f7c",
+                        "questionId": "e2ec133d-5aab-47cc-9033-fa739a55efc9",
+                        "optionText": "(e^jx + e^-jx) / 2",
+                        "isCorrect": false,
+                        "orderIndex": 0
+                      },
+                      {
+                        "id": "27c2055c-3afd-4be8-a16a-420982d13ed4",
+                        "questionId": "e2ec133d-5aab-47cc-9033-fa739a55efc9",
+                        "optionText": "(e^jx - e^-jx) / 2j",
+                        "isCorrect": true,
+                        "orderIndex": 1
+                      },
+                      {
+                        "id": "138fe151-67e8-4e9a-9713-3d6c9160cfdd",
+                        "questionId": "e2ec133d-5aab-47cc-9033-fa739a55efc9",
+                        "optionText": "(e^jx + e^-jx) / 2j",
+                        "isCorrect": false,
+                        "orderIndex": 2
+                      },
+                      {
+                        "id": "6aeca57e-801e-46b8-8ff2-c2590d9919e9",
+                        "questionId": "e2ec133d-5aab-47cc-9033-fa739a55efc9",
+                        "optionText": "(e^jx - e^-jx) / 2",
+                        "isCorrect": false,
+                        "orderIndex": 3
+                      }
+                    ]
+                  }
+                ],
+                "attempts": [
+                  {
+                    "id": "1cf35acb-1a91-4669-9dda-50a8d27bba84",
+                    "quizId": "4cd8b56f-c228-478a-b2e8-6faf8306a748",
+                    "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+                    "score": 0,
+                    "totalPoints": 4,
+                    "startedAt": "2026-06-19T09:30:09.654Z",
+                    "submittedAt": "2026-06-19T09:30:09.652Z",
+                    "answers": [
+                      {
+                        "id": "1b4ea7fc-5401-40ff-84e2-4712f87c04d2",
+                        "attemptId": "1cf35acb-1a91-4669-9dda-50a8d27bba84",
+                        "questionId": "d576d988-5d33-434d-b775-6dbbf180be3a",
+                        "optionId": "4da82639-33cc-45c2-a694-839e340fe571"
+                      },
+                      {
+                        "id": "503a4406-36f0-4fa5-beb3-e5b4c212f048",
+                        "attemptId": "1cf35acb-1a91-4669-9dda-50a8d27bba84",
+                        "questionId": "d73af384-826f-4246-b432-213bf70077e3",
+                        "optionId": "95401676-0e39-458c-b989-1c599dbc2b98"
+                      },
+                      {
+                        "id": "2c8249af-f68b-412b-9cf5-10add94d2804",
+                        "attemptId": "1cf35acb-1a91-4669-9dda-50a8d27bba84",
+                        "questionId": "dc47863f-b50c-436b-b35e-c9ab263bfa38",
+                        "optionId": "faaca3e1-e06b-414c-9d95-97ba74af759f"
+                      },
+                      {
+                        "id": "98049926-06e2-46bc-9271-80603fecaf55",
+                        "attemptId": "1cf35acb-1a91-4669-9dda-50a8d27bba84",
+                        "questionId": "e2ec133d-5aab-47cc-9033-fa739a55efc9",
+                        "optionId": "f089dd87-7344-48a5-bcb5-51875b875f7c"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "da8b8e40-e30d-4330-86f0-fa4503bcb10a",
+      "title": "Toán rời rạc",
+      "description": "Học phần này nhằm cung cấp cho sinh viên một số phương pháp tư duy của toán học rời rạc và các kiến thức của toán rời rạc cần thiết cho các môn học chuyên ngành Công nghệ thông tin. Sinh viên nắm được một số mô hình và một số bài toán đặc trưng của toán học rời rạc, một số thuật toán thường gặp để giải các bài toán hữu hạn và có khả năng thiết kế các thuật toán để có thể thực thi trên máy tính.",
+      "thumbnailUrl": "https://plus.unsplash.com/premium_photo-1672256330854-98c717493128",
+      "teacherId": "c03b3d24-3e1b-49b2-b8d7-539b09d1e7bf",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-06-20T06:52:35.501Z",
+      "updatedAt": "2026-06-20T07:17:17.263Z",
+      "enrollments": [
+        {
+          "id": "2557d57e-6d2f-4c5f-8f3b-4a418cc8f43a",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "da8b8e40-e30d-4330-86f0-fa4503bcb10a",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-20T07:18:12.244Z"
+        }
+      ],
+      "chatThreads": [],
+      "modules": [
+        {
+          "id": "3a92c03a-5133-4653-baec-a486dcba8df9",
+          "courseId": "da8b8e40-e30d-4330-86f0-fa4503bcb10a",
+          "title": "Lý thuyết tổ hợp",
+          "description": null,
+          "orderIndex": 0,
+          "createdAt": "2026-06-20T06:53:39.266Z",
+          "updatedAt": "2026-06-20T06:53:39.266Z",
+          "lessons": [
+            {
+              "id": "d7285b8b-b570-4c3c-a899-0f1a81d5ebb9",
+              "moduleId": "3a92c03a-5133-4653-baec-a486dcba8df9",
+              "title": "Bài toán đếm",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 0,
+              "createdAt": "2026-06-20T06:53:59.963Z",
+              "updatedAt": "2026-06-20T06:53:59.963Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "8fe174d9-f2a0-4b51-af5d-12fcc3be58b7",
+              "moduleId": "3a92c03a-5133-4653-baec-a486dcba8df9",
+              "title": "Bài toán tồn tại",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 1,
+              "createdAt": "2026-06-20T06:54:06.081Z",
+              "updatedAt": "2026-06-20T06:54:06.081Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "00e87eb7-31e2-46cc-895e-766c5d669f9c",
+              "moduleId": "3a92c03a-5133-4653-baec-a486dcba8df9",
+              "title": "Bài toán liệt kê",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 2,
+              "createdAt": "2026-06-20T06:54:13.289Z",
+              "updatedAt": "2026-06-20T06:54:13.289Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "e0f57f06-f8fa-407a-8970-f18b72d4b176",
+              "moduleId": "3a92c03a-5133-4653-baec-a486dcba8df9",
+              "title": "Bài toán tối ưu tổ hợp",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 3,
+              "createdAt": "2026-06-20T06:54:19.621Z",
+              "updatedAt": "2026-06-20T06:54:19.621Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            }
+          ]
+        },
+        {
+          "id": "ecaa3c93-cb21-47fa-a97a-26d52050c1b7",
+          "courseId": "da8b8e40-e30d-4330-86f0-fa4503bcb10a",
+          "title": "Lý thuyết đồ thị",
+          "description": null,
+          "orderIndex": 1,
+          "createdAt": "2026-06-20T06:53:46.622Z",
+          "updatedAt": "2026-06-20T06:53:46.622Z",
+          "lessons": [
+            {
+              "id": "c5a749e0-6b2c-4dac-8315-4228cde31af2",
+              "moduleId": "ecaa3c93-cb21-47fa-a97a-26d52050c1b7",
+              "title": "Các khái niệm cơ bản của đồ thị",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 0,
+              "createdAt": "2026-06-20T06:54:34.110Z",
+              "updatedAt": "2026-06-20T06:54:34.110Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "3fc54697-ba6a-41f5-80a4-cfd3be07d639",
+              "moduleId": "ecaa3c93-cb21-47fa-a97a-26d52050c1b7",
+              "title": "Biểu diễn đồ thị trên máy tính",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 1,
+              "createdAt": "2026-06-20T06:54:39.278Z",
+              "updatedAt": "2026-06-20T06:54:39.278Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "c91b86bf-6f6b-49fa-84e9-f2d82b450f26",
+              "moduleId": "ecaa3c93-cb21-47fa-a97a-26d52050c1b7",
+              "title": "Bài toán tìm kiếm",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 2,
+              "createdAt": "2026-06-20T06:54:43.526Z",
+              "updatedAt": "2026-06-20T06:54:43.526Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "cdc38d65-73f3-4d7c-9fcf-29a6553cbd7e",
+              "moduleId": "ecaa3c93-cb21-47fa-a97a-26d52050c1b7",
+              "title": "Tìm đường đi ngắn nhất",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 3,
+              "createdAt": "2026-06-20T06:54:53.476Z",
+              "updatedAt": "2026-06-20T06:54:53.476Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "2bb21e8f-a0a0-449d-9027-dcff225b5f5c",
+              "moduleId": "ecaa3c93-cb21-47fa-a97a-26d52050c1b7",
+              "title": "Cây khung nhỏ nhất trên đồ thị",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 4,
+              "createdAt": "2026-06-20T06:55:00.887Z",
+              "updatedAt": "2026-06-20T06:55:00.887Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "a606aeac-6d8a-4304-9a54-c8831e2f968d",
+              "moduleId": "ecaa3c93-cb21-47fa-a97a-26d52050c1b7",
+              "title": "Bài toán luồng cực đại trong mạng",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 5,
+              "createdAt": "2026-06-20T06:55:05.871Z",
+              "updatedAt": "2026-06-20T06:55:05.871Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "85540525-3977-4afb-8fee-850ce8d2a93d",
+      "title": "C Programming Language",
+      "description": "Học phần nhằm cung cấp cho sinh viên các kiến thức cơ bản về ngôn ngữ lập trình C bao gồm các khái niệm về giải thuật, chương trình, cấu trúc và cú pháp của chương trình C, các kiểu dữ liệu cơ sở và có cấu trúc, các cấu trúc điều khiển, các thao tác tính toán trên biểu thức và các thao tác vào ra dữ liệu. Học phần còn nhằm trang bị cho sinh viên khả năng cài đặt các giải thuật bằng ngôn ngữ lập trình C.",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1607799279861-4dd421887fb3",
+      "teacherId": "c03b3d24-3e1b-49b2-b8d7-539b09d1e7bf",
+      "aiEnabled": false,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-06-20T06:56:25.897Z",
+      "updatedAt": "2026-06-20T07:17:36.509Z",
+      "enrollments": [
+        {
+          "id": "2d7f1e90-ff1b-4e3e-ae5f-5fbbae8b1cbb",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "85540525-3977-4afb-8fee-850ce8d2a93d",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-20T07:18:50.100Z"
+        }
+      ],
+      "chatThreads": [],
+      "modules": [
+        {
+          "id": "1abd7b14-5cbe-48e7-a1a3-a63333115059",
+          "courseId": "85540525-3977-4afb-8fee-850ce8d2a93d",
+          "title": "Giới thiệu",
+          "description": null,
+          "orderIndex": 0,
+          "createdAt": "2026-06-20T06:57:06.133Z",
+          "updatedAt": "2026-06-20T06:57:06.133Z",
+          "lessons": [
+            {
+              "id": "6d87eb00-c048-4cfe-97fd-77434180f033",
+              "moduleId": "1abd7b14-5cbe-48e7-a1a3-a63333115059",
+              "title": "Các khái niệm về giải thuật, chương trình",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 0,
+              "createdAt": "2026-06-20T06:57:40.468Z",
+              "updatedAt": "2026-06-20T06:57:40.468Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "2e5979d2-cbd2-4abb-a897-4c916da6d2ce",
+              "moduleId": "1abd7b14-5cbe-48e7-a1a3-a63333115059",
+              "title": "Cấu trúc và cú pháp",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 1,
+              "createdAt": "2026-06-20T06:57:52.038Z",
+              "updatedAt": "2026-06-20T06:57:52.038Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            },
+            {
+              "id": "06dd18b9-96d8-44fd-9a74-dd1022a8c228",
+              "moduleId": "1abd7b14-5cbe-48e7-a1a3-a63333115059",
+              "title": "Các từ khóa của chương trình C",
+              "content": null,
+              "lessonType": "LECTURE",
+              "orderIndex": 2,
+              "createdAt": "2026-06-20T06:58:00.755Z",
+              "updatedAt": "2026-06-20T06:58:00.755Z",
+              "materials": [],
+              "progress": [],
+              "bookmarks": [],
+              "quiz": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8aee7024-9bda-48b4-ac0d-e7b0c9c52c90",
+      "title": "Cấu trúc dữ liệu và thuật toán",
+      "description": "Cung cấp cho sinh viên những kiến thức cơ bản về cấu trúc dữ liệu và thuật toán cần thiết cho việc phát triển thuật toán và cài đặt phần mềm giải quyết các vấn đề ứng dụng. Sau khi hoàn thành học phần này, sinh viên có khả năng hiểu, cài đặt và áp dụng các cấu trúc dữ liệu cơ bản như ngăn xếp, hàng đợi, hàng đợi có ưu tiên, danh sách, cây và bảng băm vào các bài toán ứng dụng toán. Sinh viên phải có khả năng thiết kế và cài đặt các chương trình trong đó có sử dụng các cấu trúc dữ liệu để phát triển các hệ thống xử lý thông tin. Sinh viên hiểu và cài đặt được các thuật toán tìm kiếm, sắp xếp cơ bản như sắp xếp nhanh, sắp xếp vun đống, sắp xếp trộn, bảng băm và các thuật toán cơ bản trên đồ thị. Sinh viên phải nắm được các kỹ thuật xây dựng thuật toán cơ bản như đệ qui, tham lam, chia để trị, quy hoạch động để giải quyết các bài toán tính toán. Sinh viên biết cách phân tích được độ phức tạp trong ngôn ngữ ký hiệu tiệm cận của các cấu trúc dữ liệu và thuật toán cơ bản.",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1665690399857-9de8bbbeb108",
+      "teacherId": "c03b3d24-3e1b-49b2-b8d7-539b09d1e7bf",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-06-20T07:00:04.532Z",
+      "updatedAt": "2026-06-20T07:01:57.370Z",
+      "enrollments": [
+        {
+          "id": "5e1c6652-7116-4ce6-bbeb-d462b9f1c14b",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "8aee7024-9bda-48b4-ac0d-e7b0c9c52c90",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-20T07:18:55.004Z"
+        }
+      ],
+      "chatThreads": [],
+      "modules": [
+        {
+          "id": "fc6a4637-ef86-4717-acc4-45c687dd3235",
+          "courseId": "8aee7024-9bda-48b4-ac0d-e7b0c9c52c90",
+          "title": "Các khái niệm cơ bản về cấu trúc dữ liệu và thuật toán",
+          "description": null,
+          "orderIndex": 0,
+          "createdAt": "2026-06-20T07:00:54.068Z",
+          "updatedAt": "2026-06-20T07:00:54.068Z",
+          "lessons": []
+        },
+        {
+          "id": "145497e9-dbb0-485f-954e-a3127fa45d5d",
+          "courseId": "8aee7024-9bda-48b4-ac0d-e7b0c9c52c90",
+          "title": "Mã giả để mô tả thuật toán",
+          "description": null,
+          "orderIndex": 1,
+          "createdAt": "2026-06-20T07:01:04.508Z",
+          "updatedAt": "2026-06-20T07:01:04.508Z",
+          "lessons": []
+        },
+        {
+          "id": "db627bfa-f581-4186-be70-123ff7db1ca6",
+          "courseId": "8aee7024-9bda-48b4-ac0d-e7b0c9c52c90",
+          "title": "Phân tích độ phức tạp thời gian sử dụng ký hiệu big-O",
+          "description": null,
+          "orderIndex": 2,
+          "createdAt": "2026-06-20T07:01:12.862Z",
+          "updatedAt": "2026-06-20T07:01:12.862Z",
+          "lessons": []
+        },
+        {
+          "id": "96e18faf-5291-4918-8459-6478c0e59972",
+          "courseId": "8aee7024-9bda-48b4-ac0d-e7b0c9c52c90",
+          "title": "Đệ quy",
+          "description": null,
+          "orderIndex": 3,
+          "createdAt": "2026-06-20T07:01:24.064Z",
+          "updatedAt": "2026-06-20T07:01:24.064Z",
+          "lessons": []
+        },
+        {
+          "id": "29a9ad8c-3d9e-483b-9865-f13c43045b51",
+          "courseId": "8aee7024-9bda-48b4-ac0d-e7b0c9c52c90",
+          "title": "Quay lui",
+          "description": null,
+          "orderIndex": 4,
+          "createdAt": "2026-06-20T07:01:33.187Z",
+          "updatedAt": "2026-06-20T07:01:33.187Z",
+          "lessons": []
+        },
+        {
+          "id": "9f8c6a92-62e6-4210-afaa-a19e868a0aaf",
+          "courseId": "8aee7024-9bda-48b4-ac0d-e7b0c9c52c90",
+          "title": "Nhánh và cận",
+          "description": null,
+          "orderIndex": 5,
+          "createdAt": "2026-06-20T07:01:40.528Z",
+          "updatedAt": "2026-06-20T07:01:40.528Z",
+          "lessons": []
+        },
+        {
+          "id": "776e21a6-fdab-4610-bba5-7b0fbff6337d",
+          "courseId": "8aee7024-9bda-48b4-ac0d-e7b0c9c52c90",
+          "title": "Các mô hình thuật toán với tham lam, chia để trị, quy hoạch động",
+          "description": null,
+          "orderIndex": 6,
+          "createdAt": "2026-06-20T07:01:52.196Z",
+          "updatedAt": "2026-06-20T07:01:52.196Z",
+          "lessons": []
+        }
+      ]
+    },
+    {
+      "id": "53dcea9f-8086-48ac-89e1-dc40152856b9",
+      "title": "Cơ sở dữ liệu",
+      "description": "Học phần này nhằm cung cấp cho sinh viên các khái niệm cơ bản về hệ cơ sở dữ liệu và những vấn đề mang tính nguyên lý của các hệ cơ sở dữ liệu; khái niệm về các mô hình dữ liệu trong đó đặc biệt nhấn mạnh vào mô hình dữ liệu quan hệ, các ngôn ngữ truy vấn CSDL; khai thác và sử dụng các hệ quản trị cơ sở dữ liệu quan hệ; các phương pháp thiết kế CSDL; một số vấn đề và kỹ thuật về quản trị hệ CSDL như tổ chức lưu trữ và chỉ mục, xử lý truy vấn, quản trị giao dịch",
+      "thumbnailUrl": null,
+      "teacherId": "c03b3d24-3e1b-49b2-b8d7-539b09d1e7bf",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-06-20T07:04:50.908Z",
+      "updatedAt": "2026-06-20T07:05:02.313Z",
+      "enrollments": [
+        {
+          "id": "e6994f7d-d688-472f-8740-540278205463",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "53dcea9f-8086-48ac-89e1-dc40152856b9",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-20T07:19:00.018Z"
+        }
+      ],
+      "chatThreads": [],
+      "modules": []
+    },
+    {
+      "id": "dc36f1a2-979c-4007-9a28-b6a5682efea3",
+      "title": "Thực hành cơ sở dữ liệu",
+      "description": "Học phần này nhằm cung cấp cho sinh viên các kỹ năng thực hành với hệ cơ sở dữ liệu và hiểu hoạt động của các hệ cơ sở dữ liệu; sử dụng thành thạo ngôn ngữ thao tác dữ liệu SQL, biết áp dụng kiến thức thiết kế cơ sở dữ liệu, thiết kế chỉ mục cho CSDL, viết và tối ưu câu truy vấn, áp dụng các chiến lược phù hợp trong quản trị giao dịch trong hệ CSDL\n\nBên cạnh đó, học phần cũng cung cấp các kỹ năng làm việc nhóm, kỹ năng phản biện, kỹ năng phân tích-giải quyết vấn đề thông qua làm và chữa bài tập, tổ chức các nhóm thảo luận các tình huống/bài toán thực tế ứng dụng các kiến thức được học trong học phần này",
+      "thumbnailUrl": null,
+      "teacherId": "c03b3d24-3e1b-49b2-b8d7-539b09d1e7bf",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": true,
+      "createdAt": "2026-06-20T07:06:06.932Z",
+      "updatedAt": "2026-06-20T07:06:30.697Z",
+      "enrollments": [],
+      "chatThreads": [],
+      "modules": []
+    },
+    {
+      "id": "a5ab3ba8-0e9b-41c8-b1c0-15933026216d",
+      "title": "Kiến trúc máy tính",
+      "description": "Học phần giới thiệu về kiến trúc tập lệnh và tổ chức của máy tính, cũng như những nguyên lý cơ bản trong thiết kế máy tính. Nội dung chính bao gồm: cấu trúc và hoạt động của máy tính, đánh giá hiệu năng, kiến trúc tập lệnh RISC-V và lập trình hợp ngữ, số học máy tính, thiết kế bộ xử lý, tổ chức bộ nhớ và hệ thống vào-ra, các kiến trúc song song.",
+      "thumbnailUrl": null,
+      "teacherId": "c03b3d24-3e1b-49b2-b8d7-539b09d1e7bf",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": false,
+      "createdAt": "2026-06-20T07:06:59.765Z",
+      "updatedAt": "2026-06-20T07:07:06.391Z",
+      "enrollments": [
+        {
+          "id": "2eaa2edd-e48b-4d25-97c8-d24f12a2b44f",
+          "studentId": "db2a6de6-2c9c-4ea9-b21f-a6e9ce193002",
+          "courseId": "a5ab3ba8-0e9b-41c8-b1c0-15933026216d",
+          "status": "ACTIVE",
+          "enrolledAt": "2026-06-20T07:19:05.534Z"
+        }
+      ],
+      "chatThreads": [],
+      "modules": []
+    },
+    {
+      "id": "08fc4fb4-1f45-49f1-9fdf-664f4c7f0369",
+      "title": "Thực hành kiến trúc máy tính",
+      "description": "Đây là học phần thực hành về lập trình hợp ngữ và kiến trúc máy tính. Học phần giúp sinh viên hiểu rõ tương tác giữa phần cứng và phần mềm, cách thức hoạt động của bộ xử lý nói riêng và hệ thống máy tính nói chung thông qua mã hợp ngữ và công cụ mô phỏng hệ thống máy tính.",
+      "thumbnailUrl": null,
+      "teacherId": "c03b3d24-3e1b-49b2-b8d7-539b09d1e7bf",
+      "aiEnabled": true,
+      "isPublished": true,
+      "isPrivate": true,
+      "createdAt": "2026-06-20T07:07:38.453Z",
+      "updatedAt": "2026-06-20T07:07:43.463Z",
+      "enrollments": [],
       "chatThreads": [],
       "modules": []
     }
