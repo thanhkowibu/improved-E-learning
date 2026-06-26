@@ -1,0 +1,71 @@
+## Cài đặt và chạy cục bộ
+
+### 1. Cài đặt dependencies
+
+Từ thư mục gốc repository:
+
+```bash
+cd client
+npm install
+```
+
+Sau khi cài đặt, script `postinstall` sẽ chạy `prisma generate`.
+
+### 2. Cấu hình biến môi trường
+
+Tạo file môi trường trong thư mục `client/`, ví dụ `client/.env.local` hoặc `client/.env`. Không commit file môi trường thật lên repository.
+
+Các biến được mã nguồn tham chiếu trực tiếp:
+
+| Biến | Mục đích | Ghi chú |
+| --- | --- | --- |
+| `DATABASE_URL` | Chuỗi kết nối PostgreSQL cho Prisma | Bắt buộc |
+| `JWT_SECRET` | Khóa bí mật dùng để ký/xác minh JWT | Bắt buộc; nên đủ dài và không công khai |
+| `GEMINI_API_KEY` | API key cho Gemini AI | Cần cho chức năng AI |
+| `NODE_ENV` | Môi trường chạy ứng dụng | Thường do runtime thiết lập |
+| `NEXT_PUBLIC_API_URL` | Base URL cho đoạn API client cũ | Mã cũ/legacy; không phải kiến trúc API chính hiện tại |
+
+UploadThing cũng cần cấu hình khóa/token theo tài khoản và cấu hình SDK UploadThing đang sử dụng. Hãy kiểm tra cấu hình UploadThing của dự án trước khi chạy chức năng upload, và không ghi giá trị bí mật vào README hoặc commit lên Git.
+
+### 3. Khởi tạo cơ sở dữ liệu
+
+Repository có sẵn `docker-compose.yml` ở thư mục gốc để chạy PostgreSQL local và pgAdmin:
+
+```bash
+docker compose up -d
+```
+
+Sau đó cấu hình `DATABASE_URL` trong file môi trường của `client/` để trỏ tới PostgreSQL local tương ứng.
+
+Chạy các lệnh Prisma từ thư mục `client/`:
+
+```bash
+cd client
+npx prisma generate
+npx prisma migrate dev
+npx prisma db seed
+```
+
+Nếu không cần dữ liệu mẫu, có thể bỏ qua bước seed.
+
+### 4. Chạy ứng dụng
+
+Chạy môi trường phát triển:
+
+```bash
+cd client
+npm run dev
+```
+
+Ứng dụng mặc định chạy tại:
+
+```text
+http://localhost:3000
+```
+
+Build và chạy bản production local:
+
+```bash
+npm run build
+npm run start
+```
